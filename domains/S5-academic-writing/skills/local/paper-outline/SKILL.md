@@ -1,7 +1,7 @@
 ---
 name: qihang-paper-outline
 description: 「启航」S5 学术表达域库内 skill：给结构大纲 + 各节字数 + 论证链自查 + 3 条改进建议，再做一次「审稿人视角」预审。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,15 +30,39 @@ license: MIT
 5. 给引用格式规范（GB/T 7714 或 APA）
 6. 输出文件落点
 
+## 可执行示例
+
+**输入**
+
+> 写一篇 3000 字课程论文，题目《人工智能对教育的影响》
+
+**澄清判定**：对象/产出/约束(字数)齐全 → 不追问
+
+**输出**
+
+```
+【结论】走「现象—机制—证据—批判—展望」五段，已给字数分配。
+【依据】库内 skill paper-outline
+【步骤】① 引言 400（问题与争议）
+       ② 机制 700（个性化/自动化/评估）
+       ③ 证据 900（3 项实证研究）
+       ④ 批判 700（公平性、教师角色、数据隐私）
+       ⑤ 展望 300
+【产物】paper/ai-in-education.md 大纲
+【下一步】先补第 ③ 节的 3 项实证研究（我给了检索式）
+【模拟审稿】最可能被质疑：把"个性化"当既成事实、缺少反例
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 图书馆 https://lib.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 图书馆电子资源校外访问 https://lib.dlut.edu.cn/wxzy1/xwfw.htm
 
 ## 失败与降级

@@ -51,12 +51,17 @@ library:
 private_sites:
   mode: controlled_browser     # A 受控浏览器 | B 手动投喂 | C 仅登记
   user_authorized: true
+  require_isolated_profile: true            # ★强制：不得复用用户真实浏览器 profile
+  profile_dir: "~/.qihang/browser-profile"  # ★独立 profile 目录
+  verify_on_exit: [close_all, session_list_empty]
   read_only: true
   persist_cookies: false
   persist_pages: false
+  # 实测最佳聚合点（2026-10-01 验证）：单页拿到课表/借阅/一卡通/网费/邮件/日程
+  primary_aggregator: https://portal.dlut.edu.cn/
   level_rules:
     L1_auto: [课表, 成绩, 考试安排, 借阅, 一卡通余额, 场馆预约状态]
-    L2_confirm: [资助申请状态, 就业投递记录, 培养进度]
+    L2_confirm: [资助申请状态, 就业投递记录, 培养进度, 邮件未读提示]
     L3_forbidden: [缴费金额, 银行卡, 身份证, 家庭信息, 邮件正文, 心理记录]
 
 # ============ 能力域开关（19 域） ============

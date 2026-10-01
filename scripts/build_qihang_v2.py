@@ -5,6 +5,10 @@
 结构：skill库(1级) → 域(2级) → skill(3级)
 改域只需改本文件 DOMAINS，再跑一次即可整体重建。
 用法: python build_qihang_v2.py <输出目录>
+
+⚠️ 重跑会覆盖 references/dlut-login-sites.md（该文件已手工增补 §0.1 Profile 隔离
+   与 §0.2 实测记录）。如无必要不要重跑；确需重跑，请先备份该文件。
+   生成顺序应为: build_qihang_v2.py → build_qihang_v2_extras.py → build_phase1.py
 """
 import os, sys, shutil, json
 

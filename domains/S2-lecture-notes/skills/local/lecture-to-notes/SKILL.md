@@ -1,7 +1,7 @@
 ---
 name: qihang-lecture-to-notes
 description: 「启航」S2 课堂与笔记域库内 skill：把讲义/录音/PPT 压成「5–8 条核心 + 概念图 + 3 个自测题」，并标注未理解点供下次复考。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,15 +30,37 @@ license: MIT
 5. 标注 1–2 处未理解点，写入学习档案
 6. 给出笔记文件落点
 
+## 可执行示例
+
+**输入**
+
+> 把这份《数学分析》第一章的讲义整理成笔记（附 PDF）
+
+**澄清判定**：对象=讲义、产出=笔记，无需追问
+
+**输出**
+
+```
+【结论】已按「核心结论 + 概念图 + 自测题」三段整理，共 7 条核心。
+【依据】讲义 PDF 第 1–18 页；库内 skill lecture-to-notes
+【步骤】① 抽 7 条核心结论（附页码）
+       ② 生成概念图：实数系 → 确界 → 极限定义
+       ③ 出 3 道自测题
+【产物】notes/数学分析-第1章.md（含概念图 Mermaid 块）
+【下一步】先做自测题第 1 题，答完我判
+【未理解点】"确界原理的证明"已记入学习档案，下次复考
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 图书馆 https://lib.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 数字书院（超星）https://dlutzqsy.mh.chaoxing.com/
 - 大工金课平台 https://dlut.fanya.chaoxing.com/
 - 雨课堂 https://www.yuketang.cn/

@@ -47,7 +47,7 @@ cmd_status() {
   echo "「启航」学伴包 v2.0 · 状态"
   echo "----------------------------------------"
   echo "[1级] skill 库"
-  for f in library/clarity.md library/domain-review.md library/output-spec.md; do
+  for f in library/clarity.md library/domain-review.md library/output-spec.md library/domain-review-cases.md library/output-checklist.md; do
     [ -f "$ROOT/$f" ] && printf '  ✓ %s\n' "$f" || printf '  ✗ %s\n' "$f"
   done
   echo "[2级] 域"

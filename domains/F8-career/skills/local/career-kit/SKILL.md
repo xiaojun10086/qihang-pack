@@ -1,7 +1,7 @@
 ---
 name: qihang-career-kit
 description: 「启航」F8 求职与竞赛域库内 skill：按目标岗位/竞赛倒推能力缺口，改简历只做「相关性重构」，面试按 STAR 打磨。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,16 +30,39 @@ license: MIT
 5. 竞赛：查 DUT 创新创业学院与学院通知的报名节点
 6. 输出行动清单
 
+## 可执行示例
+
+**输入**
+
+> 想参加大创，不知道从哪下手
+
+**澄清判定**：对象=大创、任务=入门 → 不追问
+
+**输出**
+
+```
+【结论】先找导师与题目，再组队报名，别先想商业计划。
+【依据】创新创业学院 https://chuangxin.dlut.edu.cn/
+【步骤】① 定方向：从你上过的课里挑 1 个感兴趣的
+       ② 找导师：教师主页 https://faculty.dlut.edu.cn/ 查研究方向
+       ③ 组队：3–5 人，补你缺的角色（设计/数据/写作）
+       ④ 关注学院与创院通知的申报节点
+【产物】plan/大创-启动.md
+【下一步】本周约 1 位老师聊 15 分钟（邮件模板已给）
+【提醒】先确认申报 DDL，别准备好才发现在截止后
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 就业信息网 https://job.dlut.edu.cn/
 - 创新创业学院 https://chuangxin.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 就业系统（宣讲会/投递）
 
 ## 失败与降级

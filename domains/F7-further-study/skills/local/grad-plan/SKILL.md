@@ -1,7 +1,7 @@
 ---
 name: qihang-grad-plan
 description: 「启航」F7 升学深造域库内 skill：先定路径（保研/考研/留学），再倒排时间线，标出每个节点的硬性材料。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,9 +30,33 @@ license: MIT
 5. 文书只给结构与自查，不代写
 6. 输出时间线表
 
+## 可执行示例
+
+**输入**
+
+> 我大一，想保研，现在该做什么
+
+**澄清判定**：年级已知、路径明确 → 不追问
+
+**输出**
+
+```
+【结论】保研是三年工程，大一重点是绩点与科研入口。
+【依据】研究生院 https://gs.dlut.edu.cn/（推免章程逐年发布）
+【步骤】① 大一：把绩点打进专业前 20%（这是硬门槛）
+       ② 大二：进实验室/竞赛，攒 1 段科研经历
+       ③ 大三上：关注学院推免章程与夏令营通知
+       ④ 大三下：夏令营 → 预推免 → 材料准备
+【网址】研究生招生 https://gs.dlut.edu.cn/yjszs.htm
+【状态】✅ 已核验（信息库 §3）
+【下一步】先查你所在学院的推免章程（我给了路径）
+【红线】个人陈述与自我介绍只给结构与自查，不代写
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
@@ -40,7 +64,7 @@ license: MIT
 - 国际合作与交流处 https://dutdice.dlut.edu.cn/
 - 研究生招生 https://gs.dlut.edu.cn/yjszs.htm
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 研究生招生报名系统 https://yjszs.dlut.edu.cn/zsbm
 
 ## 失败与降级

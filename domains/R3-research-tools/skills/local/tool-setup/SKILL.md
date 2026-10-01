@@ -1,7 +1,7 @@
 ---
 name: qihang-tool-setup
 description: 「启航」R3 科研工具与代码域库内 skill：先问清目标工具与系统，再给最小可用环境步骤；报错按「复现 → 最小化 → 假设 → 验证」处理。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,16 +30,39 @@ license: MIT
 5. 给可复现的目录结构
 6. 输出环境清单与 README
 
+## 可执行示例
+
+**输入**
+
+> Python 跑机器学习，环境老装不好
+
+**澄清判定**：缺「操作系统/具体报错」→ 追问 1 问
+
+**输出**
+
+```
+【结论】用 conda 建独立环境，别在 base 里装。
+【依据】库内 skill tool-setup（自建）
+【步骤】① 建环境：conda create -n ml python=3.11
+       ② 先装 torch 再装其余（顺序敏感）
+       ③ 报错处理：复现 → 最小化 → 假设 → 插桩 → 修复
+       ④ 固化：pip freeze > requirements.txt
+【产物】env/requirements.txt + README
+【下一步】把完整报错贴给我，我定位
+【提醒】网信中心有正版软件与超算资源 https://its.dlut.edu.cn/
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 网络与信息化中心 https://its.dlut.edu.cn/
 - 软件学院 https://ss.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 校园软件正版化平台（its 提供）
 
 ## 失败与降级

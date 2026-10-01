@@ -1,7 +1,7 @@
 ---
 name: qihang-explain-stepwise
 description: 「启航」S1 课程答疑域库内 skill：先让学习者自己写一步，再按「定位卡点 → 给提示 → 给解法 → 出同类题」四步走，不直接抛答案。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,16 +30,38 @@ license: MIT
 5. 给完整解法，标出每一步依据
 6. 出 1 道同类题并留白，不代做
 
+## 可执行示例
+
+**输入**
+
+> 老师，这道极限题 x→0 时 (sin x − x)/x³，为什么先做等价无穷小代换是错的？
+
+**澄清判定**：对象明确、任务明确、无需追问（U ≤ 5%）
+
+**输出**
+
+```
+【结论】等价无穷小只能替换"乘积因子"，这里是相减，必须泰勒展开到 x³。
+【依据】sin x = x − x³/6 + o(x³)；分步讲解流程（库内 skill）
+【步骤】① 展开 sin x 到 x³ 项
+       ② 相减，x 消去，得 −x³/6
+       ③ 除以 x³ → −1/6
+       ④ 回讲为什么代换失败：减法产生同阶抵消
+【下一步】用同法算 (tan x − x)/x³，做完发我
+【未代做】第 4 步的同类题留白
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 教务处 https://teach.dlut.edu.cn/
 - 数学科学学院 https://math.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 综合教务系统 http://jxgl.dlut.edu.cn/（考试安排、培养方案）
 
 ## 失败与降级

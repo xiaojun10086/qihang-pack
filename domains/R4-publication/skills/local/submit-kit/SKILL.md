@@ -1,7 +1,7 @@
 ---
 name: qihang-submit-kit
 description: 「启航」R4 学术产出与投稿域库内 skill：先跑投稿前自检（结构/引用/数据），再给期刊匹配与审稿意见逐条回复表。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,16 +30,39 @@ license: MIT
 5. 为每条意见写回复草稿 + 修改位置
 6. 输出返修对照表
 
+## 可执行示例
+
+**输入**
+
+> 导师让我投一篇会议论文
+
+**澄清判定**：缺「方向/时间」→ 追问 2 问
+
+**输出**
+
+```
+【结论】先跑投稿前自检，再按方向匹配会议，最后排时间。
+【依据】科学技术研究院 https://scidep.dlut.edu.cn/
+【步骤】① 自检：结构完整性 / 引用规范 / 数据可复现
+       ② 匹配 3 个候选会议（含截稿日与周期）
+       ③ 材料：Cover Letter + 声明 + 伦理审查
+       ④ 预留返修时间（按会议周期倒排）
+【产物】submit/会议筛选.md + checklist
+【下一步】先做第 ① 步自检（清单已给）
+【提醒】注意会议的 AI 使用声明要求
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 科学技术研究院 https://scidep.dlut.edu.cn/
 - 研究生院 https://gs.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 科研管理系统（项目/成果登记）
 
 ## 失败与降级

@@ -1,7 +1,7 @@
 ---
 name: qihang-integrity-check
 description: 「启航」R5 学术规范与伦理域库内 skill：跑一份合规自查：引用、查重、署名、数据来源、AI 使用声明，逐项给可执行修正。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,16 +30,39 @@ license: MIT
 5. AI 使用声明：按学校与期刊要求撰写
 6. 输出自查表 + 修正清单
 
+## 可执行示例
+
+**输入**
+
+> 用 ChatGPT 写的部分要不要声明
+
+**澄清判定**：对象明确（AI 使用声明）→ 不追问
+
+**输出**
+
+```
+【结论】要声明，且原始文献必须你自己核过。
+【依据】研究生院 https://gs.dlut.edu.cn/ ｜ 期刊/课程具体要求优先
+【步骤】① 引用自查：直接引用加引号 + 页码
+       ② 查重自查：连续 15 字以上雷同必须改写 + 引用
+       ③ AI 声明模板：写清"用于什么环节 + 由本人核实"
+       ④ 红线：**不得用 AI 生成虚构文献与数据**
+【产物】selfcheck/integrity.md
+【下一步】先把参考文献逐条回源核验（我给了核验表）
+【红线】不代改以规避查重；不隐藏 AI 使用痕迹
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 研究生院 https://gs.dlut.edu.cn/
 - 图书馆 https://lib.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 查重系统（图书馆/研究生院入口）
 
 ## 失败与降级

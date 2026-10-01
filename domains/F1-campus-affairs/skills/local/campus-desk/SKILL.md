@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-desk
 description: 「启航」F1 校园事务域库内 skill：先查 DUT 信息库锁定入口与电话，再给「去哪办 / 带什么 / 多久」，查不到就明说未收录。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,9 +30,31 @@ license: MIT
 5. 未收录则固定回复：信息库未收录，建议访问 www.dlut.edu.cn 核实
 6. 输出办理卡片
 
+## 可执行示例
+
+**输入**
+
+> 校园卡丢了怎么办
+
+**澄清判定**：对象明确（校园卡）、任务明确（挂失补办）→ 不追问
+
+**输出**
+
+```
+【结论】先线上挂失冻结，再去服务点补卡，工本费另收。
+【网址】一卡通 https://ecard.dlut.edu.cn/ ｜ 网信中心 https://its.dlut.edu.cn/
+【状态】✅ 已核验（信息库 §3 / §5）
+【步骤】① ecard 或「大连理工大学网信中心」公众号挂失
+       ② 凌水大厅在网信中心一楼；开发区在新宿舍楼二楼西侧
+       ③ 带学生证/身份证补办
+【下一步】现在先去线上挂失（防止被盗刷）
+【备注】校园卡服务电话见信息库 §1 部门电话总表
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
@@ -41,7 +63,7 @@ license: MIT
 - 后勤处 https://houqin.dlut.edu.cn/
 - 保卫处 https://gach.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 一卡通 https://ecard.dlut.edu.cn/
 - 校园门户办事大厅
 - 离校系统 http://lx.dlut.edu.cn/

@@ -11,6 +11,8 @@
 ```
 qihang-pack/
 ├── SKILL.md                  入口（安装单元）
+├── PROJECT.md                项目文档（简略）
+├── ROADMAP.md                分阶段开发计划
 ├── config.yaml               学校绑定 + 学期配置 + 域开关
 ├── library/                  ★1 级 · skill 库（既是 skill 也是库）
 │   ├── SKILL.md              库本体

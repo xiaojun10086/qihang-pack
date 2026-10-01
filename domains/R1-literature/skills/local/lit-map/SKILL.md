@@ -1,7 +1,7 @@
 ---
 name: qihang-lit-map
 description: 「启航」R1 文献检索与管理域库内 skill：先出检索式与纳排标准，再按「主题—方法—结论」矩阵整理；每条引文给可核验锚点。
-version: 2.0.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -30,15 +30,38 @@ license: MIT
 5. 每条引文标注来源与可核验锚点（DOI/页码）
 6. 输出文献矩阵表
 
+## 可执行示例
+
+**输入**
+
+> 要写一篇关于「大模型幻觉」的综述，怎么找文献
+
+**澄清判定**：对象/产出明确 → 不追问
+
+**输出**
+
+```
+【结论】先定检索式与纳排标准，再做矩阵，别一上来就读全文。
+【依据】图书馆 https://lib.dlut.edu.cn/（含校外访问）
+【步骤】① 拆概念：LLM / hallucination / detection|mitigation
+       ② 检索式中英各一版（已给）
+       ③ 纳排标准：2022 年后、有实验、同行评议
+       ④ 建矩阵：方法 | 数据集 | 指标 | 局限
+【产物】lit/matrix.md
+【下一步】先用检索式跑一遍，回我命中数量再筛
+【提醒】每条引文留 DOI，方便回源核验
+```
+
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点。
+按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点
 
 - 图书馆 https://lib.dlut.edu.cn/
 
-需登录：
+需登录（方案 A · 只读 · 须隔离 profile）：
 - 图书馆电子资源校外访问 https://lib.dlut.edu.cn/wxzy1/xwfw.htm
 
 ## 失败与降级
