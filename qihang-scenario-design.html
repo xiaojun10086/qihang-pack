@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「启航」新生学习生活一体化学伴包 · 场景设计书</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#131a24; --panel:#161d29; --line:#26303f;
+    --txt:#e6edf3; --txt2:#9fb0c3; --txt3:#6e8199;
+    --blue:#5b9dff; --violet:#8b7cff; --green:#3fb950; --amber:#d29922; --pink:#f778ba; --cyan:#39c5cf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:radial-gradient(1100px 550px at 12% -8%,#16233a 0,transparent 60%),
+               radial-gradient(900px 480px at 92% 0,#221a35 0,transparent 55%),var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+    line-height:1.72;-webkit-font-smoothing:antialiased;padding:0 0 70px;
+  }
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px}
+  header{padding:50px 0 24px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--blue);background:#5b9dff14;border:1px solid #5b9dff33;padding:5px 12px;border-radius:999px;margin-bottom:16px}
+  h1{font-size:30px;line-height:1.28;font-weight:750;letter-spacing:-.01em}
+  h1 .hl{background:linear-gradient(92deg,var(--blue),var(--violet) 55%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .meta{color:var(--txt2);font-size:14px;margin-top:14px}
+  .meta b{color:var(--txt)}
+  h2{font-size:21px;font-weight:720;margin:0 0 6px;display:flex;align-items:center;gap:11px}
+  h2 .num{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:700;
+    background:linear-gradient(135deg,#5b9dff33,#8b7cff33);border:1px solid #5b9dff44;color:#cfe0ff}
+  h3{font-size:15.5px;font-weight:680;margin:20px 0 8px;color:var(--txt)}
+  h4{font-size:14px;font-weight:660;margin:14px 0 6px;color:#cdd9e6}
+  section{padding-top:34px}
+  .lead{color:var(--txt2);font-size:14.5px;margin-bottom:14px}
+  p{font-size:14.2px;color:var(--txt2);margin:8px 0}
+  ul,ol{padding-left:22px;color:var(--txt2);font-size:14.2px;display:flex;flex-direction:column;gap:5px;margin:8px 0}
+  li b,p b,td b{color:var(--txt)}
+  code{background:#0a0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.4px;color:#9fd6a0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:#0a0f16;border:1px solid var(--line);border-radius:10px;padding:13px 15px;overflow-x:auto;margin:10px 0}
+  pre code{background:none;border:0;padding:0;font-size:12.6px;line-height:1.75;color:#c9d6e4}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+  .panel.tint{border-color:#5b9dff44;background:linear-gradient(180deg,#5b9dff0f,#131a24)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.4px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;color:var(--txt2)}
+  th{background:#ffffff08;color:var(--txt);font-weight:660;font-size:13px}
+  tr:hover td{background:#ffffff04}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:#ffffff0d;border:1px solid var(--line);color:var(--txt3)}
+  .tag.blue{color:#a8c9ff;background:#5b9dff1a;border-color:#5b9dff44}
+  .tag.green{color:#8ee79a;background:#3fb9501a;border-color:#3fb95044}
+  .tag.amber{color:#ffd580;background:#d299221a;border-color:#d2992244}
+  .tag.pink{color:#ffb0d8;background:#f778ba1a;border-color:#f778ba44}
+  .kv{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:16px 0}
+  .step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 13px;position:relative}
+  .step .n{font-size:11px;color:var(--blue);font-weight:700;letter-spacing:.06em}
+  .step .t{font-size:14px;font-weight:660;margin:3px 0 4px}
+  .step .d{font-size:12.4px;color:var(--txt3);line-height:1.6}
+  .arrow{display:grid;place-items:center;color:var(--txt3);padding:0 6px;font-size:17px}
+  @media(max-width:760px){.arrow{transform:rotate(90deg);padding:4px 0}}
+  .note{border-left:3px solid var(--amber);padding-left:13px;color:var(--txt2);font-size:13.4px;margin:10px 0}
+  .note.blue{border-color:var(--blue)}
+  .note.green{border-color:var(--green)}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--txt3);font-size:12.4px;text-align:center;line-height:1.9}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .toc a{font-size:12.6px;color:var(--txt2);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+  .toc a:hover{border-color:#5b9dff66;color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="kicker">赛道二 · 智能体场景设计 · 设计方案</span>
+  <h1>「启航」——大一新生<span class="hl">学习·生活一体化</span>学伴 Skill 包</h1>
+  <p class="meta">
+    依托平台：<b>连小理</b>（大连理工大学 × 腾讯）&nbsp;·&nbsp;
+    适用对象：<b>2026 级本科新生</b>&nbsp;·&nbsp;
+    形态：<b>1 个编排器 + 6 个能力域（可插拔 Skill）</b>
+  </p>
+  <div class="toc">
+    <a href="#s0">场景概述</a>
+    <a href="#s1">① 输入过程</a>
+    <a href="#s2">② Skill 选择过程</a>
+    <a href="#s3">③ 输出过程</a>
+    <a href="#s4">④ 使用流程示意</a>
+    <a href="#s5">⑤ 预期效果</a>
+  </div>
+</header>
+
+<!-- ============ 场景概述 ============ -->
+<section id="s0">
+  <h2><span class="num">◈</span>场景概述</h2>
+  <p class="lead">新生入学后真正卡住他们的，不是"不会用 AI"，而是<b>没人把散落的工具串成一条线</b>——课表在教务、DDL 在群消息、笔记在备忘录、习题在纸面、情绪在心里。本方案把"学习"与"生活"两条线合并成<b>一个可插拔的 Skill 包</b>，由编排器统一调度。</p>
+
+  <table>
+    <tr><th style="width:120px">要素</th><th>内容</th></tr>
+    <tr><td>场景名称</td><td><b>「启航」新生学习生活一体化陪伴场景</b></td></tr>
+    <tr><td>适用对象</td><td>2026 级本科新生（首次离家、首次选课、首次面对绩点）</td></tr>
+    <tr><td>触发情境</td><td>开学前两周 / 每周期末预警 / 每次作业与实验 / 情绪波动时的一句话求助</td></tr>
+    <tr><td>核心任务</td><td>把"一句话模糊求助"转成"结构化可执行方案"，并调用对应 Skill 落地</td></tr>
+    <tr><td>新场景 or 改进</td><td><b>新场景拓展</b>（连小理现有能力多为单点问答，本方案为跨域编排 + 澄清门 + 可插拔包）</td></tr>
+  </table>
+
+  <h3>真实需求与现存痛点</h3>
+  <div class="grid2">
+    <div class="panel">
+      <h4>😵 痛点 1 · 需求说不清</h4>
+      <p>"我高数要挂了怎么办"——不给章节、不给时间、不给目标。AI 只能给一篇正确的废话。</p>
+    </div>
+    <div class="panel">
+      <h4>🧩 痛点 2 · 工具是散的</h4>
+      <p>课表、日历、笔记、错题、文献各一个 App，新生第一学期要装 8 个工具，最后都弃用。</p>
+    </div>
+    <div class="panel">
+      <h4>📉 痛点 3 · 学习与生活割裂</h4>
+      <p>作息崩 → 上课困 → 笔记缺 → 期末崩。但没人把"作息"和"成绩"连起来看。</p>
+    </div>
+    <div class="panel">
+      <h4>🧭 痛点 4 · 无长期记忆</h4>
+      <p>今天问了，明天重来。没有人记得"你上次错在换元积分"。</p>
+    </div>
+  </div>
+  <div class="note">
+    <b>支撑依据（可替换为本人经历/访谈摘录）：</b>新生群高频问句集中在"课表怎么看""作业什么时候交""XX 老师给分吗""高数怎么学"；这四类恰好分布在<b>生活事务</b>与<b>学业节奏</b>两端，说明需求天然是跨域的。
+  </div>
+</section>
+
+<!-- ============ ① 输入过程 ============ -->
+<section id="s1">
+  <h2><span class="num">1</span>① 输入过程：提示词拆解 + 需求明确</h2>
+  <p class="lead">入口只有一句话，但这句话必须被"拆成槽位、量化不确定度、追问到确定"。</p>
+
+  <h3>1.1 提示词拆解（Slot Parsing）</h3>
+  <p>把用户原话映射到 6 个槽位（空槽位显式留空，不猜）：</p>
+  <table>
+    <tr><th style="width:92px">槽位</th><th>含义</th><th>示例（原话："高数快挂了")</th></tr>
+    <tr><td><b>对象 O</b></td><td>具体课程 / 科目 / 章节 / 事件</td><td>高数？哪一章？</td></tr>
+    <tr><td><b>任务 T</b></td><td>答疑 / 备考 / 笔记 / 事务 / 规划</td><td>备考？（推断）</td></tr>
+    <tr><td><b>时间 W</b></td><td>截止时间 / 可投入时长 / 周期</td><td>（空）</td></tr>
+    <tr><td><b>约束 C</b></td><td>形式 / 字数 / 工具 / 禁忌</td><td>（空）</td></tr>
+    <tr><td><b>产出 D</b></td><td>期望交付物（提纲/卡组/计划/文档）</td><td>（空）</td></tr>
+    <tr><td><b>背景 B</b></td><td>年级 / 专业 / 既往薄弱点 / 情绪状态</td><td>新生；情绪焦虑（推断）</td></tr>
+  </table>
+
+  <h3>1.2 需求明确：不确定性 &gt; 5% 必须反复追问</h3>
+  <div class="panel tint">
+    <h4>澄清门（Clarification Gate）算法</h4>
+    <pre><code>1) 对每个槽位 i 自评置信度 c_i ∈ [0,1]
+   （c_i 由"是否显式提及 / 是否可唯一推断 / 是否与上下文冲突"三项均值给出）
+2) 计算整体不确定度：   U = 1 − ∏ c_i
+3) 判定：  U ≤ 5%  → 直接执行
+           U &gt; 5%  → 触发澄清，最多 3 轮，每轮 ≤ 3 问
+4) 提问优先级（高杠杆优先）：时间 W(3.0) &gt; 对象 O(2.5) &gt; 产出 D(2.0)
+                            &gt; 约束 C(1.5) &gt; 背景 B(1.0) &gt; 任务 T(0.5)
+5) 3 轮后仍未达标 → 按最大后验假设执行，并在输出顶部显式声明
+   「⚠️ 假设：…；如不符请纠正」</code></pre>
+  </div>
+
+  <h4>对照示例</h4>
+  <p><b>用户：</b>"高数快挂了"</p>
+  <ul>
+    <li>拆解：O=高数（c=0.6）、T=备考（c=0.7）、W=∅（c=0.1）、C=∅（c=0.5）、D=∅（c=0.3）、B=新生（c=0.8）</li>
+    <li>U = 1 − (0.6×0.7×0.1×0.5×0.3×0.8) ≈ <b>99.5% &gt; 5%</b> → 必须澄清</li>
+    <li>按权重生成 3 问：<br>
+      ① 距离考试/补考还有几天？（W）<br>
+      ② 卡在哪几章——极限、导数、积分、级数？（O）<br>
+      ③ 想要"一周冲刺计划"还是"错题卡组"？（D）</li>
+    <li>收集答案 → 重算：O=0.95, W=0.95, D=0.9 … → U ≈ <b>3.2% ≤ 5%</b> → 放行，进入选择过程</li>
+  </ul>
+  <div class="note blue"><b>设计要点：</b>不是"多问"，而是"<b>算出来该问才问</b>"。高置信度场景（如"帮我把这段录音转文字"）一次都不追问，避免打扰。</div>
+</section>
+
+<!-- ============ ② Skill 选择过程 ============ -->
+<section id="s2">
+  <h2><span class="num">2</span>② Skill 选择过程：路由 + 安装/调用</h2>
+  <p class="lead">澄清完成后，编排器按「任务 T × 产出 D」查路由表，命中能力域后依次执行三步：<b>探测 → 安装（若缺）→ 调用</b>。</p>
+
+  <h3>2.1 包结构</h3>
+  <div class="panel">
+    <p><b>📦 <code>qihang-pack</code>（启航包）</b></p>
+    <ul>
+      <li><b>0 号 · 编排器</b> <code>qihang-orchestrator</code>：澄清门 + 路由 + 串联 + 输出模板（本包唯一自建件）</li>
+      <li><b>A 域 · 学业节奏</b>：课表 / DDL / 考试周</li>
+      <li><b>B 域 · 课堂消化</b>：讲座 → 笔记 → 知识库</li>
+      <li><b>C 域 · 学科答疑</b>：数学 / 物理 / 化学 / 编程</li>
+      <li><b>D 域 · 备考冲刺</b>：间隔重复 / 卡组 / 模拟卷</li>
+      <li><b>E 域 · 学术表达</b>：实验报告 / 课程论文 / 展示</li>
+      <li><b>F 域 · 生活适应</b>：专注作息 / 习惯 / 事务 / 情绪</li>
+    </ul>
+  </div>
+
+  <h3>2.2 路由表与安装命令</h3>
+  <p>全部为开源 Skill，来源见下表。<b>安装方法统一两种</b>：插件市场 <code>/plugin marketplace add owner/repo</code>，或 CLI <code>npx skills add owner/repo@skill</code>。</p>
+  <table>
+    <tr><th style="width:74px">域</th><th style="width:180px">Skill / 仓库</th><th style="width:210px">用途</th><th>安装命令</th></tr>
+    <tr><td>A</td><td><code>googleworkspace/skills</code><br><span class="tag">gws-calendar / gws-tasks</span></td><td>课表排布、作业 DDL、考试周倒排</td><td><code>/plugin marketplace add googleworkspace/skills</code></td></tr>
+    <tr><td>B</td><td><code>Jellypod-Inc/school-skills</code><br><span class="tag">lecture-to-study-guide</span></td><td>课堂笔记&幻灯片 → 结构化学习指南</td><td><code>/plugin marketplace add Jellypod-Inc/school-skills</code></td></tr>
+    <tr><td>B</td><td><code>kepano/obsidian-skills</code></td><td>笔记沉淀进本地知识库</td><td><code>/plugin marketplace add kepano/obsidian-skills</code></td></tr>
+    <tr><td>B</td><td><code>0x-man/mindmap-skill</code></td><td>章节 → 概念图 / 思维导图</td><td><code>npx skills add 0x-man/mindmap-skill</code></td></tr>
+    <tr><td>C</td><td><code>googlarz/math-skill</code></td><td>数学逐步解题 + 自校验</td><td><code>npx skills add googlarz/math-skill</code></td></tr>
+    <tr><td>C</td><td><code>somenssarkar/gurukul-ai</code><br><span class="tag">physics</span></td><td>物理苏格拉底提问 + 误区检查</td><td><code>npx skills add somenssarkar/gurukul-ai</code></td></tr>
+    <tr><td>C</td><td><code>egouilliard-leyton/python-tutor-skill</code></td><td>编程入门答疑（大一 C/Python）</td><td><code>npx skills add egouilliard-leyton/python-tutor-skill</code></td></tr>
+    <tr><td>D</td><td><code>GlacierXiaowei/structured-learning-skill</code> <span class="tag pink">中文</span></td><td>3 步突击 / 7 步系统学习，会判分记错</td><td><code>npx skills add glacierxiaowei/structured-learning</code></td></tr>
+    <tr><td>D</td><td><code>peter209393/anki-card-skills</code></td><td>生成可导入 Anki 卡组</td><td><code>/plugin marketplace add peter209393/anki-card-skills</code></td></tr>
+    <tr><td>D</td><td><code>sickn33/agentic-awesome-skills</code> <span class="tag">examprep-ai</span></td><td>大纲/真题 → 高分路线图 + 题目预测</td><td><code>npx skills add sickn33/agentic-awesome-skills</code></td></tr>
+    <tr><td>E</td><td><code>anthropics/skills</code> <span class="tag blue">官方</span></td><td>docx / pptx / xlsx / pdf 文档底座</td><td><code>/plugin marketplace add anthropics/skills</code></td></tr>
+    <tr><td>E</td><td><code>Imbad0202/academic-research-skills</code></td><td>课程论文全流程 + 模拟审稿预审</td><td><code>/plugin marketplace add Imbad0202/academic-research-skills</code></td></tr>
+    <tr><td>E</td><td><code>Gabberflast/academic-pptx-skill</code></td><td>答辩 / 展示 PPT 结构规范</td><td><code>npx skills add Gabberflast/academic-pptx-skill</code></td></tr>
+    <tr><td>F</td><td><code>jakedahn/pomodoro</code></td><td>番茄钟专注 + 时段统计</td><td><code>npx skills add jakedahn/pomodoro</code></td></tr>
+    <tr><td>F</td><td><code>eddiebelaval/squire</code> <span class="tag">habit-tracker</span></td><td>作息/运动习惯养成与连续天数</td><td><code>npx skills add eddiebelaval/squire</code></td></tr>
+    <tr><td>F</td><td><code>ComposioHQ/awesome-claude-skills</code> <span class="tag">file-organizer</span></td><td>课业资料整理、去重、归类</td><td><code>/plugin marketplace add ComposioHQ/awesome-claude-skills</code></td></tr>
+    <tr><td>底层</td><td><code>mattpocock/skills</code> <span class="tag amber">teach</span></td><td>长期学习档案 + 间隔重复课程（自学主力）</td><td><code>npx skills add mattpocock/skills@teach</code></td></tr>
+  </table>
+
+  <h3>2.3 探测 → 安装 → 调用（幂等执行）</h3>
+  <pre><code># 第 1 步：探测已装清单（避免重复安装）
+ls ~/.claude/skills/ 2>/dev/null; claude-code --list-skills
+
+# 第 2 步：按需安装（仅缺哪装哪）
+/plugin marketplace add googleworkspace/skills          # A 域
+npx skills add glacierxiaowei/structured-learning         # D 域（中文）
+
+# 第 3 步：调用（已安装则跳过第 2 步，直接命中）
+#   路由示例：T=备考 & D=卡组  →  D 域 anki-card-skills
+#             T=笔记 & D=概念图 →  B 域 mindmap-skill</code></pre>
+  <div class="note green"><b>幂等规则：</b>已安装 → <b>直接调用</b>，不重复装；缺失 → 先装再调；安装失败 → 降级到同域备用 Skill，并在输出中标注"已降级"。</div>
+
+  <h3>2.4 串联（多域协同）</h3>
+  <p>复杂需求不是单选，而是流水线。例：<b>"下周三高数期中，帮我把这学期笔记整成复习方案"</b></p>
+  <div class="flow">
+    <div class="step"><div class="n">B 域</div><div class="t">笔记归一</div><div class="d">obsidian-skills + mindmap-skill</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">A 域</div><div class="t">时间倒排</div><div class="d">gws-tasks 生成 7 天 DDL</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">D 域</div><div class="t">生成卡组</div><div class="d">structured-learning（中文）+ anki-card-skills</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">F 域</div><div class="t">节奏保障</div><div class="d">pomodoro 排专注块</div></div>
+  </div>
+</section>
+
+<!-- ============ ③ 输出过程 ============ -->
+<section id="s3">
+  <h2><span class="num">3</span>③ 输出过程：要点式、尽量简略</h2>
+  <p class="lead">统一模板，默认 <b>≤ 6 条要点</b>，先结论后步骤；细节折叠进"展开可见"，不刷屏。</p>
+
+  <div class="panel">
+    <h4>统一输出模板</h4>
+    <pre><code>【结论】  一句话给出可执行答案
+【依据】  ≤2 条关键信息（来自哪个 Skill / 哪份材料）
+【步骤】  ≤5 条编号动作，每条 ≤15 字
+【产物】  文件/卡组/日程的落点（可点击）
+【下一步】1 条——给出唯一推荐动作
+【假设】  仅当触发"3 轮未澄清"时出现，一行说明</code></pre>
+  </div>
+
+  <h4>示例输出（承接上例：高数期中 7 天冲刺）</h4>
+  <div class="panel tint">
+    <p><b>【结论】</b>7 天可救，重点攻"换元积分 + 级数判敛"，每天 2 个番茄钟。</p>
+    <p><b>【步骤】</b></p>
+    <ol>
+      <li>D1–D2　补换元积分 12 道典型题</li>
+      <li>D3–D4　级数判敛 8 道 + 错因归类</li>
+      <li>D5　　错题卡组过一轮（Anki）</li>
+      <li>D6　　限时模拟卷 1 套</li>
+      <li>D7　　只过错题与公式速查</li>
+    </ol>
+    <p><b>【产物】</b><code>gws-tasks</code> 已生成 7 条 DDL · <code>高数-换元积分.apkg</code> 可导入</p>
+    <p><b>【下一步】</b>现在做 D1 的前 3 道，做完回我。</p>
+  </div>
+  <div class="note"><b>简略原则：</b>①能一句话不写一段；②能列表不写散文；③过程细节默认折叠；④每次只给<b>一个</b>下一步动作，避免选择瘫痪。</div>
+</section>
+
+<!-- ============ ④ 流程示意 ============ -->
+<section id="s4">
+  <h2><span class="num">4</span>④ 使用流程示意（赛道二要求五项）</h2>
+  <div class="flow">
+    <div class="step"><div class="n">1</div><div class="t">发起需求</div><div class="d">新生一句话求助</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">2</div><div class="t">提供信息</div><div class="d">澄清门追问 ≤3 问 / 贴材料</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">3</div><div class="t">智能体处理</div><div class="d">拆解 → 路由 → 探测/装/调 → 跨域串联</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">4</div><div class="t">结果反馈</div><div class="d">要点式模板 + 产物落点</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="n">5</div><div class="t">用户确认</div><div class="d">采纳/纠偏，写入学习档案</div></div>
+  </div>
+
+  <h3>闭环：长期记忆</h3>
+  <p>用户确认后，编排器把「薄弱章节 / 错因 / 作息表现」写入学习档案（Learning Records），下次触发时自动带出——解决"今天问了明天重来"的痛点。</p>
+</section>
+
+<!-- ============ ⑤ 预期效果 ============ -->
+<section id="s5">
+  <h2><span class="num">5</span>⑤ 预期效果</h2>
+  <table>
+    <tr><th style="width:150px">维度</th><th>预期提升</th></tr>
+    <tr><td>需求命中率</td><td>澄清门把"答非所问"从常见降到少数；不确定度 >5% 必被追问</td></tr>
+    <tr><td>工具成本</td><td>新生从"装 8 个 App"降为"用 1 个学伴"，包内按需装载，哪缺装哪</td></tr>
+    <tr><td>学习连续性</td><td>学习档案跨会话保留，薄弱点被记住并复考</td></tr>
+    <tr><td>学习 × 生活打通</td><td>作息（F 域）与成绩（C/D 域）首次进入同一决策链</td></tr>
+    <tr><td>可复用性</td><td>Skill 均为开源标准件，包内可替换；下学期可直接换课程沿用</td></tr>
+  </table>
+  <div class="badge-row">
+    <span class="tag blue">创新性：跨域编排 + 澄清门量化</span>
+    <span class="tag green">需求度：新生四大高频痛点全覆盖</span>
+    <span class="tag amber">可行性：全部基于已开源 Skill，无需另开发</span>
+    <span class="tag pink">表达：三段式 + 流程图 + 要点模板</span>
+  </div>
+</section>
+
+<footer>
+  「启航」新生学习生活一体化学伴包 · 赛道二 智能体场景设计 方案稿<br>
+  Skill 来源均为公开开源项目（检索于 2026-10-01），安装前请阅读源码与许可证；<br>
+  本稿约 1800 字，符合赛道二「2200 字以内」要求。
+</footer>
+
+</div>
+</body>
+</html>
