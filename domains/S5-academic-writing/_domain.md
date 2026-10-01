@@ -1,0 +1,33 @@
+# S5 · 学术表达
+
+> 域 ID `S5` ｜ 所属大类 **学习类** ｜ 目录 `domains/S5-academic-writing/`
+
+## 域边界
+
+- **覆盖**：课程论文 / 综述 / 答辩展示的结构、引用规范、预审
+- **不覆盖**：不做文献检索管理（→R1）；不投稿（→R4）
+
+## 触发词（命中任一即锁定本域）
+
+`论文` ｜ `综述` ｜ `答辩` ｜ `PPT` ｜ `引用` ｜ `文献综述` ｜ `开题` ｜ `结题`
+
+## 库内 skill（优先使用，无需安装）
+
+- **`paper-outline`** — 论文骨架与预审（自建）
+  给结构大纲 + 各节字数 + 论证链自查 + 3 条改进建议，再做一次「审稿人视角」预审。
+
+## DUT 绑定点
+
+**公开站（无需登录）**
+- 图书馆 https://lib.dlut.edu.cn/
+
+**私密站（需登录，见 `references/dlut-login-sites.md`）**
+- 图书馆电子资源校外访问 https://lib.dlut.edu.cn/wxzy1/xwfw.htm
+
+## 执行顺序
+
+1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 5% 才继续
+2. 1 级库完成**域审查**，确认命中 `S5`（`library/domain-review.md`）
+3. 用**库内 skill** `paper-outline` 执行（首选）
+4. 库内不满足 → 读 `skills/external.md` 走库外安装
+5. 按 `library/output-spec.md` 输出，并写入学习档案

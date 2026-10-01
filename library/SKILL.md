@@ -6,7 +6,7 @@ license: MIT
 tags: [dlut, campus, learning, library, orchestrator]
 ---
 
-# 「启航」学伴包 · 入口（v2.0）
+# 「启航」学伴包 · skill 库本体（Level 1）
 
 三级结构：**skill 库（本入口）→ 域 → skill**
 

@@ -1,14 +1,14 @@
 ---
-description: 启动「启航」学伴包编排器（先澄清门，再路由）
+description: 「启航」学伴包入口（1级库）：需求明确 → 锁定域 → 锁定skill → 库内优先
 argument-hint: [你的需求，可留空]
 ---
 
-按 `~/.claude/skills/qihang/SKILL.md` 处理：
+按 1 级 skill 库规则处理：$ARGUMENTS
 
-需求：$ARGUMENTS
-
-1. **拆解**：按 §1.1 映射为 6 槽位（O/T/W/C/D/B），空槽留空不臆测。
-2. **澄清门**：算 `U = 1 − ∏cᵢ`。`U ≤ 5%` 放行；`U > 5%` 追问，最多 3 轮、每轮 ≤3 问，按权重 W>O>D>C>B>T 排序。
-3. **路由**：放行后查 `references/routing-table.md`，探测 → 缺则装 → 调用；跨域需求按 §2.3 串联。
-4. **输出**：按 §3 模板，≤6 条要点（结论/依据/步骤/产物/下一步）。
-5. **归档**：把薄弱点与结论写入学习档案，供下次带出。
+1. **需求明确**：读 `~/.claude/skills/qihang/library/clarity.md`，拆 6 槽位，算 `U = 1 − ∏cᵢ`。
+   `U > 5%` → 追问（最多 3 轮、每轮 ≤3 问，优先级 W>O>D>C>B>T）。
+2. **锁定域**：读 `domains/_registry.md`，用触发词匹配；多域命中走跨域串联。
+3. **域审查**：读 `library/domain-review.md`，用该域「不覆盖」条目复核，越界则改锁。
+4. **锁定 skill**：读 `domains/<域>/_domain.md` → 用**库内 skill**（`skills/local/`）。
+5. **库外兜底**：仅当库内不满足，才读 `skills/external.md` 走安装。
+6. **输出**：按 `library/output-spec.md`，≤6 条要点，写入学习档案。

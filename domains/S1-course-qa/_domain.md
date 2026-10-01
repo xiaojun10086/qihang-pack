@@ -1,0 +1,34 @@
+# S1 · 课程答疑
+
+> 域 ID `S1` ｜ 所属大类 **学习类** ｜ 目录 `domains/S1-course-qa/`
+
+## 域边界
+
+- **覆盖**：单点题目/概念的分步讲解、错因诊断、举一反三
+- **不覆盖**：不代写作业（→S3）；不做整门课备考规划（→S4）
+
+## 触发词（命中任一即锁定本域）
+
+`讲一下` ｜ `这题` ｜ `为什么` ｜ `推导` ｜ `证明` ｜ `不会做` ｜ `求` ｜ `解释一下`
+
+## 库内 skill（优先使用，无需安装）
+
+- **`explain-stepwise`** — 分步讲解（自建）
+  先让学习者自己写一步，再按「定位卡点 → 给提示 → 给解法 → 出同类题」四步走，不直接抛答案。
+
+## DUT 绑定点
+
+**公开站（无需登录）**
+- 教务处 https://teach.dlut.edu.cn/
+- 数学科学学院 https://math.dlut.edu.cn/
+
+**私密站（需登录，见 `references/dlut-login-sites.md`）**
+- 综合教务系统 http://jxgl.dlut.edu.cn/（考试安排、培养方案）
+
+## 执行顺序
+
+1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 5% 才继续
+2. 1 级库完成**域审查**，确认命中 `S1`（`library/domain-review.md`）
+3. 用**库内 skill** `explain-stepwise` 执行（首选）
+4. 库内不满足 → 读 `skills/external.md` 走库外安装
+5. 按 `library/output-spec.md` 输出，并写入学习档案

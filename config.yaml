@@ -1,65 +1,73 @@
-# 「启航」学伴包 · 唯一需要按学期 / 课程修改的文件
-# 新学期执行 `bash scripts/qihang.sh new-term` 会自动备份本文件并提示重置。
+# 「启航」学伴包 v2.0 · 唯一需要按学期 / 课程修改的文件
+# 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 
-# ============ 学校绑定（强绑定，勿随意改） ============
+# ============ 学校绑定（强绑定） ============
 school:
   name: 大连理工大学
   short: 大工 / DUT
   domain: dlut.edu.cn
   official: https://www.dlut.edu.cn/
-  entry_sso: https://sso.dlut.edu.cn/          # 统一身份认证
-  entry_portal: https://portal.dlut.edu.cn/    # 校园门户（办事大厅）
-  entry_jwgl: http://jxgl.dlut.edu.cn/student/ucas-sso/login   # 综合教务系统
-  webvpn: https://webvpn.dlut.edu.cn/          # 校外访问
-  app: i大工                                    # 场馆/心理/浴室预约仅 APP
-  site_registry: references/dlut-official-sites.md   # 信息库文件（G 域强制引用）
+  entry_sso: https://sso.dlut.edu.cn/
+  entry_portal: https://portal.dlut.edu.cn/
+  entry_jwgl: http://jxgl.dlut.edu.cn/student/ucas-sso/login
+  webvpn: https://webvpn.dlut.edu.cn/
+  app: i大工
+  sites_public: references/dlut-official-sites.md
+  sites_private: references/dlut-login-sites.md
 
-# 学生本人信息（影响回答口径，如所在校区决定推送哪些通知）
 student:
-  campus: 凌水主校区      # 可选：凌水主校区 / 开发区校区 / 盘锦校区
+  campus: 凌水主校区      # 凌水主校区 / 开发区校区 / 盘锦校区
   college: 待填写          # 例：计算机科学与技术学院
   grade: 2026
 
-# ============ 学期配置（换学期只改这一段） ============
+# ============ 学期配置 ============
 term: 2026-2027-1
-
 courses:
   - 高等数学
   - 大学物理
   - 程序设计基础
-
 exam_weeks:
-  - 第9周     # 期中
-  - 第17周    # 期末
-
+  - 第9周
+  - 第17周
 sleep_window: "23:30-07:00"
 
-# ============ 澄清门参数（一般无需修改） ============
-clarify:
-  threshold: 0.05            # 不确定度上限，超过即追问
-  max_rounds: 3              # 最多追问轮数
-  max_questions_per_round: 3 # 每轮最多问题数
-  weights:                   # 提问优先级（高杠杆优先）
-    W: 3.0                   # 时间
-    O: 2.5                   # 对象
-    D: 2.0                   # 产出
-    C: 1.5                   # 约束
-    B: 1.0                   # 背景
-    T: 0.5                   # 任务
-  skip_when:                 # 以下情况跳过澄清（避免打扰）
-    - 命中 G 域且对象明确
-    - 用户显式要求"直接给结果"
+# ============ 1 级库参数 ============
+library:
+  clarity:
+    threshold: 0.05
+    max_rounds: 3
+    max_questions_per_round: 3
+    weights: {W: 3.0, O: 2.5, D: 2.0, C: 1.5, B: 1.0, T: 0.5}
+    skip_when:
+      - 命中校情横切且对象明确
+      - 用户显式要求"直接给结果"
+  policy:
+    local_first: true          # 库内优先（硬规则）
+    forbid_fabricate_url: true # 禁止编造 DUT URL
+    write_learning_records: true
+    never_write_sensitive: [F3]  # 不写入档案的敏感域
 
-# ============ 能力域开关 ============
+# ============ 私密站接入（方案 A · 受控浏览器） ============
+private_sites:
+  mode: controlled_browser     # A 受控浏览器 | B 手动投喂 | C 仅登记
+  user_authorized: true
+  read_only: true
+  persist_cookies: false
+  persist_pages: false
+  level_rules:
+    L1_auto: [课表, 成绩, 考试安排, 借阅, 一卡通余额, 场馆预约状态]
+    L2_confirm: [资助申请状态, 就业投递记录, 培养进度]
+    L3_forbidden: [缴费金额, 银行卡, 身份证, 家庭信息, 邮件正文, 心理记录]
+
+# ============ 能力域开关（19 域） ============
 domains:
-  G: true    # 校情信息（内置数据域，建议常开）
-  A: true    # 学业节奏（课表 / DDL）
-  B: true    # 课堂消化（讲座 → 笔记）
-  C: true    # 学科答疑（数学 / 物理 / 编程）
-  D: true    # 备考冲刺（卡组 / 路线图）
-  E: true    # 学术表达（报告 / 论文 / PPT）
-  F: true    # 生活适应（专注 / 习惯）
-
-# A 域降级方案：学校未启用 Google Workspace 时改为本地方案
-fallback:
-  A: local_ics_and_tasks_md   # 可选值：googleworkspace | local_ics_and_tasks_md
+  S1: true   # 课程答疑        S2: true   # 课堂与笔记
+  S3: true   # 作业与考核      S4: true   # 备考与记忆
+  S5: true   # 学术表达        S6: true   # 语言能力
+  F1: true   # 校园事务        F2: true   # 作息与专注
+  F3: true   # 身心与社交      F4: true   # 财务与安全
+  F5: true   # 健康与运动      F6: true   # 军训与志愿
+  F7: true   # 升学深造        F8: true   # 求职与竞赛
+  R1: true   # 文献检索与管理  R2: true   # 实验与数据
+  R3: true   # 科研工具与代码  R4: true   # 学术产出与投稿
+  R5: true   # 学术规范与伦理

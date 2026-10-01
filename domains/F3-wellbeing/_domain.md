@@ -1,0 +1,34 @@
+# F3 · 身心与社交
+
+> 域 ID `F3` ｜ 所属大类 **生活类** ｜ 目录 `domains/F3-wellbeing/`
+
+## 域边界
+
+- **覆盖**：情绪压力疏导、适应问题、宿舍与人际、社团选择
+- **不覆盖**：**不做心理诊断、不做危机干预**；出现自伤/自杀念头立即转介专业资源
+
+## 触发词（命中任一即锁定本域）
+
+`焦虑` ｜ `压力` ｜ `emo` ｜ `室友` ｜ `社团` ｜ `人际` ｜ `想家` ｜ `孤独` ｜ `适应`
+
+## 库内 skill（优先使用，无需安装）
+
+- **`wellbeing-checkin`** — 状态check-in（自建）
+  先倾听再给方法；不评判、不诊断；识别危机信号并第一时间转介心理中心。
+
+## DUT 绑定点
+
+**公开站（无需登录）**
+- 心理健康教育与咨询中心 https://xinli.dlut.edu.cn/
+- 校团委 https://tuanwei.dlut.edu.cn/
+
+**私密站（需登录，见 `references/dlut-login-sites.md`）**
+- i大工 APP 心理服务-咨询预约（仅 APP）
+
+## 执行顺序
+
+1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 5% 才继续
+2. 1 级库完成**域审查**，确认命中 `F3`（`library/domain-review.md`）
+3. 用**库内 skill** `wellbeing-checkin` 执行（首选）
+4. 库内不满足 → 读 `skills/external.md` 走库外安装
+5. 按 `library/output-spec.md` 输出，并写入学习档案
