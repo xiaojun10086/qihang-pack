@@ -1,5 +1,10 @@
 # 输出规范（Level 1 · output-spec）
 
+> **输出标准修订 v3.1.0** —— 此号**仅标识本规范的第 2 次重设计**，**包版本仍为 3.0.0**
+> （`aligncheck.py` 断言的是各 `SKILL.md` frontmatter 的 `version:`，与本号不冲突，勿混用）。
+> 本次重设计要点：字段集改为【结论】【依据】【结果】【建议】【下一步】【假设】；新增三条铁律与快通道；
+> 固化「内部名禁止词表」（§1.2）；降级标注改能力级。
+>
 > 所有 3 级 skill 的输出都必须走本模板，并过 `output-checklist.md` 校验。
 > **本文件是输出形态的唯一权威口径。** 改动本文件后，`output-checklist.md`、
 > `scripts/runcheck.py`、`scripts/aligncheck.py`、`scripts/regress.sh` 的断言必须同步改。

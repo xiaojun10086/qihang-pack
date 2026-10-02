@@ -44,7 +44,7 @@ qihang-pack/
     ├── selfcheck.sh             结构与计数自检
     ├── audit.sh                 安全审计 + L3 门禁实测
     ├── regress.sh               行为回归（澄清门算例 / 门禁矩阵）
-    ├── aligncheck.py            全量文件级对齐审计（17 组断言）
+    ├── aligncheck.py            全量文件级对齐审计（18 组断言）
     ├── runcheck.py              端到端运行性（每域多触发词跑完整三级链）
     └── qihang.sh                管理脚本
 ```
