@@ -398,7 +398,7 @@ bash scripts/qihang.sh new-term   # 换学期重置
 | 换什么 | 改哪里 | 成本 |
 |---|---|---|
 | 换课程/学期 | `config.yaml` 的 `courses` / `term` / `exam_weeks` | 3 行 |
-| 加/改域 | `scripts/build_qihang_v2.py` 的 `DOMAINS` → 重跑 | 改数据即可 |
+| 加/改域 | `scripts/_build/build_qihang_v2.py` 的 `DOMAINS` → 重跑 | 改数据即可 |
 | 加库内 skill | 对应域 `skills/local/<name>/SKILL.md` | 1 个文件 |
 | 加库外候选 | 对应域 `skills/external.md` | 1 行 |
 | 扩 DUT 信息库 | `references/dlut-*.md` | 1 行 |

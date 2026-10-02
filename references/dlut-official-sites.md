@@ -1,5 +1,8 @@
 # 大连理工大学 官方信息库（DUT Site Registry）
 
+> 网址核验记录见 `references/dlut-url-verification.md`（2026-10-01 三路实抓 · 93 域名 · 77/4/6/6）。
+> 本表 ❌ 失效项与 ⚠️ 受限项已按核验结果标注。
+
 > **本文件被 `SKILL.md` §2.4 强制引用**：凡涉及大连理工大学校情、教务、学院、校区、职能部门的问题，**必须先查本表，不得凭模型记忆作答**；本表未命中时，明确回复「信息库未收录，建议访问 https://www.dlut.edu.cn/ 核实」，禁止臆造 URL。
 >
 > 核验时间：2026-10-01 ｜ 核验方式：WebSearch + WebFetch 实抓
@@ -13,7 +16,7 @@
 |---|---|---|---|
 | 1 | 统一身份认证 SSO | https://sso.dlut.edu.cn/ | ✅ 全校业务系统唯一登录入口 |
 | 2 | 校园门户 | https://portal.dlut.edu.cn/ | ✅ 办事大厅、业务系统总入口 |
-| 3 | 综合教学管理系统 | http://jxgl.dlut.edu.cn/student/ucas-sso/login | ✅ 选课、成绩查询 |
+| 3 | 综合教学管理系统 | http://jxgl.dlut.edu.cn/student/home | ✅ **登录后实测可达**（含 学生信息 / 常用服务 / 所有服务） |
 | 备用 | WebVPN（校外访问） | https://webvpn.dlut.edu.cn/ | ✅ 校外访问校内资源 |
 | 备用 | i大工 APP | 应用商店搜「i大工」 | ✅ 场馆/心理/浴室预约等**仅 APP** |
 
@@ -45,7 +48,7 @@
 | **盘锦校区** | https://panjin.dlut.edu.cn/ | 盘锦市辽东湾新区大工路 2 号 124221 | 化工海洋与生命学院、商学院、公共基础学院、莱斯特国际学院 |
 | 盘锦校区英文站 | https://panjin.dlut.edu.cn/en/ | — | — |
 | 一二九校区（市内） | ⚠️ 无独立官网 | 大连市西岗区一二九街 2 号 | 培训中心（远程与继续教育学院） |
-| 城市学院（独立学院） | https://www.dlutci.edu.cn/ | 大连市保税区广宁路 1 号 | 独立域名 dlutci.edu.cn |
+| ~~城市学院~~ → **大连工程学院** | https://www.dlutci.edu.cn/ | 大连市保税区广宁路 1 号 | **实测标题已为「大连工程学院」**（2026-10-01）→ 已转设，勿再按城市学院引用 |
 
 ## 3. 教学与学习资源
 
@@ -54,10 +57,10 @@
 | 教务处（本科） | https://teach.dlut.edu.cn/ | ✅ |
 | 教务处机构设置 / 科室电话 | https://teach.dlut.edu.cn/bmjs/jgsz.htm | ✅ |
 | 本科生招生网 | https://zs.dlut.edu.cn/ | ✅ |
-| 盘锦校区招生与就业 | https://pjzsjy.dlut.edu.cn/ | ✅ |
+| 盘锦校区招生与就业 | pjzsjy ❌ **实测失效** | ❌ 改用 panjin.dlut.edu.cn 或 zs.dlut.edu.cn |
 | 研究生院 | https://gs.dlut.edu.cn/ | ✅ |
 | 研究生招生栏目 | https://gs.dlut.edu.cn/yjszs.htm | ✅ |
-| 研究生招生报名系统 | https://yjszs.dlut.edu.cn/zsbm | ✅ |
+| 研究生招生报名系统 | https://yjszs.dlut.edu.cn/zsbm | ⚠️ **仅系统入口**（根页仅 Welcome） |
 | 教学运行保障中心（选课/考试/自习） | https://jxyxbzzx.dlut.edu.cn/ | ✅ |
 | 图书馆（伯川馆/令希馆） | https://lib.dlut.edu.cn/ | ✅ |
 | 图书馆电子资源校外访问 | https://lib.dlut.edu.cn/wxzy1/xwfw.htm | ✅ |
@@ -67,7 +70,7 @@
 | 校园邮箱 | http://mail.dlut.edu.cn/ | ✅ |
 | 一卡通 / 玉兰卡 | https://ecard.dlut.edu.cn/ | ✅ |
 | 校园统一支付平台 | http://pay.dlut.edu.cn/ | ✅ |
-| 财务处 | http://cw.dlut.edu.cn/ | ✅ |
+| 财务处 | http://cw.dlut.edu.cn/ | ⚠️ **登录后仍受限**（实测仍返回「系统提示」）→ 需校内网/VPN |
 | 离校系统 | http://lx.dlut.edu.cn/ | ✅ |
 | 教师主页平台 | https://faculty.dlut.edu.cn/ | ✅ |
 | 迎新网 | https://yx.dlut.edu.cn/ | ✅ |
@@ -80,8 +83,8 @@
 | 雨课堂 | https://www.yuketang.cn/ | ✅ 学校官方接入 |
 | 英文版校历 | https://en.dlut.edu.cn/About/Academic_Calendar.htm | ✅（内容更新至 2024-2025 学年，可能滞后） |
 | 中文校历 | 主站「公共服务 → 学期校历」 | ⚠️ 入口存在，无直链 |
-| 旧教务系统 zhjw | http://zhjw.dlut.edu.cn/ | ⚠️ 第三方提及 |
-| 校园网自助服务 tulip | http://tulip.dlut.edu.cn/ | ⚠️ 域名待复核 |
+| 旧教务系统 zhjw | zhjw ❌ **已下线** | ❌ 统一用 jxgl / portal |
+| 校园网自助服务 tulip | http://tulip.dlut.edu.cn/ | ⚠️ **仅校园网** |
 | 毕业设计系统 | http://etd.lib.dlut.edu.cn | ⚠️ 未直接验证 |
 
 ## 4. 学部与学院（按校区归类）
@@ -151,7 +154,7 @@
 | 商学院 | https://business.dlut.edu.cn/ | — |
 | 公共基础学院 | https://fldpj.dlut.edu.cn/ | — |
 | 莱斯特国际学院 | https://dli.dlut.edu.cn/ | 与英国莱斯特大学 |
-| 生命科学与药学学院 | http://pjlsm.dlut.edu.cn/ | ⚠️ 疑已并入化工海洋与生命学院 |
+| ~~生命科学与药学学院~~ | pjlsm ❌ **实测失效** | ❌ 已并入盘锦化工海洋与生命学院 |
 | 昆士兰科技国际工学院 | ⚠️ 2026 年新设，未检索到官网 | — |
 
 ### 4.4 其他办学单位
@@ -159,7 +162,7 @@
 | 单位 | URL | 备注 |
 |---|---|---|
 | 远程与继续教育学院（培训中心） | http://ce.dlut.edu.cn/ | 市内校区 |
-| 城市学院 | http://www.dlutci.edu.cn/ | 独立学院 |
+| ~~城市学院~~ → 大连工程学院 | http://www.dlutci.edu.cn/ | **已转设**（实测标题为「大连工程学院」） |
 
 ## 5. 职能部门与服务
 
@@ -170,11 +173,11 @@
 | 学生资助管理中心 | 挂靠 https://xsc.dlut.edu.cn/ | ✅ 本科 84708317 / 研究生 84708336 |
 | 心理健康教育与咨询中心 | https://xinli.dlut.edu.cn/ | ✅ |
 | 就业指导中心 | https://job.dlut.edu.cn/ | ✅ |
-| 学生公寓服务中心 | 挂靠 https://houqin.dlut.edu.cn/ | ✅ 84708190 |
+| 学生公寓服务中心 | 挂靠 https://houqin.dlut.edu.cn/ | ✅ 73 |
 | 校园卡服务中心 | https://ecard.dlut.edu.cn/ | ✅ |
 | 人力资源处 | https://perdep.dlut.edu.cn/ | ✅ |
 | 科学技术研究院 | https://scidep.dlut.edu.cn/ | ✅ |
-| 财务处 | http://cw.dlut.edu.cn/ | ✅ |
+| 财务处 | http://cw.dlut.edu.cn/ | ⚠️ **登录后仍受限**（实测仍返回「系统提示」）→ 需校内网/VPN |
 | 保卫处 | https://gach.dlut.edu.cn/ | ✅ 入校申请、居住证等 |
 | 后勤处 | https://houqin.dlut.edu.cn/ | ✅ |
 | 国际合作与交流处 | https://dutdice.dlut.edu.cn/ | ✅ |

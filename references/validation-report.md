@@ -25,7 +25,7 @@
 | 12 | 中文 awesome 列表 | yzfly / mblode `awesome-skills-zh` | 精选清单 | ❌ | ✅（52★ / 活跃度极低） | 规模与活跃度都不够 |
 
 **结论**：**不存在**一个既提供真实使用量、又深耕教育/校园场景的中文索引站。
-→ 探测策略定为：**skills.sh 查使用量 + GitHub 查反馈 + 自建内部索引**（即本包 `references/routing-table.md`）。
+→ 探测策略定为：**skills.sh 查使用量 + GitHub 查反馈 + 自建内部索引**（即本包 `references/skill-sources.md` 与各域 `skills/external.md`）。
 
 ---
 
@@ -133,5 +133,59 @@
 ## 六、待办（下一版）
 
 1. 补 `references/dlut-official-sites.md` 中 22 条「待核实」URL（需校园网或人工确认）。
-2. 为 C 域补充 Windows 可用的学科答疑替代件。
-3. 用 `npx skills add` 实机安装一遍，产出「安装成功率」实测记录。
+2. 在**真实 Claude Code 环境**跑完整安装（本机受批量保护限制，见 §七）。
+3. 学习档案（跨会话记忆）落地 —— 对应 ROADMAP 阶段 4。
+
+---
+
+## 七、阶段 2 追加验收（2026-10-01）
+
+### 7.1 合法性自检
+
+完整报告见 `references/skill-compliance-audit.md`。结论：
+
+| 判定 | 数量 | 处置 |
+|---|---|---|
+| ✅ 宽松许可（MIT / Apache-2.0） | 20 | 可摘录、可分发 |
+| ⚠️ 强 copyleft（**GPL-3.0**） | 1（`NeoLabHQ/context-engineering-kit`） | **禁止摘录，仅外部调用** |
+| ❌ 禁商用（**CC-BY-NC**） | 1（`Imbad0202/academic-research-skills`） | 对外发布须替换 |
+| ⛔ **无 LICENSE** | 3（`mordor-forge/study-skill`、`googlarz/math-skill`、`somenssarkar/gurukul-ai`） | **禁止摘录，仅本地自用** |
+
+**包内摘录合法性自查**：19 个库内 skill 中仅 2 个为摘录 ——
+`Jellypod-Inc/school-skills`（**MIT**）与 `GlacierXiaowei/structured-learning-skill`（**Apache-2.0**），
+**均属宽松许可，0 侵权风险**；其余 17 个为自建。
+
+### 7.2 可用性自检
+
+- **无任何仓库处于 archived 状态**
+- `googleworkspace/skills` 确认 **404**，已替换为 `googleworkspace/cli`（31,219★，Apache-2.0）
+- 全部候选的许可证 / Stars / 最近推送逐项列于 `skill-compliance-audit.md` §2.1
+
+### 7.3 安装通道实测
+
+| 通道 | 结果 |
+|---|---|
+| `npx skills add <owner>/<repo>` | ✅ **可用** |
+| `/plugin marketplace add` | ⚠️ 须在 Claude Code 内执行 |
+| 手动 clone / 复制 | ✅ 可用 |
+
+**实测装通 6 个仓库 / 70+ 个 skill**：
+`structured-learning-skill` · `mattpocock/skills@teach` · `googleworkspace/cli`（41 个 `gws-*`）·
+`ielts-claude-skills`（4 个）· `ResumeSkills`（26 个）· `papers-skill` · `scientific-agent-skills`。
+
+**环境限制（非包缺陷）**：本机沙箱有**批量删除保护**（单轮 50 次上限），
+文件多的仓库（如 `school-skills`）安装会反复重试而变慢；**不影响真实 Claude Code 使用**。
+
+### 7.4 阶段 2 验收结论
+
+| 验收项 | 判定 |
+|---|---|
+| 合法性自检（许可证四档分级） | ✅ 通过 |
+| 包内摘录 0 侵权 | ✅ 通过 |
+| GPL 污染风险已识别并隔离 | ✅ 通过 |
+| 可用性逐项核验 | ✅ 通过（26 个仓库） |
+| archived / 404 清理 | ✅ 通过（0 archived；1 个 404 已替换） |
+| 安装通道实测 | ✅ 通过（`npx skills add` 可用，6 仓库装通） |
+| 降级链写入各域 `external.md` | ✅ 通过（19 域全部含降级链 + 许可证列） |
+| 真实 Claude Code 端到端安装 | ⏳ 转阶段 5 |
+

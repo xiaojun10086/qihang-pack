@@ -1,4 +1,4 @@
-# 「启航」学伴包 v2.0 · 唯一需要按学期 / 课程修改的文件
+# 「启航」学伴包 v2.6 · 唯一需要按学期 / 课程修改的文件
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 
 # ============ 学校绑定（强绑定） ============
@@ -34,10 +34,11 @@ sleep_window: "23:30-07:00"
 # ============ 1 级库参数 ============
 library:
   clarity:
-    threshold: 0.05
+    threshold: 0.30
     max_rounds: 3
     max_questions_per_round: 3
-    weights: {W: 3.0, O: 2.5, D: 2.0, C: 1.5, B: 1.0, T: 0.5}
+    weights: {O: 1.5, T: 1.5, D: 1.5, W: 0.8, C: 0.6, B: 0.2}
+    ask_priority: {W: 3.0, O: 2.5, D: 2.0, C: 1.5, B: 1.0, T: 0.5}
     skip_when:
       - 命中校情横切且对象明确
       - 用户显式要求"直接给结果"
@@ -45,7 +46,8 @@ library:
     local_first: true          # 库内优先（硬规则）
     forbid_fabricate_url: true # 禁止编造 DUT URL
     write_learning_records: true
-    never_write_sensitive: [F3]  # 不写入档案的敏感域
+    never_write_sensitive: [F3, F5]   # 整域不写入档案（F3 身心 / F5 健康）
+    partial_write_sensitive: [F4, F6] # 排除敏感字段后写入（金额债务 / 伤病）
 
 # ============ 私密站接入（方案 A · 受控浏览器） ============
 private_sites:
@@ -60,9 +62,9 @@ private_sites:
   # 实测最佳聚合点（2026-10-01 验证）：单页拿到课表/借阅/一卡通/网费/邮件/日程
   primary_aggregator: https://portal.dlut.edu.cn/
   level_rules:
-    L1_auto: [课表, 成绩, 考试安排, 借阅, 一卡通余额, 场馆预约状态]
-    L2_confirm: [资助申请状态, 就业投递记录, 培养进度, 邮件未读提示]
-    L3_forbidden: [缴费金额, 银行卡, 身份证, 家庭信息, 邮件正文, 心理记录]
+    L1_auto: [课表 / 成绩等级 / 考试安排 / 借阅 / 一卡通余额 / 场馆预约状态 / 网费 / 日程, 网费, 日程]
+    L2_confirm: [资助申请状态 / 就业投递记录 / 培养进度 / 邮箱未读提示, 邮箱未读提示]
+    L3_forbidden: [缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细, 成绩明细]
 
 # ============ 能力域开关（19 域） ============
 domains:

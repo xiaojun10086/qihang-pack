@@ -409,7 +409,7 @@ def external_md(d):
     lines.append("> 安装前三步：① 探测是否已装 ② 读源码与许可证 ③ 装后验证。\n")
     if not d["external"]:
         lines.append("**本域暂无合适的库外 skill** —— 属于方向空白，建议直接用库内 skill 或自建。\n")
-        lines.append("> 找新 skill 的入口见 `references/routing-table.md` §0（12 个平台）。")
+        lines.append("> 找新 skill 的入口见 `references/skill-sources.md`（12 个平台）。")
         return "\n".join(lines)
     lines.append("| # | Skill | 仓库 | 安装命令 | 备注 |")
     lines.append("|---|---|---|---|---|")
@@ -457,7 +457,7 @@ def local_skill_md(d):
 def registry_md():
     lines = []
     lines.append("# 域总表（Level 2 Registry）\n")
-    lines.append(f"> 共 **{len(DOMAINS)} 个域** ｜ 生成自 `scripts/build_qihang_v2.py`\n")
+    lines.append(f"> 共 **{len(DOMAINS)} 个域** ｜ 生成自 `scripts/_build/build_qihang_v2.py`\n")
     lines.append("## 锁定规则\n")
     lines.append("1. 1 级库先做**需求明确**（6 槽位 + 澄清门）\n2. 用下表**触发词**匹配锁定域；命中多个 → 走跨域串联\n3. 无域可命中 → 走 `library/domain-review.md` 的兜底流程\n")
     for ck, (cname, cdesc) in CATS.items():
@@ -736,6 +736,10 @@ def login_sites_md():
 """
 
 def build(out):
+    # 安全护栏：拒绝危险输出路径（本函数会 rmtree(out)）
+    ap = os.path.abspath(out)
+    if ap in ("/", "\\", os.path.expanduser("~")) or len(ap.rstrip("/\\")) <= 3:
+        raise SystemExit("拒绝执行：输出路径 %s 不安全（本函数会递归删除该目录）" % ap)
     if os.path.isdir(out):
         shutil.rmtree(out)
     os.makedirs(out)

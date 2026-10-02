@@ -1,13 +1,16 @@
 # S6 · 语言能力 — 库外 skill 候选
 
 > **使用规则**：先确认库内 skill `lang-drill` 不能满足需求，再读本表。
-> 安装前三步：① 探测是否已装 ② 读源码与许可证 ③ 装后验证。
+> 安装前三步：① 探测是否已装 ② **读源码与许可证** ③ 装后验证。
+> **摘录红线**：GPL-3.0 与「无 LICENSE」一律**只做外部调用，不得复制内容进本包**。
 
-| # | Skill | 仓库 | 安装命令 | 备注 |
-|---|---|---|---|---|
-| 1 | `ielts` | `YANZHANLIN/ielts-claude-skills` | `手动复制` |  |
-| 2 | `english-coach` | `tianmind-studio/english-coach` | `npx skills add tianmind-studio/english-coach` |  |
+| # | Skill | 仓库 | 许可证 | 合规判定 | 安装命令 |
+|---|---|---|---|---|---|
+| 1 | `ielts` | `YANZHANLIN/ielts-claude-skills` | MIT | ✅ 合法 | `手动复制` |
+| 2 | `english-coach` | `tianmind-studio/english-coach` | MIT | ✅ 合法 | `npx skills add tianmind-studio/english-coach` |
 
-**降级链**：库内 skill → 上表第 1 项 → 第 2 项 → 纯提示词模式
+## 降级链
 
-> 风险与验收数据见 `references/validation-report.md`
+库内 skill → 上表第 1 项 → 上表第 2 项 → 纯提示词模式
+
+> 完整自检报告见 `references/skill-compliance-audit.md`；风险与验收数据见 `references/validation-report.md`
