@@ -12,7 +12,6 @@
 qihang-pack/
 ├── SKILL.md                  入口（安装单元）
 ├── LICENSE                     MIT 许可证全文
-├── CHANGELOG.md                版本历史（v1.0 → v2.11）
 ├── THIRD_PARTY_NOTICES.md      库外 skill 来源与许可证归属（26 个仓库）
 ├── config.yaml               学校绑定 + 学期配置 + 域开关
 ├── library/                  ★1 级 · skill 库（既是 skill 也是库）
@@ -28,7 +27,7 @@ qihang-pack/
 │       └── skills/           ★3 级 · skill
 │           ├── local/<name>/SKILL.md   库内 skill（优先，无需安装）
 │           └── external.md             库外候选（库内不满足才装）
-├── references/                  数据与外部依据（随包分发）
+├── references/                  数据与外部依据
 │   ├── dlut-official-sites.md      DUT 公开站信息库（139 条条目 / 表格行 159）
 │   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
 │   ├── dlut-field-map.md           私密站字段映射表
@@ -40,17 +39,10 @@ qihang-pack/
 │   ├── skill-compliance-audit.md   合法性 + 可用性自检报告
 │   ├── platforms.md                平台适配表
 │   └── e2e-scenarios.md            3 条端到端演示路径
-│
-│   （开发侧过程文档 8 份 —— 已移出版本控制、未随包分发，见 .gitignore）
-│   validation-report.md · acceptance-v2.md · review-report-v2.2.md ·
-│   review-report-v2.3.md · review-report-v2.4.md · stress-test-v3.md ·
-│   alignment-audit-v3.md · 需求确认书-v2三级结构.md
-│
 ├── commands/                    21 张 LearnBuddy 域入口卡（库 + 校情 + 19 域）
 └── scripts/
     ├── aligncheck.py            全量文件级对齐审计（15 组断言）
     ├── qihang.sh                管理脚本
-    └── build_qihang_v2.py       结构生成器（改域后重跑）
 ```
 
 ## 2. 工作流（严格按序）
@@ -90,7 +82,7 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 ```
 
 ```bash
-bash scripts/selfcheck.sh         # 结构与计数自检（v2.7 起 38 skill）
+bash scripts/selfcheck.sh         # 结构与计数自检
 bash scripts/audit.sh             # 安全审计 + L3 门禁实测
 bash scripts/qihang.sh status     # 三级结构完整度
 bash scripts/qihang.sh domains    # 19 域清单
@@ -113,7 +105,7 @@ bash scripts/qihang.sh new-term   # 换学期重置
 | 换什么 | 改哪里 | 成本 |
 |---|---|---|
 | 换课程/学期 | `config.yaml` 的 `courses` / `term` / `exam_weeks` | 3 行 |
-| 加/改域 | `scripts/_build/build_qihang_v2.py` 的 `DOMAINS` → 重跑 | 改数据即可 |
+| 加/改域 | 在 `domains/` 下新增 `<域ID>-<slug>/` 目录，并在 `domains/_registry.md` 登记 | 1 个目录 |
 | 加库内 skill | 对应域 `skills/local/<name>/SKILL.md` | 1 个文件 |
 | 加库外候选 | 对应域 `skills/external.md` | 1 行 |
 | 扩 DUT 信息库 | `references/dlut-*.md` | 1 行 |

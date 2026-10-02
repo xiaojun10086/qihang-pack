@@ -47,7 +47,7 @@ agent_created: true
 　　　　② 每周固定 2 小时，选校内图书馆引导岗
 　　　　③ 每次记一行：日期/项目/时长/证明人
 【产物】service/志愿记录.md
-【下一步】今天先到校团委网站确认可认定项目清单
+【下一步】今天到智慧学工系统（第二课堂/志愿时长）确认可认定项目清单
 ```
 
 ## ⚠️ 红线（不得绕过）
@@ -67,7 +67,6 @@ agent_created: true
 
 **公开站（无需登录）**
 - 学生工作处（武装部）https://xsc.dlut.edu.cn/
-- 校团委 https://tuanwei.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 智慧学工系统（第二课堂/志愿时长）

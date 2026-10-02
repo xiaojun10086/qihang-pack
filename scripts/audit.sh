@@ -46,13 +46,13 @@ for pat in 'rm[[:space:]]+-rf[[:space:]]+/' 'rm[[:space:]]+-rf[[:space:]]+~' \
 done
 [ "$hits" -eq 0 ] && ok "可执行文件中未发现危险命令模式（注释与文档说明已排除）"
 
-# rmtree / rm -rf 单独说明：正式生成器须有护栏；旧位置的残留副本属陈旧文件
+# rmtree / rm -rf 单独说明：可执行文件里出现递归删除时必须带护栏
 if echo "$EXEC_FILES" | xargs grep -ln 'shutil\.rmtree' 2>/dev/null | grep -q .; then
   for f in $(echo "$EXEC_FILES" | xargs grep -ln 'shutil\.rmtree' 2>/dev/null); do
     if grep -q '拒绝执行：输出路径' "$f" 2>/dev/null; then
-      ok "生成器含 rmtree 但已加「拒绝危险路径」护栏（$f）"
+      ok "含递归删除但已加「拒绝危险路径」护栏（$f）"
     else
-      bad "含 rmtree 且无护栏：$f —— 若位于 scripts/ 根目录，属陈旧副本，请删除（正式生成器在 scripts/_build/）"
+      bad "含递归删除且无护栏：$f"
     fi
   done
 fi
@@ -103,7 +103,7 @@ if [ -f scripts/dlut-read.sh ]; then
   fi
   out=$(bash scripts/dlut-read.sh 邮箱提示 </dev/null 2>&1); [ $? -eq 2 ] \
     && ok "L2 需确认（退出码 2）" || bad "L2 未要求确认"
-  # v2.7 新增：L3 语义变体必须同样被拒（旧版精确匹配可被「缴费金额」等绕开）
+  # L3 语义变体必须同样被拒（旧版精确匹配可被「缴费金额」等绕开）
   for t in 缴费金额 银行卡号 身份证号 邮件内容 成绩单 家庭信息卡; do
     out=$(bash scripts/dlut-read.sh "$t" </dev/null 2>&1); rc=$?
     if [ "$rc" -eq 3 ] && echo "$out" | grep -q "拒绝执行"; then ok "L3 变体拦截 [$t]"
@@ -133,7 +133,7 @@ nd=$(find domains -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
 nred=$(grep -rl '## ⚠️ 红线' domains/*/_domain.md 2>/dev/null | wc -l | tr -d ' ')
 nred2=$(grep -rl '红线\|安全护栏' domains/*/skills/local/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
 [ "$nred" -eq "$nd" ] && ok "域文件红线覆盖 $nred/$nd" || bad "域文件红线覆盖 $nred/$nd（应全覆盖）"
-# v2.7：每域 2 个库内 skill，故期望 2×域数
+# 每域 2 个库内 skill，故期望 2×域数
 _want=$((nd*2))
 [ "$nred2" -eq "$_want" ] && ok "库内 skill 红线覆盖 $nred2/$_want（每域 2 个）" || bad "库内 skill 红线覆盖 $nred2/$_want"
 grep -q '红线总览' SKILL.md 2>/dev/null && ok "入口含「红线总览」" || bad "入口缺「红线总览」"

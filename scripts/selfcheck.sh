@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 · 自检脚本（v2.6 稳健重写版）
+# 「启航」学伴包 · 自检脚本
 # 用法: bash scripts/selfcheck.sh
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT" || exit 1
-# v2.7：本脚本**不创建任何临时文件**（旧版为 TMP="${ROOT}/.selfcheck.tmp"）。
+# 本脚本**不创建任何临时文件**（旧版为 TMP="${ROOT}/.selfcheck.tmp"）。
 # 原因（实测）：部分受限环境把 rm 做成"失败即封"的拦截器，
 # 旧版在 EXIT trap 里 rm 临时文件，会导致**整个脚本静默失败、零输出**；
 # 旧版还把 .selfcheck.tmp / .selfcheck.tmp.refs 留在仓库根目录。
@@ -19,7 +19,7 @@ echo "========================================"
 
 # ---------- 1. 必备文件 ----------
 echo "[1] 必备文件完整性"
-REQ="SKILL.md README.md INSTALL.md PROJECT.md ROADMAP.md CHANGELOG.md config.yaml
+REQ="SKILL.md README.md INSTALL.md config.yaml
 LICENSE THIRD_PARTY_NOTICES.md
 library/README.md library/clarity.md library/domain-review.md library/output-spec.md
 library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md
@@ -38,7 +38,7 @@ done
 
 # ---------- 2. 19 域三级结构 ----------
 echo "[2] 19 域三级结构"
-# v2.7：改为单遍统计（原逐域循环会起 ~60 个子进程，受限环境易被中断）
+# 改为单遍统计（原逐域循环会起 ~60 个子进程，受限环境易被中断）
 nd=$(find domains -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
 n_dom=$(find domains -maxdepth 2 -name '_domain.md' 2>/dev/null | wc -l | tr -d ' ')
 n_ext=$(find domains -maxdepth 3 -path '*/skills/external.md' 2>/dev/null | wc -l | tr -d ' ')
@@ -52,7 +52,7 @@ nbad=0
 
 # ---------- 3. frontmatter ----------
 echo "[3] SKILL.md frontmatter"
-# v2.7：单次 awk 取代「逐文件 3 次 grep」（原为 ~120 个子进程）
+# 单次 awk 取代「逐文件 3 次 grep」（原为 ~120 个子进程）
 _ff=$(awk '
   FNR==1{if(fn!="")chk(); fn=FILENAME; first=0; hasname=0; hasdesc=0}
   FNR==1 && $0 ~ /^---[[:space:]]*$/{first=1}
@@ -69,9 +69,8 @@ else bad "$nfm 处不合规"; printf '%s\n' "$_ff" | head -6 | sed 's/^/       /
 
 # ---------- 4. 交叉引用（零临时文件版） ----------
 echo "[4] 文档交叉引用"
-# v2.7：单遍 grep -r 取全部引用，再在 shell 内用内建 test 判定（原为逐文件 ~280 个子进程）
-# v2.11：扫描范围排除 .learnbuddy / .git / .idea —— 记忆日志会「提及」文件名，不属产品文档引用
-# v2.11：开发侧过程文档（见 .gitignore）**未随包分发**，不参与交付物的交叉引用契约。
+# 单遍 grep -r 取全部引用，再在 shell 内用内建 test 判定
+# 扫描范围排除 .learnbuddy / .git / .idea —— 记忆日志会「提及」文件名，不属产品文档引用
 # 排除项从 .gitignore 派生（单一真相源）—— 克隆者本就没有这些文件，判据才能两边一致。
 _exdev=""
 for _g in $(grep -E '^references/.*[.]md$' .gitignore 2>/dev/null); do
@@ -88,7 +87,7 @@ while IFS= read -r p; do
     [ "$nbroke" -le 8 ] && printf '       %s\n' "$p"
   fi
 done <<< "$_refs"
-# v2.11 新增：**裸文件名**引用（无目录前缀，如 `xxx-review.md`）同样必须存在。
+# **裸文件名**引用（无目录前缀，如 `xxx-review.md`）同样必须存在。
 # 原正则只认「带目录前缀」的路径，此类断链会被漏检（实测：曾有文件引用不存在的 review 副本）。
 # 口径：只取反引号内、不含斜杠的 *.md 名，按「全仓库是否存在同名文件」判定。
 # _BARE_SKIP = 故意不存在于仓库的名字（见 [5] 陈旧文件清单中的历史文件名）。
@@ -111,8 +110,8 @@ else bad "$nbroke 处失效引用"; fi
 # ---------- 5. 陈旧文件 ----------
 echo "[5] 陈旧 / 无关文件"
 STALE="references/routing-table.md .extracted dev proc
-scripts/__pycache__ scripts/_build/__pycache__
-scripts/build_qihang_v2.py scripts/build_phase1.py scripts/build_phase2.py"
+scripts/__pycache__ 
+"
 ns=0
 for f in $STALE; do [ -e "$f" ] && { warn "待清: $f"; ns=$((ns+1)); }; done
 [ "$ns" -eq 0 ] && ok "无陈旧文件"
@@ -126,18 +125,18 @@ done
 
 # ---------- 7. 阈值 / 旧域名 / 红线去重 / 版本 / 清单 ----------
 echo "[7] 一致性与红线"
-_bad_th=$(grep -rlE "(U ?[≤≥><]=? ?5%|U ?≈ ?0\.05|threshold: 0\.05)" --include='*.md' --include='*.yaml' --include='*.html' . 2>/dev/null | grep -v _build | grep -v review-report | grep -v 需求确认书 | grep -v clarity.md | wc -l | tr -d ' ')
+_bad_th=$(grep -rlE "(U ?[≤≥><]=? ?5%|U ?≈ ?0\.05|threshold: 0\.05)" --include='*.md' --include='*.yaml' --include='*.html' . 2>/dev/null | grep -v clarity.md | grep -v 需求确认书 | grep -v clarity.md | wc -l | tr -d ' ')
 [ "${_bad_th:-0}" -eq 0 ] && ok "无旧阈值残留" || bad "$_bad_th 个文件仍有旧阈值（期望 0.30）"
 
 _od=$(grep -rlnE '\b[A-G] 域\b' domains/ library/ SKILL.md 2>/dev/null | wc -l | tr -d ' ')
 [ "${_od:-0}" -eq 0 ] && ok "无 v1.1 旧域名残留" || bad "$_od 个文件含旧域名"
 
-# v2.7：单遍统计（原逐文件 grep 为 ~95 个子进程）
+# 单遍统计（原逐文件 grep 为 ~95 个子进程）
 _dup=$(grep -rc '^## ⚠️ 红线（不得绕过）' domains --include='*.md' 2>/dev/null \
        | awk -F: '$2>1' | wc -l | tr -d ' ')
 [ "${_dup:-0}" -eq 0 ] && ok "无重复红线段" || bad "$_dup 个文件红线段重复"
 
-# v2.7：单次 awk 检测「同一 skill 内红线条目重复」
+# 单次 awk 检测「同一 skill 内红线条目重复」
 _di=$(awk '/^## ⚠️ 红线/{inr=1;next} inr&&/^## /{inr=0}
   inr&&/^- /{k=FILENAME "|" $0; if(seen[k]++){print FILENAME; print FILENAME > "/dev/stderr"}}
 ' $(find domains -path '*skills/local*' -name SKILL.md 2>/dev/null | sort) 2>/dev/null \
@@ -147,7 +146,7 @@ _di=$(awk '/^## ⚠️ 红线/{inr=1;next} inr&&/^## /{inr=0}
 _nr=$(grep -rl '## ⚠️ 红线' domains/*/_domain.md 2>/dev/null | wc -l | tr -d ' ')
 [ "${_nr:-0}" -eq 19 ] && ok "域文件红线覆盖 19/19" || bad "域文件红线覆盖 $_nr/19"
 
-# v2.7 新增：库内 skill 的红线条目必须与所属域**逐条一致**（防措辞漂移）
+# 库内 skill 的红线条目必须与所属域**逐条一致**（防措辞漂移）
 # 单次 awk 完成全部比对：既快，也避免受限环境对子进程数的限制
 _rd=$(awk '
   function save(f){S[f]=sig}
@@ -195,7 +194,7 @@ echo "   info DUT 公开站表格行: $pub"
 
 # ---------- 8b. 入口唯一性与声明 ----------
 echo "[8b] 入口唯一性与声明"
-# v2.11 新增：堵住「同名双入口」盲区 —— 此前包根 SKILL.md 与 library/SKILL.md
+# 堵住「同名双入口」盲区 —— 此前包根 SKILL.md 与 library/SKILL.md
 # 都写 `name: qihang` 且红线表已分叉，而四个校验器当时**全绿**（纯结构性盲区）。
 #
 # ⚠️ 为什么编号是 8b 而不是 11（**锚点冲突，实测踩过**）：
@@ -220,14 +219,19 @@ if [ -f SKILL.md ] && [ ! -e library/SKILL.md ]; then
 else bad "入口不唯一（library/SKILL.md 不应存在，应为 library/README.md）"; fi
 
 _dmiss=0
-for d in LICENSE CHANGELOG.md THIRD_PARTY_NOTICES.md; do
+for d in LICENSE THIRD_PARTY_NOTICES.md; do
   [ -f "$d" ] || { bad "缺声明文件: $d"; _dmiss=$((_dmiss+1)); }
 done
-[ "$_dmiss" -eq 0 ] && ok "LICENSE / CHANGELOG.md / THIRD_PARTY_NOTICES.md 三件齐全"
+[ "$_dmiss" -eq 0 ] && ok "LICENSE / THIRD_PARTY_NOTICES.md 声明文件齐全"
 
-_gi=$(grep -c '^references/.*[.]md$' .gitignore 2>/dev/null); _gi=${_gi:-0}
-[ "$_gi" -ge 8 ] && ok "开发侧过程文档已由 .gitignore 排除（$_gi 项）" \
-  || bad "gitignore 排除不足（$_gi 项，期望 ≥8）"
+# .gitignore 不随包交付时，排除已在导出阶段完成 —— 断言降级为说明项
+if [ -f .gitignore ]; then
+  _gi=$(grep -c '^references/.*[.]md$' .gitignore); _gi=${_gi:-0}
+  [ "$_gi" -ge 8 ] && ok "过程文档已由 .gitignore 排除（$_gi 项）" \
+    || bad "gitignore 排除不足（$_gi 项，期望 ≥8）"
+else
+  ok "发布副本：无 .gitignore（过程文档已在导出阶段剔除）"
+fi
 
 # ---------- 9. 多源比对与 DUT 适配 ----------
 echo "[9] 库外多源比对"

@@ -66,7 +66,6 @@ license: MIT
 ## DUT 绑定点
 
 - 学生工作处（武装部）https://xsc.dlut.edu.cn/
-- 校团委 https://tuanwei.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
 - 智慧学工系统（第二课堂/志愿时长）

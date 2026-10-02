@@ -2,7 +2,7 @@
 # 「启航」DUT 私密站只读取数（方案 A · 受控浏览器）
 #
 # 用法: bash dlut-read.sh <目标> [--yes] [--dry-run]
-#   目标: 门户 | 课表 | 借阅 | 一卡通 | 网费 | 日程 | 邮箱提示
+#   目标: 门户 | 课表 | 借阅 | 一卡通 | 网费 | 日程 | 邮箱提示 | 资助申请状态 | 就业投递记录 | 培养进度
 #
 # 铁律：① 只读 ② 不外传 ③ 不落盘  ④ 必须用独立 Profile
 # 授权分级：L1 直接读 | L2 需 --yes 确认 | L3 一律拒绝
@@ -13,6 +13,9 @@ HOME_DIR="${HOME:-$USERPROFILE}"
 PROFILE_DIR="${HOME_DIR}/.qihang/browser-profile"
 SSO="https://sso.dlut.edu.cn/"
 PORTAL="https://portal.dlut.edu.cn/"
+XSC="https://xsc.dlut.edu.cn/"      # 学生工作系统（资助/评奖）
+JOB="https://job.dlut.edu.cn/"      # 就业信息网（投递记录）
+GS="https://gs.dlut.edu.cn/"        # 研究生系统（培养进度）
 
 TARGET="${1:-}"
 shift || true
@@ -23,7 +26,7 @@ for a in "$@"; do
 done
 
 # ---------- L3 禁止清单（**语义匹配**：先拦，绝不打开页面） ----------
-# v2.7 修复：旧版用精确 case 匹配，导致「缴费金额」「银行卡号」「身份证号」「邮件内容」
+# 旧版用精确 case 匹配，导致「缴费金额」「银行卡号」「身份证号」「邮件内容」
 # 这类**变体写法绕开拒绝分支**（落到 usage，退出码 1）。改为关键词包含匹配，闭合绕过面。
 L3_KEYS="缴费 金额 银行卡 身份证 家庭信息 家庭 邮件正文 邮件内容 心理记录 成绩明细 成绩单 简历"
 L3_HIT=""
@@ -53,10 +56,13 @@ case "$TARGET" in
   网费)      LEVEL=L1; URL="$PORTAL";        DESC="网络自助（余额/流量）" ;;
   日程)      LEVEL=L1; URL="$PORTAL";        DESC="我的日程 / 校内通知" ;;
   邮箱提示)  LEVEL=L2; URL="$PORTAL";        DESC="邮箱未读提示（**不读邮件正文**）" ;;
+  资助申请状态) LEVEL=L2; URL="$XSC";       DESC="资助 / 评奖申请状态（只看办理进度，不看数额与家庭信息）" ;;
+  就业投递记录) LEVEL=L2; URL="$JOB";       DESC="就业投递记录（只看投递与面试状态，不看个人经历正文）" ;;
+  培养进度)     LEVEL=L2; URL="$GS";        DESC="研究生培养进度（学分完成度 / 开题状态）" ;;
   ""|*)
     sed -n '3,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
     echo ""
-    echo "可用目标: 门户 课表 借阅 一卡通 网费 日程 邮箱提示"
+    echo "可用目标: 门户 课表 借阅 一卡通 网费 日程 邮箱提示 资助申请状态 就业投递记录 培养进度"
     exit 1 ;;
 esac
 

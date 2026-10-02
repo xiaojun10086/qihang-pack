@@ -45,7 +45,7 @@
 
 - **不存在**既有真实使用量、又深耕教育/校园场景的中文索引站。
 - 教育垂类 skill 中，仅 `mattpocock/skills · teach` 进入 skills.sh 榜单（**736.7K installs**）。
-- **v2.7 更正**：此前「教育场景空白」的结论已过时 —— GitHub 检索发现多个千星级教育垂类：
+- **更正**：此前「教育场景空白」的结论已过时 —— GitHub 检索发现多个千星级教育垂类：
   `bevibing/tutor-skills`（1,313★）、`GarethManning/education-agent-skills`（817★，教师侧）、
   `bevibing/socrates-skill`（326★）、`Lucaswangzcx/literature-downloader-skill`（230★，中文）、
   `flysheep-ai/education-skills`（106★，中文）。但**适配 DUT 本科新生**的仍以中文垂类为主，且整体占比不高（见 `skill-matrix-v3.md` 量化结论）。

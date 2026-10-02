@@ -25,7 +25,7 @@
 ## 0.1 ★ Profile 隔离（实测踩坑，强制项）
 
 **实测发现（2026-10-01）**：`agent-browser` 默认复用用户**真实 Chrome 的 profile**
-（实测命中 `C:\Users\xiaojun\AppData\Local\Google\Chrome\User Data` → Profile 2）。
+（实测命中 `%LOCALAPPDATA%\Google\Chrome\User Data` → Profile 2）。
 
 **后果**：自动化浏览器不只是拿到 DUT 登录态，而是**继承了该 profile 下所有站点的 Cookie**（邮箱、社交、支付…），远超本包所需的最小权限。
 

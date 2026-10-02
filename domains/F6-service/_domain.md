@@ -23,7 +23,6 @@
 
 **公开站（无需登录）**
 - 学生工作处（武装部）https://xsc.dlut.edu.cn/
-- 校团委 https://tuanwei.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 智慧学工系统（第二课堂/志愿时长）

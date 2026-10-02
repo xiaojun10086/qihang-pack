@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 v2.6.0 · 三级结构管理脚本
+# 「启航」学伴包 v2.11.0 · 三级结构管理脚本
 # 用法: bash qihang.sh {status|platform|probe|install|domains|registry|records|new-term}
 set -uo pipefail
 
@@ -9,6 +9,17 @@ CONFIG="${ROOT}/config.yaml"
 PUBLIC="${ROOT}/references/dlut-official-sites.md"
 PRIVATE="${ROOT}/references/dlut-login-sites.md"
 DOMAINS_DIR="${ROOT}/domains"
+
+# 学习档案目录（见 `library/memory.md` §2.2 / §5）：
+#   正常 → {ws}/.learnbuddy/memory/qihang/<域ID>.md ｜ 回落 → <包根>/records/<域ID>.md
+# 包以「项目级」方式装在 {ws}/.learnbuddy/skills/qihang 时自动定位 {ws}；
+# 用户级安装（~/.learnbuddy/skills/...）不写进平台托管的 ~/.learnbuddy/memory/，直接走包根回落。
+RECORDS_DIR_DEFAULT=""
+case "$ROOT" in
+  "${HOME}/.learnbuddy/skills/"*) : ;;
+  */.learnbuddy/skills/*) RECORDS_DIR_DEFAULT="${ROOT%%/.learnbuddy/skills/*}/.learnbuddy/memory/qihang" ;;
+esac
+[ -n "$RECORDS_DIR_DEFAULT" ] || RECORDS_DIR_DEFAULT="${ROOT}/records"
 
 # 域ID|目录slug|主库外仓库|安装命令   （每个域取第一条库外候选作代表）
 REGISTRY="S1|course-qa|mattpocock/skills|npx skills add mattpocock/skills@teach
@@ -27,13 +38,24 @@ R3|research-tools|mattpocock/skills|npx skills add mattpocock/skills@teach
 R4|publication|Imbad0202/academic-research-skills|npx skills add Imbad0202/academic-research-skills（CC-BY-NC）
 R5|integrity|NeoLabHQ/context-engineering-kit|npx skills add NeoLabHQ/context-engineering-kit"
 
-# v2.9：公开站「表格数据行」= 去掉分隔行与表头行（表头 = 其下一行为分隔行）。
+# 公开站「表格数据行」= 去掉分隔行与表头行（表头 = 其下一行为分隔行）。
 # 旧版用 `grep -o ✅` 统计会把正文里的标记一并算入（得 71/26），正确口径为 67/21。
 pub_rows() {
   awk '{l[NR]=$0} END{for(i=1;i<=NR;i++){ if(l[i]~/^\|/ && l[i]!~/^\|[ :|-]+\|$/ && l[i+1]!~/^\|[ :|-]+\|$/) print l[i] }}' "$PUBLIC"
 }
 
-is_installed() { [ -d "${SKILLS_DIR}/$1" ]; }
+# 推断库外候选在 ${SKILLS_DIR} 下真正落地的目录名。
+# 优先级：① 安装命令里的显式 @skill 名；② `skills add <owner>/<name>` 的 <name>；③ 仓库末段。
+# 旧实现直接取仓库名（mattpocock/skills → "skills"），与实际安装目录不符，导致 status 恒报「已装 0」。
+cand_name() {
+  local repo="$1" inst="$2" n=""
+  n=$(printf '%s\n' "$inst" | sed -n 's/.*@\([A-Za-z0-9._-][A-Za-z0-9._-]*\).*/\1/p' | head -1)
+  [ -n "$n" ] || n=$(printf '%s\n' "$inst" | sed -n 's#.*skills add [^ ]*/\([A-Za-z0-9._-][A-Za-z0-9._-]*\).*#\1#p' | head -1)
+  [ -n "$n" ] || n=$(basename "$repo")
+  printf '%s' "$n"
+}
+
+is_installed() { [ -d "${SKILLS_DIR}/$(cand_name "$1" "$2")" ]; }
 
 cmd_domains() {
   echo "「启航」域清单（Level 2）"
@@ -66,8 +88,7 @@ cmd_status() {
   while IFS='|' read -r id slug repo inst; do
     [ -z "$id" ] && continue
     total=$((total+1))
-    nm=$(basename "$repo")
-    if is_installed "$nm"; then ok=$((ok+1)); fi
+    if is_installed "$repo" "$inst"; then ok=$((ok+1)); fi
   done <<< "$REGISTRY"
   printf '  已装 %s / %s（库外为兜底，不装也可用库内）\n' "$ok" "$total"
   echo "[资源] DUT 信息库"
@@ -79,8 +100,8 @@ cmd_probe() {
   echo "探测库外候选缺失项（不执行安装）"
   while IFS='|' read -r id slug repo inst; do
     [ -z "$id" ] && continue
-    nm=$(basename "$repo")
-    is_installed "$nm" || printf '  %s 域缺 → %s\n      装: %s\n' "$id" "$repo" "$inst"
+    is_installed "$repo" "$inst" || printf '  %s 域缺 → %s\n      期望目录: %s\n      装: %s\n' \
+      "$id" "$repo" "$(cand_name "$repo" "$inst")" "$inst"
   done <<< "$REGISTRY"
   echo ""
   echo "提示：库内 skill 已全部就绪，库外仅作增强，可跳过。"
@@ -90,8 +111,7 @@ cmd_install() {
   echo "安装库外候选（已装跳过；可选）"
   while IFS='|' read -r id slug repo inst; do
     [ -z "$id" ] && continue
-    nm=$(basename "$repo")
-    if is_installed "$nm"; then printf '  %s 已装，跳过\n' "$id"; continue; fi
+    if is_installed "$repo" "$inst"; then printf '  %s 已装，跳过\n' "$id"; continue; fi
     case "$inst" in
       npx*) printf '  %s 安装中: %s\n' "$id" "$inst"; eval "$inst" || printf '  ! %s 失败，含库内降级\n' "$id" ;;
       *)    printf '  %s 请在 Agent 中执行: %s\n' "$id" "$inst" ;;
@@ -148,8 +168,61 @@ cmd_records() {
   esac
 }
 
+cmd_platform() {
+  echo "「启航」平台探测（LearnBuddy / WorkBuddy）"
+  echo "----------------------------------------"
+  echo "[运行环境]"
+  printf '  OS        : %s\n' "$(uname -s 2>/dev/null || echo 未知)"
+  printf '  Bash      : %s\n' "${BASH_VERSION:-未知}"
+  printf '  HOME      : %s\n' "${HOME:-（未设置）}"
+  printf '  包根      : %s\n' "$ROOT"
+  echo "[平台目录]"
+  if [ -d "${HOME}/.learnbuddy" ]; then
+    printf '  ✓ 配置目录    %s\n' "${HOME}/.learnbuddy"
+  else
+    printf '  · 配置目录未创建  %s（首次使用平台时自动生成）\n' "${HOME}/.learnbuddy"
+  fi
+  if [ -d "$SKILLS_DIR" ]; then
+    printf '  ✓ skills 目录  %s（已装 %s 个）\n' "$SKILLS_DIR" \
+      "$(find "$SKILLS_DIR" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
+  else
+    printf '  · skills 目录未创建  %s\n' "$SKILLS_DIR"
+  fi
+  echo "[本包安装位置]"
+  _hit=0
+  if [ -d "${HOME}/.learnbuddy/skills/qihang" ]; then
+    printf '  ✓ 用户级  %s\n' "${HOME}/.learnbuddy/skills/qihang"; _hit=1
+  fi
+  case "$ROOT" in
+    */.learnbuddy/skills/*)
+      printf '  ✓ 项目级  %s\n' "$ROOT"; _hit=1 ;;
+  esac
+  [ "$_hit" = 0 ] && printf '  · 未在标准安装位检出（当前直接运行于 %s，不影响使用）\n' "$ROOT"
+  echo "[记忆层]"
+  if [ -f "${HOME}/.learnbuddy/MEMORY.md" ]; then
+    printf '  ✓ 用户级长期记忆  %s/.learnbuddy/MEMORY.md\n' "$HOME"
+  else
+    printf '  · 用户级长期记忆未创建  %s/.learnbuddy/MEMORY.md\n' "$HOME"
+  fi
+  printf '  · 学习档案目录  %s\n' "$RECORDS_DIR_DEFAULT"
+  if [ -d "$RECORDS_DIR_DEFAULT" ]; then
+    printf '    已有 %s 个域档案\n' "$(ls -1 "$RECORDS_DIR_DEFAULT" 2>/dev/null | wc -l | tr -d ' ')"
+  else
+    printf '    （尚未创建，首次归档时自动生成）\n'
+  fi
+  echo "[就绪度]"
+  _nd=$(find "$DOMAINS_DIR" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
+  _ns=$(find "$DOMAINS_DIR" -path '*/skills/local/*/SKILL.md' 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$_nd" -gt 0 ] && [ "$_ns" -gt 0 ]; then
+    printf '  ✓ 可离线直接用：%s 个域 / %s 个库内 skill（不依赖库外安装）\n' "$_nd" "$_ns"
+  else
+    printf '  ✗ 包结构不完整，请重新解压后再试\n'
+  fi
+}
+
 case "${1:-status}" in
   status)   cmd_status ;;
+  platform) cmd_platform ;;
   probe)    cmd_probe ;;
   install)  cmd_install ;;
   domains)  cmd_domains ;;

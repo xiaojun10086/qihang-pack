@@ -1,6 +1,6 @@
 # 库外 Skill 多源比对矩阵 v3
 
-> 生成：`scripts/_build/build_phase14.py` ｜ 基准日 **2026-10-02**
+> 基准日 **2026-10-02**
 > 数据：GitHub API 实抓（stars / license / pushed_at / archived / size）+ 12 平台可达性实测
 > 评分口径与门禁见各域 `skills/external.md` §二；本表为全量汇总。
 
@@ -64,7 +64,7 @@
 | `R4` | `academic-research-skills`（`Imbad0202/academic-research-skills`） | 2 | 同上 |
 | `R4` | `paper-tutor-skills`（`cabbage2000-lab/paper-tutor-skills`） | 2 | 同上 |
 
-## 二、许可证分布（本轮实抓复核）
+## 二、许可证分布
 
 | 判定 | 数量 | 处置 |
 |---|---|---|
@@ -72,18 +72,18 @@
 | ⚠️ 强 copyleft / 禁商用 | 1 | **只做外部调用，禁止摘录进包** |
 | ⛔ 无 LICENSE / API 未识别 | 11 | **禁止摘录、禁止再分发** |
 
-## 三、与 v2.6 相比的修正
+## 三、复核修正
 
-| # | v2.6 原判 | 本轮实测 | 处置 |
+| # | 原判 | 实测 | 处置 |
 |---|---|---|---|
 | 1 | `wentorai/Research-Claw` 标 MIT ✅ | GitHub API 返回 **未声明**（NOASSERTION） | 改判「许可证未声明」，降权并标注 |
 | 2 | `Imbad0202/academic-research-skills` 标 CC-BY-NC 4.0 | GitHub API 返回 **未声明** | 按**最保守**处置（视同禁商用 + 禁摘录） |
 | 3 | `anthropics/skills` 标 Apache-2.0(子目录) | 仓库**根目录**未声明总许可证 | 标注「子目录许可，根目录未声明」 |
 | 4 | R2 候选仓库名写作 `openai`，许可证「未查到」却判 ✅ 合法 | 实为 **`openai/skills`**（27,841★），根目录未声明 | **修正仓库名**，合规改判为 0（不入围） |
 | 5 | `GlacierXiaowei` 安装命令写作 `structured-learning` | 实际仓库名 `structured-learning-skill` | 修正安装命令 |
-| 6 | 教育垂类「只有 mattpocock/teach 入榜」 | 新发现 `bevibing/tutor-skills` 1,313★、`GarethManning/education-agent-skills` 817★、`bevibing/socrates-skill` 326★、`Lucaswangzcx/literature-downloader-skill` 230★ | **结论过时**，已补入候选表 |
+| 6 | 教育垂类「只有 mattpocock/teach 入榜」 | 实测发现 `bevibing/tutor-skills` 1,313★、`GarethManning/education-agent-skills` 817★、`bevibing/socrates-skill` 326★、`Lucaswangzcx/literature-downloader-skill` 230★ | **结论过时**，已补入候选表 |
 
-## 四、新增收录（v2.6 未收录）
+## 四、新增收录
 
 | 仓库 | ★ | 许可证 | 收录域 |
 |---|---|---|---|

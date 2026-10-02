@@ -69,7 +69,6 @@ license: MIT
 ## DUT 绑定点
 
 - 心理健康教育与咨询中心 https://xinli.dlut.edu.cn/
-- 校团委 https://tuanwei.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
 - i大工 APP 心理服务-咨询预约（仅 APP）

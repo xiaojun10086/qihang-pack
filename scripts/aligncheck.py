@@ -15,7 +15,7 @@
   python scripts/aligncheck.py .            # 单轮
   python scripts/aligncheck.py . 5          # 连跑 5 轮（校验确定性）
 
-检查项（14 组）：
+检查项（19 组：A–S）：
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
@@ -30,6 +30,11 @@
   L 澄清门算例：文档中出现的 U 值可复算
   M 红线一致性：域 ↔ 库内 skill 逐条（含顺序）
   N 无临时/备份残留文件
+  O 库内 skill 可行性（O1–O9）：必需小节 / 步骤可执行 / 示例可复现 / 输出合规格 /
+    O7 标题跨域唯一 · O8 同域定位不相似 · O9 目录名跨域唯一
+  P 三级路由链可解：触发词数 / 执行顺序覆盖库内 skill、库外兜底与输出规范
+  Q 文档声明数 == 实测数：表格行 / 条目 / ✅⚠️ 分项 / §8 项数 / 文件总数
+  S 小节正文非空（空壳标题）：正文完全为空 → FAIL；仅 <8 字 → WARN
 """
 import os, re, sys, json, glob, io, hashlib, collections
 
@@ -48,10 +53,7 @@ def rd(p):
     with open(p, 'r', encoding='utf-8', errors='replace') as fh:
         return fh.read()
 
-# v2.11：开发侧过程文档（评审 / 审计 / 验收 / 需求书）已移出版本控制、未随包分发。
-# 它们**不在交付物里**，因此必须同时从「文件总数」等全量统计中排除 ——
-# 否则克隆者跑 aligncheck 会因「PROJECT.md 声明值 != 实测值」而误报。
-# phase19 回写 PROJECT.md 的声明值时用的是同一口径（见 measure_files()）。
+# 评审 / 审计 / 验收 / 需求书等过程文档不属交付物，统计时应一并排除。
 DEV_ONLY_DOCS = {
     'validation-report.md', 'acceptance-v2.md',
     'review-report-v2.2.md', 'review-report-v2.3.md', 'review-report-v2.4.md',
@@ -301,13 +303,11 @@ def run_round(r):
             bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 2.11.0）' % pv)
     except Exception:
         pass
-    # 当前状态/提交物 的版本声明（易漂移点，显式点名）
-    for f, pat_ in (('PROJECT.md', r'##\s*7\.\s*当前状态（v([\d.]+)）'),
-                    ('qihang-scenario-design.html', r'<title>[^<]*（v([\d.]+)）')):
-        t = rd(f)
-        m = re.search(pat_, t)
-        if m and m.group(1) != '2.11.0':
-            bad(f, '版本声明 %s（期望 2.11.0）' % m.group(1))
+    # 提交物的版本声明（易漂移点，显式点名）
+    _vf = 'qihang-scenario-design.html'
+    m = re.search(r'<title>[^<]*（v([\d.]+)）', rd(_vf))
+    if m and m.group(1) != '2.11.0':
+        bad(_vf, '版本声明 %s（期望 2.11.0）' % m.group(1))
 
     # ---------- I commands ----------
     for f in sorted(glob.glob('commands/*.md')):
@@ -453,9 +453,43 @@ def run_round(r):
         for f_ in fs:
             m = re.search(r'\*\*定位\*\*[：:]\s*(.+)', rd(f_.replace('\\', '/')))
             pos.append(m.group(1).strip() if m else '')
-        r = difflib.SequenceMatcher(None, pos[0], pos[1]).ratio()
-        if r > 0.60:
-            bad(fs[0].replace('\\', '/'), '同域两条 skill 定位相似度 %.2f（路由歧义）' % r)
+        sim = difflib.SequenceMatcher(None, pos[0], pos[1]).ratio()
+        if sim > 0.60:
+            bad(fs[0].replace('\\', '/'), '同域两条 skill 定位相似度 %.2f（路由歧义）' % sim)
+
+    # O9 库内 skill 目录名不得跨域重复（同名会导致路由判定与安装路径冲突）
+    _name_map = collections.defaultdict(list)
+    for _f in LOCAL:
+        _sd = _f.split('/skills/local/')[1].split('/')[0]
+        _name_map[_sd].append(_f)
+    for _nm, _fs in sorted(_name_map.items()):
+        if len(_fs) > 1:
+            bad('（全域）', '库内 skill 目录名跨域重复「%s」: %s' % (_nm, _fs))
+
+    # S 小节正文非空（防空壳标题：只有标题、正文缺失 —— 读者无法据以执行）
+    # 两个例外不算空壳：① 容器标题（下面直接跟更深一级子节，如 ## 2 → ### 2.1）；
+    #                   ② 代码块里的示例标题（非真实小节），因此先屏蔽 ``` 围栏区间。
+    for _f in [x for x in MD if x.startswith('library/') or x.endswith('/_domain.md')]:
+        _t = rd(_f)
+        _fence = [(m.start(), m.end()) for m in re.finditer(r'```.*?```', _t, re.S)]
+
+        def _in_fence(_p, _sp=_fence):
+            return any(_a <= _p < _b for _a, _b in _sp)
+
+        _hs = [(m.start(), len(m.group(1)), m.group(2).strip(), m.end())
+               for m in re.finditer(r'^(#{2,3})\s+([^\n]+)', _t, re.M)]
+        for _i, (_st, _lv, _title, _en) in enumerate(_hs):
+            if _in_fence(_st):
+                continue
+            _nxt = _hs[_i + 1] if _i + 1 < len(_hs) else None
+            if _nxt and _nxt[1] > _lv and not _in_fence(_nxt[0]):
+                continue  # 容器标题：由下层子节承载正文
+            _body = _t[_en:(_nxt[0] if _nxt else len(_t))]
+            _n = len(re.sub(r'[\s>*\-|`#]+', '', _body))
+            if _n == 0:
+                bad(_f, '小节「%s」正文完全为空（空壳标题）' % _title[:32])
+            elif _n < 8:
+                warn(_f, '小节「%s」正文仅 %d 字（偏短，请确认非空壳）' % (_title[:32], _n))
 
     # ---------- P 三级路由链可解 ----------
     for d in DOMS:
@@ -492,7 +526,7 @@ def run_round(r):
     ENTRIES = len(_data)
     OK_N = len([l for l in _data if '✅' in l])
     WARN_N = len([l for l in _data if '⚠️' in l])
-    # v2.9.2 全量扫描：不再用**文件名白名单**（旧版只查 7 个文件，ROADMAP / references
+    # 全量扫描：不再用**文件名白名单**（旧版只查 7 个文件，部分目录
     # 全在射程外）。改为「全量扫描 + 内容标记豁免」，豁免必须**写在文件里**：
     #   · 文件级：前 20 行含「历史文档」→ 整文件豁免
     #   · 行级  ：该行或其前 2 行含「历史口径」→ 该处豁免
@@ -571,13 +605,6 @@ def run_round(r):
                     if int(_m2.group(1)) != _n8:
                         bad(_f2, '「未核实清单」项数 %s ≠ 实测 %d'
                             % (_m2.group(1), _n8))
-
-    # 文件总数声明（口径：不含 .git/.idea/.learnbuddy/开发侧过程文档）
-    _pt = rd('PROJECT.md') if os.path.exists('PROJECT.md') else ''
-    for m in re.finditer(r'\*\*(\d{2,4})\s*个文件\*\*', _pt):
-        if int(m.group(1)) != len(FILES):
-            bad('PROJECT.md', '文件总数声明 %s ≠ 实测 %d'
-                % (m.group(1), len(FILES)))
 
     # ---------- 汇总 ----------
     nf = sum(1 for x in FIND if x[0] == 'FAIL')

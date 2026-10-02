@@ -69,7 +69,6 @@ agent_created: true
 
 **公开站（无需登录）**
 - 心理健康教育与咨询中心 https://xinli.dlut.edu.cn/
-- 校团委 https://tuanwei.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - i大工 APP 心理服务-咨询预约（仅 APP）
