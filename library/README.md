@@ -11,6 +11,7 @@
 - `output-checklist.md` —— 配套：7 项硬校验
 - `memory.md` —— 学习档案：四类内容 + 分层落点 + 敏感域红线
 - `login-policy.md` —— 登录选择原则：A/B/C 三档 + 标准话术 + 安全保障
+- `general-fallback.md` —— 通用兜底框架：**需求未命中任何 skill / 域时**仍产出有效结果的六步框架
 
 ## 边界（硬规则）
 

@@ -44,14 +44,14 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 - LearnBuddy 通过 **SKILL.md 的 `description`** 自动判定何时加载，**无需斜杠命令**。
 - 触发表述（在 `description` 中已写死）：涉及**大连理工大学校情（学院/校区/选课/校历/职能部门/联系方式）、
   大学课程学习、备考复习、课堂笔记、作业与实验报告、科研文献、作息专注、升学求职**的**模糊求助**。
-- `commands/` 是 **LearnBuddy 域入口卡**（21 张 = 库入口 1 + 校情 1 + 19 域），
+- `commands/` 是 **LearnBuddy 域入口卡**（22 张 = 库入口 1 + 校情 1 + 20 域），
   用自然语言说需求即可命中对应域，无需输入命令。
 
 ---
 
 ## 四、记忆系统对接（关键差异）
 
-LearnBuddy 有三层记忆，本包的工作流第 **⑧** 步「归档」直接落到这套记忆里：
+LearnBuddy 有三层记忆，本包的工作流第 **⑥** 步「输出 / 归档」直接落到这套记忆里：
 
 | 层 | 位置 | 本包怎么写 |
 |---|---|---|
@@ -73,21 +73,23 @@ LearnBuddy 有三层记忆，本包的工作流第 **⑧** 步「归档」直接
 | `show_widget` | 流程示意、概念图可直接内联渲染，无需落文件 |
 | 子 agent（Task） | 跨域串联时，可让子 agent 并行处理不同域 |
 | 对话检索（`conversation_search`） | 学习档案缺失时，回溯历史结论 |
-| 技能检索（`find-skills`） | 库内不满足时，为各域 `skills/external.md` 找可用库外 skill |
 | MCP 连接器 | F1 域可接腾讯地图、文档类可接腾讯文档等（按需） |
 
 ---
 
-## 六、库外 skill 安装（仅库内不满足时）
+## 六、库内 skill：唯一通道（无需安装）
 
-| 通道 | 做法 |
+本包为**纯 DUT 特化库**，运行时**只指向本地库内 skill**：
+
+| 项 | 说明 |
 |---|---|
-| **LearnBuddy 原生（首选）** | 用 `find-skills` 技能检索并安装到 `~/.learnbuddy/skills/` |
-| 通用 skills CLI | `npx skills add <owner>/<repo>`（npm 包，跨 agent 的通用安装器） |
-| 手动 | `git clone` 后把 `<repo>/skills/*` 复制到 `~/.learnbuddy/skills/` |
+| 通道 | **库内唯一** —— 不安装、不引用任何库外 skill |
+| 规模 | `domains/*/skills/local/` 下 **92 个**（自建 80 + 由 MIT/Apache 许可外部最优解重写 12） |
+| 依赖 | **零外部依赖**，离线可用 |
+| 缺口 | 库内无法覆盖的细分场景走**同域降级**并记「缺口」，不引入库外通道 |
 
-> **摘录红线**：GPL-3.0 / AGPL / CC-BY-NC / 无 LICENSE 一律**只做外部调用，不得复制内容进本包**
-> （见 `references/skill-compliance-audit.md`）。
+> **构建期素材红线**：GPL / AGPL / CC-BY-NC / 无 LICENSE 一律**只做思路参考，不得复制内容进包**
+> （见 `references/skill-compliance-audit.md`）。素材经「骨架提取 + 重写 + DUT 特化」后成为本包自有 skill。
 
 ---
 

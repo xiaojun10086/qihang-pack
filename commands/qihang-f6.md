@@ -15,10 +15,9 @@ description: F6 军训与志愿（生活类）域入口卡：军训、国防、�
 
 **处理步骤**
 
-1. **需求明确**：读 `library/clarity.md` 拆 6 槽位；`U > 0.30` 或关键槽 `O/T/D` 缺失 / 歧义 → 先追问。
+1. **需求明确**：读 `library/clarity.md` 拆 6 槽位，算 U；**先过 §5 的 6 条「不追问例外」（优先级 4 红线 > 6 通用知识型 > 1 校情横切 > 2 关键槽齐全 > 5 紧急豁免 > 3 显式要求）**；未命中例外且关键槽 `O/T/D` 缺失 / 歧义（`cᵢ = 0.5`）→ 才追问。
 2. **域审查**：读 `domains/F6-service/_domain.md` 确认边界；越界按 `library/domain-review.md` 改锁到对应域。
-3. **库内优先**：调用库内 skill `service-log` / `volunteer-hours`
-   路径：`domains/F6-service/skills/local/service-log/SKILL.md`、`domains/F6-service/skills/local/volunteer-hours/SKILL.md`
-4. **库外兜底**：仅当库内不满足，才读 `domains/F6-service/skills/external.md` 走安装（LearnBuddy 用 `find-skills`）。
-5. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
-6. **DUT 绑定点**：见 `domains/F6-service/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（只读 / 不外传 / 不落盘）。
+3. **库内择优**：按**主体与任务**在本域 4 个库内 skill 中择优 —— 首选 `service-log`；其余 `military-prep` / `social-practice` / `volunteer-hours` 按触发场景择用
+   路径：`domains/F6-service/skills/local/military-prep/SKILL.md`、`domains/F6-service/skills/local/service-log/SKILL.md`、`domains/F6-service/skills/local/social-practice/SKILL.md`、`domains/F6-service/skills/local/volunteer-hours/SKILL.md`
+4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
+5. **DUT 绑定点**：见 `domains/F6-service/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（只读 / 不外传 / 不落盘）。

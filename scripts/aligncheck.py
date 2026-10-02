@@ -5,34 +5,35 @@
 ==================================
 
 用途：**打开每一个文件**做机器可判定的一致性检查，用于「对齐 + 可行性验证」。
-与另外三个脚本的分工：
+与其余四个脚本的分工：
   selfcheck.sh   结构/计数（bash，轻量）
   audit.sh       安全/合规/门禁（bash）
   regress.sh     行为回归（bash，澄清门算例与 L3 门禁矩阵）
   aligncheck.py  **全量文件级对齐 + skill 可行性契约**（本脚本，Python）
+  runcheck.py    端到端运行性（每域多触发词跑完整三级链）
 
 用法:
   python scripts/aligncheck.py .            # 单轮
   python scripts/aligncheck.py . 5          # 连跑 5 轮（校验确定性）
 
-检查项（19 组：A–S）：
+检查项（17 组：A–D、F–Q、S）：
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
   D SKILL.md 契约：frontmatter / 归属域 / 必需小节 / 步骤数 / 示例三要素 / 输出字段
-  E external.md 契约：表格列数一致、评分在值域、最优解唯一或声明无
   F _domain.md 契约：必需小节 / 库内 skill 实体存在 / 「不覆盖→X域」指向存在
   G 交叉引用：文档里写的路径真实存在
-  H 计数与版本：registry 候选数、skill 数、版本号全域唯一
+  H 计数与版本：registry 声明 skill 数 == 实体、版本号全域唯一（含插件清单）
   I commands/*.md：入口可用、引用路径存在
   J .codebuddy-plugin/plugin.json：JSON 合法、版本一致
   K HTML：主要标签配平、引用的文档存在
-  L 澄清门算例：文档中出现的 U 值可复算
+  L 澄清门算例：文档中出现的 U 值可复算；L2 示例「澄清判定」的 U 断言须附依据；
+    L3 阈值不得被当作**唯一**放行条件（须引 §5 例外 / 阈值真相源 / 「追问 N 问后」）
   M 红线一致性：域 ↔ 库内 skill 逐条（含顺序）
   N 无临时/备份残留文件
   O 库内 skill 可行性（O1–O9）：必需小节 / 步骤可执行 / 示例可复现 / 输出合规格 /
     O7 标题跨域唯一 · O8 同域定位不相似 · O9 目录名跨域唯一
-  P 三级路由链可解：触发词数 / 执行顺序覆盖库内 skill、库外兜底与输出规范
+  P 三级路由链可解：触发词数 / 执行顺序覆盖库内 skill、输出规范（库内唯一通道）
   Q 文档声明数 == 实测数：表格行 / 条目 / ✅⚠️ 分项 / §8 项数 / 文件总数
   S 小节正文非空（空壳标题）：正文完全为空 → FAIL；仅 <8 字 → WARN
 """
@@ -75,7 +76,6 @@ FILES = walk_files()
 MD = [f for f in FILES if f.endswith('.md')]
 SKILLS = [f for f in FILES if f.endswith('SKILL.md')]
 LOCAL = [f for f in SKILLS if '/skills/local/' in f]
-EXTERNAL = [f for f in FILES if f.endswith('skills/external.md')]
 DOMAIN = [f for f in FILES if f.endswith('/_domain.md')]
 DOMS = sorted(d for d in os.listdir('domains') if os.path.isdir(os.path.join('domains', d)))
 
@@ -173,8 +173,8 @@ def run_round(r):
             if k not in head:
                 bad(f, 'frontmatter 缺 %s' % k)
         vm = re.search(r'version:\s*([\d.]+)', head)
-        if vm and vm.group(1) != '2.11.0':
-            bad(f, '版本号 %s（期望 2.11.0）' % vm.group(1))
+        if vm and vm.group(1) != '3.0.0':
+            bad(f, '版本号 %s（期望 3.0.0）' % vm.group(1))
         if '/skills/local/' in f:
             for h in NEED:
                 if h not in t:
@@ -191,39 +191,14 @@ def run_round(r):
                     bad(f, '示例输出缺 %s' % k)
             # 归属域
             did = f.split('/')[1].split('-')[0]
-            m = re.search(r'归属域\*\*[：:]\s*`?([SFR]\d)`?', t)
+            m = re.search(r'归属域\*\*[：:]\s*`?([A-Za-z]\d)`?', t)
             if not m:
                 bad(f, '缺「归属域」')
             elif m.group(1) != did:
                 bad(f, '归属域写 %s，实际属 %s' % (m.group(1), did))
-            for ref in ('library/output-spec.md', 'library/output-checklist.md', '../../external.md'):
+            for ref in ('library/output-spec.md', 'library/output-checklist.md'):
                 if ref not in t:
                     warn(f, '未引用 %s' % ref)
-
-    # ---------- E external.md 契约 ----------
-    for f in EXTERNAL:
-        t = rd(f)
-        for h in ('## 一、候选比对', '## 二、评分口径', '## 三、最优解', '## 四、降级链'):
-            if h not in t:
-                bad(f, '缺小节 %s' % h)
-        if 'DUT 落地评估' not in t:
-            bad(f, '缺 DUT 落地评估')
-        # 表格列数一致
-        tbl = [l for l in t.splitlines() if re.match(r'^\|\s*\d+\s*\|', l)]
-        if tbl:
-            cols = [l.count('|') for l in tbl]
-            if len(set(cols)) != 1:
-                bad(f, '候选表列数不一致: %s' % sorted(set(cols)))
-        nbest = t.count('✅ **最优解**')
-        if nbest > 1:
-            bad(f, '最优解标记 %d 个（应 ≤1）' % nbest)
-        declared_none = ('无（纯自建）' in t) or ('无合规且适配 DUT' in t) or ('无合规库外首选' in t)
-        if not declared_none and nbest == 0:
-            warn(f, '既无最优解标记、也未声明「无」')
-        for m in re.finditer(r'\|\s*(\d\.\d{2})\s*\|\s*(?:✅|⛔|⚠️|备选)', t):
-            v = float(m.group(1))
-            if not (0 <= v <= 5):
-                bad(f, '综合分越界 %s' % v)
 
     # ---------- F _domain.md 契约 ----------
     for f in DOMAIN:
@@ -247,7 +222,7 @@ def run_round(r):
         if sorted(decl) != sorted(real):
             bad(f, '声明库内 skill %s ≠ 实体 %s' % (sorted(decl), sorted(real)))
         # 不覆盖 →X域 指向存在
-        for x in re.findall(r'→\s*`?([SFR]\d)`?', t):
+        for x in re.findall(r'→\s*`?([A-Za-z]\d)`?', t):
             if not any(dd.startswith(x + '-') for dd in DOMS):
                 bad(f, '「不覆盖 →%s」指向不存在的域' % x)
         # 执行顺序必须「先判红线」
@@ -271,17 +246,52 @@ def run_round(r):
                 if not alive:
                     bad(f, '失效引用 → %s' % p)
 
+    # ---------- G2 节号引用（`X.md` §N）必须指向目标文件真实存在的编号小节 ----------
+    # 防复发：output-spec.md 曾写 `output-checklist.md` §6，而该文件只有 §一/二/三 +
+    # 「7 项通用硬校验」的第 6 项 —— 节号漂移不会被路径检查捕获（文件确实存在）。
+    # 口径保守：仅当目标文件确实含「## N.」形式的编号标题时才校验；用 §一/§二 这类
+    # 中文编号指向中文节的不做名校验（不同文件编号风格不统一，易假阳性）。
+    _secpat = re.compile(r'`([\w./-]+\.md)`\s*§\s*(\d+)')
+    for f in MD:
+        for m in _secpat.finditer(rd(f)):
+            tgt = m.group(1)
+            cand = [tgt, os.path.normpath(os.path.join(os.path.dirname(f), tgt)).replace('\\', '/')]
+            real = next((c for c in cand if os.path.exists(c)), None)
+            if not real:
+                continue
+            heads = re.findall(r'^##\s+(\d+)\.', rd(real), re.M)
+            if heads and m.group(2) not in heads:
+                bad(f, '节号引用 `%s` §%s 越界（该文件仅有 §%s）'
+                    % (tgt, m.group(2), '/§'.join(heads)))
+
     # ---------- H 计数与版本 ----------
     reg = rd('domains/_registry.md')
+    # H1 registry 声明的「域数 / 库内 skill 数」必须等于实测
+    _mh = re.search(r'共\s*\*{0,2}(\d+)\s*个域\s*/\s*(\d+)\s*个库内\s*skill', reg)
+    if _mh:
+        if int(_mh.group(1)) != len(DOMS):
+            bad('domains/_registry.md', '声明域数 %s ≠ 实测 %d' % (_mh.group(1), len(DOMS)))
+        if int(_mh.group(2)) != len(LOCAL):
+            bad('domains/_registry.md', '声明库内 skill 数 %s ≠ 实测 %d' % (_mh.group(2), len(LOCAL)))
+    else:
+        bad('domains/_registry.md', '未声明「共 N 个域 / M 个库内 skill」')
+    # H2 每行 registry 的 skill 列表 == 该域 skills/local/ 实体目录
     for line in reg.splitlines():
-        m = re.match(r'^\|\s*`([SFR]\d)`\s*\|([^|]*)\|([^|]*)\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|', line)
-        if not m: continue
-        did, n = m.group(1), int(m.group(5))
-        d = [x for x in DOMS if x.startswith(did + '-')][0]
-        ex = rd('domains/%s/skills/external.md' % d)
-        a = len([l for l in ex.splitlines() if re.match(r'^\|\s*\d+\s*\|', l)])
-        if a != n:
-            bad('domains/_registry.md', '%s 候选数记 %d，实际 %d' % (did, n, a))
+        # 列：| 域ID | 名称 | 触发词 | 库内 skill 列表 |
+        m = re.match(r'^\|\s*`([A-Za-z]\d)`\s*\|([^|]*)\|([^|]*)\|\s*([^|]+?)\s*\|\s*$', line)
+        if not m:
+            continue
+        did, cell = m.group(1), m.group(4)
+        dm = [x for x in DOMS if x.startswith(did + '-')]
+        if not dm:
+            bad('domains/_registry.md', '未知域 ID: %s（不在 %d 域目录中）' % (did, len(DOMS)))
+            continue
+        d = dm[0]
+        decl = sorted(re.findall(r'`([\w-]+)`', cell))
+        real = sorted(x for x in os.listdir('domains/%s/skills/local' % d)
+                      if os.path.isdir('domains/%s/skills/local/%s' % (d, x)))
+        if decl != real:
+            bad('domains/_registry.md', '%s 声明 skill %s ≠ 实体 %s' % (did, decl, real))
     # 版本号：只认 **frontmatter 内**的 version（避免把报告正文里的引文当声明）
     vers = set()
     for f in FILES:
@@ -294,20 +304,22 @@ def run_round(r):
         m = re.search(r'^version:\s*([\d.]+)', fm.group(1), re.M)
         if m:
             vers.add(m.group(1))
-    if vers - {'2.11.0'}:
+    if vers - {'3.0.0'}:
         bad('（frontmatter）', '版本号不唯一: %s' % sorted(vers))
     # 插件清单（JSON 风格，易与 YAML 风格一起被漏改）
     try:
         pv = json.loads(rd('.codebuddy-plugin/plugin.json')).get('version')
-        if pv != '2.11.0':
-            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 2.11.0）' % pv)
+        if pv != '3.0.0':
+            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 3.0.0）' % pv)
     except Exception:
         pass
     # 提交物的版本声明（易漂移点，显式点名）
+    # 注意：场景设计书（HTML）属过程文档，发布副本在导出阶段已剔除，不存在属正常，须跳过而非崩溃。
     _vf = 'qihang-scenario-design.html'
-    m = re.search(r'<title>[^<]*（v([\d.]+)）', rd(_vf))
-    if m and m.group(1) != '2.11.0':
-        bad(_vf, '版本声明 %s（期望 2.11.0）' % m.group(1))
+    if os.path.exists(_vf):
+        m = re.search(r'<title>[^<]*（v([\d.]+)）', rd(_vf))
+        if m and m.group(1) != '3.0.0':
+            bad(_vf, '版本声明 %s（期望 3.0.0）' % m.group(1))
 
     # ---------- I commands ----------
     for f in sorted(glob.glob('commands/*.md')):
@@ -323,8 +335,8 @@ def run_round(r):
     try:
         pj = json.loads(rd('.codebuddy-plugin/plugin.json'))
         v = json.dumps(pj)
-        if '2.11.0' not in v:
-            warn('.codebuddy-plugin/plugin.json', '未声明版本 2.11.0')
+        if '3.0.0' not in v:
+            warn('.codebuddy-plugin/plugin.json', '未声明版本 3.0.0')
     except Exception as e:
         bad('.codebuddy-plugin/plugin.json', 'JSON 无法解析: %s' % e)
 
@@ -357,6 +369,31 @@ def run_round(r):
                 calc = round(1 - num / 6.1, 3)
                 if abs(calc - doc) > 0.002:
                     bad(f, 'U 值复算不符: 文档 %s，复算 %.3f（%s/6.1）' % (doc, calc, num))
+
+    # ---------- L2 示例「澄清判定」的 U 断言必须可判定 ----------
+    # 防复发：示例曾出现「U ≤ 0.30」而按公式实为 0.311（关键槽齐全例 A 的同形输入）。
+    # 示例未列槽位表、无法直接复算，故改为**依据断言**：凡以 `U ≤` 给出结论，
+    # 必须同时给出判定依据 —— 引 §5 例外 / 「追问 N 问后」/ 分母 6.1。
+    # 注意：「无需追问」里的「追问」不是依据，故要求 `追问\s*\d` 或 `问后` 这种**有追问轮次**的写法。
+    for f in LOCAL:
+        t2 = rd(f)
+        mc2 = re.search(r'\*\*澄清判定\*\*[：:][^\n]*', t2)
+        if mc2 and re.search(r'U\s*[≤<]', mc2.group(0)):
+            if not re.search(r'例外|追问\s*\d|问后|/\s*6\.1', mc2.group(0)):
+                bad(f, '澄清判定给 U 数值结论但无依据（须引 §5 例外 / 「追问 N 问后」/ 分母 6.1）')
+
+    # ---------- L3 阈值不得被当作**唯一**放行条件 ----------
+    # 防复发：各 _domain.md 与各库内 skill 曾统一写「U ≤ 0.30 才继续」／
+    # 「（6 槽位 + 澄清门，U ≤ 0.30）」，与 clarity.md §3 直接冲突 ——
+    # 关键槽 O/T/D 齐全且不歧义时，U > 0.30 也应放行（§5 例外 2，见 §6 例 A）。
+    # 规则：凡出现 `U ≤ 0.30` 的行，必须同时给出「它不是唯一条件」的依据 ——
+    #       引 §5 例外 / 注明自己是阈值真相源 / 或标注是「追问 N 问后」才降到 0.30。
+    _L3_OK = re.compile(r'例外|§5|阈值|真相源|追问\s*\d|问后|/\s*6\.1')
+    for f in MD:
+        for _i3, _ln3 in enumerate(rd(f).split('\n')):
+            if re.search(r'U\s*[≤<]\s*0\.30', _ln3) and not _L3_OK.search(_ln3):
+                bad(f, '第 %d 行把阈值当唯一放行条件（须引 §5 例外 / 注明为阈值真相源 / '
+                       '标注「追问 N 问后」）: %s' % (_i3 + 1, _ln3.strip()[:60]))
 
     # ---------- M 红线一致性 ----------
     def sig(t):
@@ -444,7 +481,7 @@ def run_round(r):
     for title, fs in titles.items():
         if len(fs) > 1:
             bad('（全域）', '库内 skill 标题重名「%s」: %s' % (title, fs))
-    # O8 同域两条 skill 定位不得高度相似（否则用户无法选择）
+    # O8 同域多条 skill 定位不得高度相似（否则用户无法选择）—— 全对比较
     for d in DOMS:
         fs = sorted(glob.glob('domains/%s/skills/local/*/SKILL.md' % d))
         if len(fs) < 2:
@@ -453,9 +490,14 @@ def run_round(r):
         for f_ in fs:
             m = re.search(r'\*\*定位\*\*[：:]\s*(.+)', rd(f_.replace('\\', '/')))
             pos.append(m.group(1).strip() if m else '')
-        sim = difflib.SequenceMatcher(None, pos[0], pos[1]).ratio()
-        if sim > 0.60:
-            bad(fs[0].replace('\\', '/'), '同域两条 skill 定位相似度 %.2f（路由歧义）' % sim)
+        _n = len(fs)
+        for _i in range(_n):
+            for _j in range(_i + 1, _n):
+                sim = difflib.SequenceMatcher(None, pos[_i], pos[_j]).ratio()
+                if sim > 0.60:
+                    bad(fs[_i].replace('\\', '/'),
+                        '同域 skill 定位与 %s 相似度 %.2f（路由歧义）'
+                        % (os.path.basename(os.path.dirname(fs[_j])), sim))
 
     # O9 库内 skill 目录名不得跨域重复（同名会导致路由判定与安装路径冲突）
     _name_map = collections.defaultdict(list)
@@ -491,7 +533,7 @@ def run_round(r):
             elif _n < 8:
                 warn(_f, '小节「%s」正文仅 %d 字（偏短，请确认非空壳）' % (_title[:32], _n))
 
-    # ---------- P 三级路由链可解 ----------
+    # ---------- P 三级路由链可解（库内唯一通道） ----------
     for d in DOMS:
         dm_p = 'domains/%s/_domain.md' % d
         dm = rd(dm_p)
@@ -506,10 +548,11 @@ def run_round(r):
         for lx in local_dirs:
             if lx not in o:
                 bad(dm_p, '执行顺序未引用库内 skill `%s`（路由断链）' % lx)
-        if 'skills/external.md' not in o:
-            bad(dm_p, '执行顺序未给出库外兜底路径')
         if 'library/output-spec.md' not in o:
             bad(dm_p, '执行顺序未接输出规范')
+        # 库内唯一通道：执行顺序不得再给出库外兜底路径
+        if 'external.md' in o or '库外' in o:
+            bad(dm_p, '执行顺序仍含库外通道表述（应为库内唯一）')
     # P2 一级库链完整（SKILL.md 声明的规则文件必须都在）
     root_skill = rd('SKILL.md')
     for rf in re.findall(r'`(library/[\w-]+\.md)`', root_skill):

@@ -9,7 +9,10 @@
 #   regress.sh    **行为回归**：澄清门算例 / L3 门禁矩阵 / 红线一致性 / 结构不变量
 #
 # 设计约束：**零临时文件**（受限环境里 rm 可能被拦截，写临时文件会让脚本静默失败）；
-#           **不依赖 seq 等外部命令**（Windows Git Bash 精简环境可能缺）。
+#           **不依赖 seq 等外部命令**（Windows Git Bash 精简环境可能缺）；
+#           **rc=127 视为环境抖动**：受限环境在高负载下偶发「子进程启动失败」，
+#           表现为退出码 127（而非被测脚本的真实结论）。对 127 做**有限重试**，
+#           避免把环境抖动误判成功能缺陷。
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT" || exit 1
@@ -41,18 +44,34 @@ L3_CASES="缴费|3
 心理记录|3
 成绩明细|3
 成绩单|3
-简历|3
+绩点|3
 邮箱提示|2
 资助申请状态|2
 就业投递记录|2
 培养进度|2
-成绩|1"
-L3_OK="课表 网费 借阅 门户 日程"
+成绩|1
+邮件|1"
+L3_OK="课表 网费 借阅 门户 日程 成绩等级"
 
 _redsig() { awk '/^## ⚠️ 红线/{f=1;next} f&&/^## /{exit} f&&/^- /{print}' "$1" 2>/dev/null; }
 _ok()   { printf '  OK   %s\n' "$1"; }
 _fail() { printf '  FAIL %s\n' "$1"; FAIL=$((FAIL+1)); }
 _chk()  { if [ "$2" = "$3" ]; then printf '  OK   %-26s %s\n' "$1" "$2"; else _fail "$1 实际 $2 / 期望 $3"; fi; }
+
+# _run_rc <期望退出码> <命令...>
+# 执行命令并回显**真实退出码**；若回显 127（子进程启动失败 = 环境抖动）则重试，
+# 一旦命中期望码立即返回。最多 5 次，避免受限环境负载抖动导致的假 FAIL。
+_run_rc() {
+  local want="$1"; shift
+  local rc=127 i=1
+  while [ "$i" -le 5 ]; do
+    "$@" </dev/null >/dev/null 2>&1; rc=$?
+    [ "$rc" -eq "$want" ] && break
+    [ "$rc" -eq 127 ] || break          # 非 127 = 真实结论，不重试
+    i=$((i + 1))
+  done
+  echo "$rc"
+}
 
 FAIL=0
 r=1
@@ -75,15 +94,22 @@ while [ "$r" -le "$ROUNDS" ]; do
   echo "[2] L3 / L2 / 歧义 门禁矩阵"
   while IFS='|' read -r tgt exp; do
     [ -n "${tgt:-}" ] || continue
-    bash scripts/dlut-read.sh "$tgt" </dev/null >/dev/null 2>&1
-    rc=$?
+    rc=$(_run_rc "$exp" bash scripts/dlut-read.sh "$tgt")
     if [ "$rc" -eq "$exp" ]; then _ok "$(printf '%-10s rc=%s' "$tgt" "$rc")"
+    elif [ "$rc" -eq 127 ]; then _fail "$(printf '%-10s rc=127（环境抖动·重试 5 次仍未启动）' "$tgt")"
     else _fail "$(printf '%-10s rc=%s（期望 %s）' "$tgt" "$rc" "$exp")"; fi
   done < <(printf '%s\n' "$L3_CASES")
   for tgt in $L3_OK; do
-    out=$(bash scripts/dlut-read.sh "$tgt" --dry-run </dev/null 2>&1); rc=$?
+    out=""; rc=127; i=1
+    while [ "$i" -le 5 ]; do
+      out=$(bash scripts/dlut-read.sh "$tgt" --dry-run </dev/null 2>&1); rc=$?
+      { [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q "未启动浏览器" && printf '%s' "$out" | grep -q "独立Profile"; } && break
+      [ "$rc" -eq 127 ] || break        # 非 127 = 真实结论，不重试
+      i=$((i + 1))
+    done
     if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q "未启动浏览器" && printf '%s' "$out" | grep -q "独立Profile"; then
       _ok "$(printf '%-10s L1 dry-run + 强制独立 Profile' "$tgt")"
+    elif [ "$rc" -eq 127 ]; then _fail "$(printf '%-10s L1 环境抖动·重试 5 次仍未启动（rc=127）' "$tgt")"
     else _fail "$(printf '%-10s L1 路径异常（rc=%s）' "$tgt" "$rc")"; fi
   done
 
@@ -118,10 +144,10 @@ while [ "$r" -le "$ROUNDS" ]; do
   ' $(find domains -name '_domain.md' -o -name 'SKILL.md' | sort) || FAIL=$((FAIL+1))
 
   echo "[4] 结构与计数不变量"
-  _chk "域数" "$(find domains -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')" 19
-  _chk "库内 skill 总数" "$(find domains -path '*skills/local/*/SKILL.md' | wc -l | tr -d ' ')" 38
-  _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 8
-  _chk "commands 数" "$(ls -1 commands/*.md | wc -l | tr -d ' ')" 21
+  _chk "域数" "$(find domains -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')" 20
+  _chk "库内 skill 总数" "$(find domains -path '*skills/local/*/SKILL.md' | wc -l | tr -d ' ')" 92
+  _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 9
+  _chk "commands 数" "$(ls -1 commands/*.md | wc -l | tr -d ' ')" 22
   _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 159
   # 数据条目 = 表格行 − 分隔行 − 表头行（表头 = 下一行是分隔行的那些行）
   _entries=$(awk '{L[NR]=$0} END{
@@ -134,10 +160,33 @@ while [ "$r" -le "$ROUNDS" ]; do
       print c+0
     }' references/dlut-official-sites.md)
   _chk "公开站数据条目" "$_entries" 139
-  _chk "external.md 含 DUT 落地评估" "$(grep -l 'DUT 落地评估' domains/*/skills/external.md | wc -l | tr -d ' ')" 19
+  _chk "无库外通道 external.md" "$(find domains -path '*/skills/external.md' | wc -l | tr -d ' ')" 0
   _chk "无自检临时文件残留" "$(find . -maxdepth 1 -name '.selfcheck.tmp*' | wc -l | tr -d ' ')" 0
 
-  echo "[5] 脚本语法"
+  echo "[5] 零命中兜底链（无域 / 无对口 skill 也必须出有效结果）"
+  # 断言全部落在**成文规则**上：兜底框架文件存在 → 两个入口都指向它 → 明令不得只回一句拒绝。
+  if [ -f library/general-fallback.md ]; then
+    _ok "兜底框架 library/general-fallback.md 在位"
+  else _fail "缺 library/general-fallback.md（零命中无成文框架）"; fi
+  for _k in '## 2. 六步通用框架' '## 3. 域通用框架' '【结论】与【下一步】'; do
+    if grep -qF -- "$_k" library/general-fallback.md 2>/dev/null; then _ok "兜底框架含「$_k」"
+    else _fail "兜底框架缺「$_k」"; fi
+  done
+  # 入口 1：无域 → domain-review.md §3 必须把兜底路由到 general-fallback.md 的六步通用框架
+  if grep -q 'general-fallback.md' library/domain-review.md 2>/dev/null \
+     && grep -q '§2 六步通用框架' library/domain-review.md 2>/dev/null; then
+    _ok "domain-review.md 无域兜底 → 路由到六步通用框架"
+  else _fail "domain-review.md 无域兜底未路由到 general-fallback.md §2"; fi
+  # 入口 2：有域无对口 skill → 输出规格必须承认「域通用框架」这一备选
+  if grep -q 'general-fallback.md' library/output-spec.md 2>/dev/null; then
+    _ok "output-spec.md 降级备选 → 引用兜底框架"
+  else _fail "output-spec.md 未承认「域通用框架」备选"; fi
+  # 反例必须被明列为违规（防 AI 回一句「本包暂无这个方向」就收工）
+  if grep -q '本包暂无这个方向' library/general-fallback.md 2>/dev/null; then
+    _ok "明列反例：只回「暂无该方向」= 违规"
+  else _fail "兜底框架未把「只回一句拒绝」列为反例"; fi
+
+  echo "[6] 脚本语法"
   for s in scripts/*.sh; do
     [ -e "$s" ] || continue
     if bash -n "$s" 2>/dev/null; then _ok "$(basename "$s")"
