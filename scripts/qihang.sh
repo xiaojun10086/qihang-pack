@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 v2.6.0 · 三级结构管理脚本（多平台）
+# 「启航」学伴包 v2.9.0 · 三级结构管理脚本（LearnBuddy 目标平台）
 # 用法: bash qihang.sh {status|platform|probe|install|domains|registry|records|new-term}
 set -uo pipefail
 
@@ -11,23 +11,20 @@ DOMAINS_DIR="${ROOT}/domains"
 HOME_DIR="${HOME:-$USERPROFILE}"
 
 # ---------- 多平台探测 ----------
+# v2.8：本包只适配 LearnBuddy / WorkBuddy 单一目标平台（原多平台探测已移除）
 detect_skills_dir() {
-  for d in "${HOME_DIR}/.learnbuddy/skills" "${HOME_DIR}/.claude/skills" \
-           "${ROOT}/../.learnbuddy/skills" "${ROOT}/../.claude/skills" \
-           "${HOME_DIR}/.codex/skills" "${HOME_DIR}/.gemini/skills"; do
+  for d in "${HOME_DIR}/.learnbuddy/skills" "${ROOT}/../.learnbuddy/skills"; do
     [ -d "$d" ] && { echo "$d"; return 0; }
   done
   echo "${HOME_DIR}/.learnbuddy/skills"
 }
 SKILLS_DIR="$(detect_skills_dir)"
 
+# v2.8：只认 LearnBuddy / WorkBuddy（唯一目标平台）
 platform_of() {
   case "$1" in
     */.learnbuddy/skills) echo "LearnBuddy / WorkBuddy" ;;
-    */.claude/skills)     echo "Claude Code" ;;
-    */.codex/skills)      echo "Codex" ;;
-    */.gemini/skills)     echo "Gemini CLI" ;;
-    *) echo "未知 / 自定义" ;;
+    *) echo "非目标平台（本包只适配 LearnBuddy）" ;;
   esac
 }
 
@@ -43,13 +40,13 @@ done
 
 # 域ID|目录slug|主库外仓库|安装命令
 REGISTRY="S1|course-qa|mattpocock/skills|npx skills add mattpocock/skills@teach
-S2|lecture-notes|Jellypod-Inc/school-skills|/plugin marketplace add Jellypod-Inc/school-skills
+S2|lecture-notes|Jellypod-Inc/school-skills|npx skills add Jellypod-Inc/school-skills
 S3|assignment|kgraph57/paper-writer-skill|npx skills add kgraph57/paper-writer-skill
 S4|exam-prep|GlacierXiaowei/structured-learning-skill|npx skills add glacierxiaowei/structured-learning
-S5|academic-writing|Imbad0202/academic-research-skills|/plugin marketplace add Imbad0202/academic-research-skills
+S5|academic-writing|Imbad0202/academic-research-skills|npx skills add Imbad0202/academic-research-skills
 S6|language|YANZHANLIN/ielts-claude-skills|npx skills add YANZHANLIN/ielts-claude-skills
 F1|campus-affairs|googleworkspace/cli|npx skills add googleworkspace/cli
-F2|focus|alirezarezvani/claude-skills|/plugin marketplace add alirezarezvani/claude-skills
+F2|focus|alirezarezvani/claude-skills|npx skills add alirezarezvani/claude-skills
 F7|further-study|Haadhi76/SOP_Consultant|npx skills add Haadhi76/SOP_Consultant
 F8|career|Paramchoudhary/ResumeSkills|npx skills add Paramchoudhary/ResumeSkills
 R1|literature|xwmxcz/papers-skill|npx skills add xwmxcz/papers-skill
@@ -57,6 +54,12 @@ R2|experiment-data|K-Dense-AI/scientific-agent-skills|npx skills add K-Dense-AI/
 R3|research-tools|mattpocock/skills|npx skills add mattpocock/skills@teach
 R4|publication|Imbad0202/academic-research-skills|npx skills add Imbad0202/academic-research-skills
 R5|integrity|NeoLabHQ/context-engineering-kit|npx skills add NeoLabHQ/context-engineering-kit"
+
+# v2.9：公开站「表格数据行」= 去掉分隔行与表头行（表头 = 其下一行为分隔行）。
+# 旧版用 `grep -o ✅` 统计会把正文里的标记一并算入（得 71/26），正确口径为 67/21。
+pub_rows() {
+  awk '{l[NR]=$0} END{for(i=1;i<=NR;i++){ if(l[i]~/^\|/ && l[i]!~/^\|[ :|-]+\|$/ && l[i+1]!~/^\|[ :|-]+\|$/) print l[i] }}' "$PUBLIC"
+}
 
 is_installed() { [ -d "${SKILLS_DIR}/$1" ]; }
 
@@ -67,8 +70,7 @@ cmd_platform() {
   echo "  → 判定平台: $(platform_of "$SKILLS_DIR")"
   echo ""
   echo "本机可用安装位置："
-  for d in "${HOME_DIR}/.learnbuddy/skills" "${HOME_DIR}/.claude/skills" \
-           "${HOME_DIR}/.codex/skills" "${HOME_DIR}/.gemini/skills"; do
+  for d in "${HOME_DIR}/.learnbuddy/skills" "${ROOT}/../.learnbuddy/skills"; do
     if [ -d "$d" ]; then printf '  ✓ %-46s (%s)\n' "$d" "$(platform_of "$d")"
     else printf '  · %-46s 未安装\n' "$d"; fi
   done
@@ -78,7 +80,7 @@ cmd_platform() {
 }
 
 cmd_status() {
-  echo "「启航」学伴包 v2.6.0 · 状态"
+  echo "「启航」学伴包 v2.9.0 · 状态"
   echo "平台: $(platform_of "$SKILLS_DIR")  |  skills: ${SKILLS_DIR}"
   echo "----------------------------------------"
   echo "[1级] skill 库"
@@ -141,8 +143,13 @@ cmd_registry() {
   echo "DUT 公开信息库: $PUBLIC"
   [ -f "$PUBLIC" ] && {
     echo "  表格行: $(grep -c '^|' "$PUBLIC")"
-    echo "  已核验: $(grep -o '✅' "$PUBLIC" | wc -l | tr -d ' ')"
-    echo "  待核实: $(grep -o '⚠️' "$PUBLIC" | wc -l | tr -d ' ')"
+    _pr="$(pub_rows | wc -l | tr -d ' ')"
+    echo "  数据条目: ${_pr}"
+    echo "  已核验: $(pub_rows | grep -o '✅' | wc -l | tr -d ' ')"
+    echo "  待核实: $(pub_rows | grep -o '⚠️' | wc -l | tr -d ' ')"
+    _ok="$(pub_rows | grep -o '✅' | wc -l | tr -d ' ')"
+    _wn="$(pub_rows | grep -o '⚠️' | wc -l | tr -d ' ')"
+    echo "  未标注: $(( _pr - _ok - _wn ))"
   }
   echo "DUT 私密站清单: $PRIVATE"
   [ -f "$PRIVATE" ] && echo "  表格行: $(grep -c '^|' "$PRIVATE")"

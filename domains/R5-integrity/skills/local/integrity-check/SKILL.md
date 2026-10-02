@@ -1,7 +1,7 @@
 ---
 name: qihang-integrity-check
 description: 「启航」R5 学术规范与伦理域库内 skill：跑一份合规自查：引用、查重、署名、数据来源、AI 使用声明，逐项给可执行修正。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -73,3 +73,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 规范自检 | `integrity-check` |
+| AI使用声明 | `ai-disclosure` |

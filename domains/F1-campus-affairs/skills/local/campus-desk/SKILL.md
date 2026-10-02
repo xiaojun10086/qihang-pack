@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-desk
 description: 「启航」F1 校园事务域库内 skill：先查 DUT 信息库锁定入口与电话，再给「去哪办 / 带什么 / 多久」，查不到就明说未收录。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -76,3 +76,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 校园事务办理台 | `campus-desk` |
+| 证明开具指引 | `campus-proof-guide` |

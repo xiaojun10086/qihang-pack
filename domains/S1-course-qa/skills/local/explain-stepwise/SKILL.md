@@ -1,7 +1,7 @@
 ---
 name: qihang-explain-stepwise
 description: 「启航」S1 课程答疑域库内 skill：先让学习者自己写一步，再按「定位卡点 → 给提示 → 给解法 → 出同类题」四步走，不直接抛答案。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -71,3 +71,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 分步讲解 | `explain-stepwise` |
+| 错因归因 | `error-diagnose` |

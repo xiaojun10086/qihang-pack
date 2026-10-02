@@ -27,7 +27,7 @@ references/dlut-official-sites.md references/dlut-login-sites.md references/dlut
 references/dlut-url-verification.md references/dlut-site-profiles.md references/browser-matrix.md
 references/skill-sources.md references/skill-compliance-audit.md references/platforms.md
 references/e2e-scenarios.md references/acceptance-v2.md references/validation-report.md
-.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh"
+.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh scripts/aligncheck.py"
 miss=0; cnt=0
 for f in $REQ; do
   cnt=$((cnt+1))
@@ -105,7 +105,7 @@ echo "[7] 一致性与红线"
 _bad_th=$(grep -rlE "(U ?[≤≥><]=? ?5%|U ?≈ ?0\.05|threshold: 0\.05)" --include='*.md' --include='*.yaml' --include='*.html' . 2>/dev/null | grep -v _build | grep -v review-report | grep -v 需求确认书 | grep -v clarity.md | wc -l | tr -d ' ')
 [ "${_bad_th:-0}" -eq 0 ] && ok "无旧阈值残留" || bad "$_bad_th 个文件仍有旧阈值（期望 0.30）"
 
-_od=$(grep -rlnE '\bD 域\b' domains/ library/ SKILL.md 2>/dev/null | wc -l | tr -d ' ')
+_od=$(grep -rlnE '\b[A-G] 域\b' domains/ library/ SKILL.md 2>/dev/null | wc -l | tr -d ' ')
 [ "${_od:-0}" -eq 0 ] && ok "无 v1.1 旧域名残留" || bad "$_od 个文件含旧域名"
 
 # v2.7：单遍统计（原逐文件 grep 为 ~95 个子进程）

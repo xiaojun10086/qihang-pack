@@ -1,7 +1,7 @@
 ---
 name: qihang-tool-setup
 description: 「启航」R3 科研工具与代码域库内 skill：先问清目标工具与系统，再给最小可用环境步骤；报错按「复现 → 最小化 → 假设 → 插桩验证 → 修复」处理。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -73,3 +73,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 科研环境搭建 | `tool-setup` |
+| 可复现环境 | `repro-env` |

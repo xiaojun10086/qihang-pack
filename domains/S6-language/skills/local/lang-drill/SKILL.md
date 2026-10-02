@@ -1,7 +1,7 @@
 ---
 name: qihang-lang-drill
 description: 「启航」S6 语言能力域库内 skill：先测水平（CEFR 或四六级分数），再出可执行的每日训练计划，写作只标错不重写。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -72,3 +72,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 语言训练 | `lang-drill` |
+| 口语跟读 | `pronounce-drill` |

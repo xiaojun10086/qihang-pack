@@ -1,7 +1,7 @@
 ---
 name: qihang-submit-kit
 description: 「启航」R4 学术产出与投稿域库内 skill：先跑投稿前自检（结构/引用/数据），再给期刊匹配与审稿意见逐条回复表。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -73,3 +73,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 投稿返修工具包 | `submit-kit` |
+| 返修回复结构 | `rebuttal-structure` |

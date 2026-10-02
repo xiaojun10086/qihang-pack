@@ -1,8 +1,8 @@
-# 「启航」新生学习生活一体化学伴包 v2.7.0
+# 「启航」新生学习生活一体化学伴包 v2.9.0
 
 > **三级结构：skill 库（1级）→ 域（2级）→ skill（3级）**
 > 面向大连理工大学 2026 级本科新生 ｜ 强绑定 DUT 公开站与需登录的私密站
-> 适配：**LearnBuddy（= 连小理）** / Claude Code / Codex / Cursor / Copilot
+> 适配：**LearnBuddy（= 连小理）**（单一目标平台）
 
 ---
 
@@ -11,7 +11,7 @@
 ```
 qihang-pack/
 ├── SKILL.md                  入口（安装单元）
-├── INSTALL.md                多平台安装指南
+├── INSTALL.md                安装指南（LearnBuddy）
 ├── PROJECT.md                项目文档（简略）
 ├── ROADMAP.md                分阶段开发计划
 ├── config.yaml               学校绑定 + 学期配置 + 域开关
@@ -33,7 +33,7 @@ qihang-pack/
 │           ├── local/<name>/SKILL.md   库内 skill（优先，无需安装）
 │           └── external.md             库外候选 + 许可证列（库内不满足才装）
 ├── references/
-│   ├── dlut-official-sites.md      DUT 公开站信息库（160 条）
+│   ├── dlut-official-sites.md      DUT 公开站信息库（139 条条目）
 │   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
 │   ├── dlut-field-map.md           私密站字段映射表
 │   ├── skill-sources.md            12 个 skill 探测平台（含可达性实测）
@@ -47,15 +47,17 @@ qihang-pack/
 │   ├── review-report-v2.3.md      复查报告 v2.3
 │   ├── review-report-v2.4.md      **复查报告 v2.4（本轮）**
 │   ├── stress-test-v3.md          **多轮压测报告**
+│   ├── alignment-audit-v3.md      全量对齐 · 可行性 · 多轮复核（v3）
 │   ├── browser-matrix.md / dlut-site-profiles.md / dlut-url-verification.md
 │   └── 需求确认书-v2三级结构.md
-├── commands/                    斜杠命令（Claude Code 用；LearnBuddy 不需要）
+├── commands/                    21 张 LearnBuddy 域入口卡（库 + 校情 + 19 域）
 └── scripts/
-    ├── qihang.sh                管理脚本（多平台探测）
+    ├── qihang.sh                管理脚本（平台探测 / 状态 / 档案 / 信息库统计）
     ├── dlut-read.sh             DUT 私密站只读取数（L1/L2/L3 硬拦截）
     ├── selfcheck.sh             结构自检（计数 / 交叉引用 / 红线一致性）
     ├── audit.sh                 安全审计（危险命令 / 凭证 / L3 门禁实测）
     ├── regress.sh               **行为回归**（澄清门算例 / L3 门禁矩阵，支持多轮）
+    ├── aligncheck.py            全量文件级对齐审计（15 组断言）
     └── _build/build_*.py        结构生成器（改域后按序重跑）
 ```
 
@@ -83,7 +85,7 @@ qihang-pack/
 | **F 生活（8）** | F1 校园事务 ｜ F2 作息与专注 ｜ F3 身心与社交 ｜ F4 财务与安全 ｜ F5 健康与运动 ｜ F6 军训与志愿 ｜ F7 升学深造 ｜ F8 求职与竞赛 |
 | **R 科研（5）** | R1 文献检索与管理 ｜ R2 实验与数据 ｜ R3 科研工具与代码 ｜ R4 学术产出与投稿 ｜ R5 学术规范与伦理 |
 
-**自查结果**：19 域 × 每域 **2 个**库内 skill = **38 个库内 skill**；**14 个域**有「合规且适配 DUT」的库外候选；**7 个域为纯自建**（F1、F3、F4、F5、F6、F7、R5 —— 库外要么许可证不清、要么环境错位）。详见 `references/skill-matrix-v3.md`。
+**自查结果**：19 域 × 每域 **2 个**库内 skill = **38 个库内 skill**；**12 个域**有「合规且适配 DUT」的库外**最优解**（另有 3 个域有候选但不达门禁）；**7 个域为纯自建**（F1、F3、F4、F5、F6、F7、R5 —— 库外要么许可证不清、要么环境错位）。详见 `references/skill-matrix-v3.md`。
 
 ## 4. 安装与使用
 
@@ -96,18 +98,10 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 用**自然语言**即可，无需斜杠命令。包根含 `.codebuddy-plugin/plugin.json`，可作插件识别。
 
-**Claude Code**
+21 张 `commands/` 域入口卡随包提供（不需要输入命令）；学习档案见 `library/memory.md`，自检脚本见 `scripts/`。
 
 ```bash
-cp -r qihang-pack ~/.claude/skills/qihang
-mkdir -p ~/.claude/commands && cp qihang-pack/commands/*.md ~/.claude/commands/
-bash ~/.claude/skills/qihang/scripts/qihang.sh status
-```
-
-**其他平台**（Codex / Gemini CLI / Cursor / Copilot）见 `INSTALL.md` 与 `references/platforms.md`。
-
-```bash
-# 通用管理脚本（自动探测平台）
+# 通用管理脚本（探测 LearnBuddy 安装位置）
 bash scripts/qihang.sh platform   # 探测本机平台与安装路径
 ```
 
@@ -130,10 +124,10 @@ bash scripts/dlut-read.sh 课表 --dry-run
 
 | 类型 | 文件 | 融入方式 |
 |---|---|---|
-| 公开站 | `references/dlut-official-sites.md` | 160 条，19 个域的 `_domain.md` 各自标注绑定点 |
+| 公开站 | `references/dlut-official-sites.md` | **139 条**条目（表格行 159），19 个域的 `_domain.md` 各自标注绑定点 |
 | 私密站 | `references/dlut-login-sites.md` | 19 个需登录站点，**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
 
-**私密站三条铁律**：① 只读 ② 不外传 ③ 不落盘。L3 级（缴费/银行卡/身份证/邮件正文/心理记录）**一律不读取**。
+**私密站三条铁律**：① 只读 ② 不外传 ③ 不落盘。L3 级（缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细）**一律不读取**。
 
 ## 6. 复用
 

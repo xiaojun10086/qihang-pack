@@ -20,20 +20,75 @@
 | **扩库** | `build_phase13.py` | 每域第 2 个库内 skill（红线**继承**自 `_domain.md`） |
 | **比对** | `build_phase14.py` | 库外多源比对选优 + 生成矩阵 + 回写 registry 候选数 |
 | **修复** | `build_phase15.py` | v2.7 复查修复层（精确替换 + 幂等护栏） |
+| **专向化** | `build_phase16.py` | **v2.8 平台专向化**：移除 Claude Code 适配 + 21 个 `commands/` 重建为 LearnBuddy 域入口卡 + 版本 2.7→2.8 |
+| **收敛层** | `build_phase17.py` | **v2.9 漏检缺陷修复 + 链末收敛**（最新一层，见 §二之四）：检查器全量化 · L3 清单去重 · 口径统一 · `qihang.sh` 可复现 · 平台口径兜底 · 授权清单收敛 · 计数/去重归一化 · P0 破坏性重建护栏 |
 
-- 顺序：`v2 → extras → phase1…15`（见 `scripts/_build/README.md`）。
+- 顺序：`v2 → extras → phase1…17`（见 `scripts/_build/README.md`）。
 - **两个铁律**：
-  1. 生成器必须**幂等**：`new` 包含 `old` 的追加型替换要加护栏（否则第二遍会重复插入）。
+  1. 生成器必须**幂等**：`new` 包含 `old` 的追加型替换要加护栏（否则第二遍会重复插入）；
+     一次性正则替换要给「完成判据」（`already=` / `absent=`），否则第二遍误报未命中。
   2. **连跑两遍才算验证过**：第二遍必须 0 变更。
 - **红线不得手写**：任何新 skill 的红线都从所属 `_domain.md` 继承，`regress.sh` 有硬断言。
+- **不改历史 phase 层**：历史层的替换表与下一层配对，改了会断链。收敛/修复一律**新增一层**。
+
+## 二之二、平台口径（v2.8 起）
+
+- **唯一目标平台 = LearnBuddy / WorkBuddy**；Claude Code 适配已全移除，其他 agent 可装但不作承诺。
+  唯一真相源：`references/platforms.md`。
+- `commands/`（21）= **LearnBuddy 域入口卡**（库 + 校情 + 19 域），**非斜杠命令**；用仓库根相对路径，
+  不含 `$ARGUMENTS` / `argument-hint` / `~/.claude/...`。
+- 库外通道：首选 `find-skills`；通用 CLI `npx skills add`；手动复制到 `~/.learnbuddy/skills/`。
+
+## 二之三、已知既有缺陷（**避坑，勿当成本轮引入**）
+
+> 2026-10-02 v2.9 轮已修复以下 1–8（细节见 §二之四）。保留本条以记录**缺陷类型**，便于下轮识别同型问题。
+
+1. ~~`regress.sh` 的「公开站数据条目」断言语义错误~~ → **已修**（精确 awk，实测 139）。**注意**：链重跑会让旧近似断言与新精确断言**并存** → `phase17` 负责只留精确版。
+2. `qihang.sh` 的 `detect_skills_dir` / `platform_of` / `cmd_platform` / `cmd_records` 原先不在生成器里 → **已由 `phase17` 幂等补齐**。
+3. ~~重跑 `build_qihang_v2.py` 会覆盖 `dlut-login-sites.md` 手工增补~~ → **已修**：`build_qihang_v2.py` 不再 `rmtree`（见 §二之四.1），`phase17` 幂等补回 §0.1/§0.2。
+4. `aligncheck` 常驻 WARN 1：`library/clarity.md` 跨表重复 `| D | 完全缺失 | 0.0 |`（两张不同表格的交叉登记，**已判定为合法**，保留 WARN）。
+5. ~~「声明==实测」有白名单盲区~~ → **已修**：改为全量扫描 + 内容标记豁免（文件级「历史文档」/ 行级「历史口径」）。
+6. ~~`qihang.sh registry` 按全文出现次数统计~~ → **已修**：只统计表格数据行内（139 / 67 / 21 / 51）。
+7. ~~`SKILL.md` / `PROJECT.md` L3 清单重复「成绩明细」~~ → **已修**。
+8. ~~92 项改动未提交~~ → 待用户 `git add -A && git commit`（v2.8+v2.9 成果）。
+
+**仍需注意（未修，属设计取舍）**：
+- 全量链中 `build_phase1…16` 仍有约 20 处精确替换 MISS（历史层文本与手改后状态漂移）。**这是可接受的**：`phase17` 作为链末收敛层负责把结果修回规范态 —— 判断链是否正常，看**链产物能否通过四项校验 + 两遍哈希一致**，不要看中间层的 MISS 数。
+
+## 二之四、生成器链的两条 P0 铁律（**2026-10-02 实测事故换来**）
+
+1. **绝不 `rmtree` 目标目录**。`build_qihang_v2.py` 旧版 `shutil.rmtree(out)` 配合文档用法 `... build_qihang_v2.py .`
+   **会把整个仓库删空**（实测 161 文件 → 0，含 `.git`），再因沙箱下 `os.rmdir('.')` 失败而中断。
+   现为「`tempfile.mkdtemp` 暂存 → `copytree(dirs_exist_ok=True)` 覆盖式合并」，**不删目标里的任何既有内容**；
+   `phase17.assert_no_destructive_rebuild()` 是防回退硬断言。
+   → **护栏要挡「像项目的目录」（含 `.git`/`.learnbuddy`/`scripts/_build`），而不是只挡 `/`、`~`。**
+2. **替换型收敛必须先问「新串是否包含旧串」**。`build_phase12.py` 用 `t.replace(旧串, 规范串)` 收敛 L1/L2/L3，
+   而规范串包含旧串 → **每跑一轮链就多追加一项**；实测 `dlut-read.sh` 的 L2 行无上界膨胀，
+   且 **`config.yaml` 被污染成 `L1_auto: [课表 / 成绩等级 / … / 日程, 网费, 日程]`**（首项被拼成整串，YAML 语义已坏）。
+   → 包含关系必须加**完成判据**；收敛应由 `phase17` 从 `config.yaml`（单一真相源）**派生**，而非逐层精确替换。
+
+## 二之五、链可复现性的验收口径（不要凭感觉说「能重跑」）
+
+```bash
+# 在临时副本上跑，绝不在真实树上试
+for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
+```
+- 判据 ①：链**跑完不中断**，`phase17` 报 **0 未命中**；
+- 判据 ②：**连跑两遍逐文件哈希完全一致**（实测 161 文件 0 变更）；
+- 判据 ③：链产物**四项校验器全绿**。
 
 ## 三、验证脚本（改完必跑）
 
 ```bash
 bash scripts/selfcheck.sh     # 结构/计数/交叉引用/红线一致性  期望 OK31 WARN0 FAIL0
 bash scripts/audit.sh         # 安全/合规/L3 门禁实测            期望 37 通过 0 警告 0 失败
-bash scripts/regress.sh 3     # 行为回归（连跑 3 轮）            期望 120 项 0 FAIL
+bash scripts/regress.sh 3     # 行为回归（连跑 3 轮）            期望 41 项/轮、累计 FAIL 0
+python scripts/aligncheck.py  # 全量文件级对齐                  期望 FAIL 0（常驻 WARN 1）
 ```
+
+**⚠️ 脚本全绿 ≠ 无问题**：断言集本身可能有盲区（见 §二之三.5）。每轮必须另加一条**不看脚本、直接比对原文**的人工透镜；用户限制「不要改动」时可作纯只读复核。
+
+**改完必须连跑**：`phase17` 连跑两遍（第二遍 0 变更）→ 四项校验器全绿 → 如需动链，再在**临时副本**上做 §二之五 的三项验收。
 
 职责不重叠：selfcheck 管「结构对不对」，audit 管「安不安全」，regress 管「行为对不对」。
 

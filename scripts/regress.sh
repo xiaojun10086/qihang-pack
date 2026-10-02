@@ -119,7 +119,18 @@ while [ "$r" -le "$ROUNDS" ]; do
   _chk "库内 skill 总数" "$(find domains -path '*skills/local/*/SKILL.md' | wc -l | tr -d ' ')" 38
   _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 8
   _chk "commands 数" "$(ls -1 commands/*.md | wc -l | tr -d ' ')" 21
-  _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 160
+  _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 159
+  # 数据条目 = 表格行 − 分隔行 − 表头行（表头 = 下一行是分隔行的那些行）
+  _entries=$(awk '{L[NR]=$0} END{
+      for(i=1;i<=NR;i++){
+        if(L[i] !~ /^\|/) continue
+        if(L[i] ~ /^\|[-: |]+\|$/) continue
+        if((i+1) in L && L[i+1] ~ /^\|[-: |]+\|$/) continue
+        c++
+      }
+      print c+0
+    }' references/dlut-official-sites.md)
+  _chk "公开站数据条目" "$_entries" 139
   _chk "external.md 含 DUT 落地评估" "$(grep -l 'DUT 落地评估' domains/*/skills/external.md | wc -l | tr -d ' ')" 19
   _chk "无自检临时文件残留" "$(find . -maxdepth 1 -name '.selfcheck.tmp*' | wc -l | tr -d ' ')" 0
 

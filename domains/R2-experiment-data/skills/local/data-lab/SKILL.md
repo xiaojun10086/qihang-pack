@@ -1,7 +1,7 @@
 ---
 name: qihang-data-lab
 description: 「启航」R2 实验与数据域库内 skill：先确认数据与假设，再选检验方法，跑完给出「图 + 一句话结论 + 不能下的结论」。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -72,3 +72,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 数据实验台 | `data-lab` |
+| 统计自查 | `stats-guard` |

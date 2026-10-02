@@ -1,5 +1,7 @@
 # 验收报告 · 启航学伴包 v1.1
 
+> ⚠️ **历史文档**：本文记录复核 / 验收时刻的状态，其中计数类结论可能已被后续版本取代；引用时请以 `PROJECT.md` / `README.md` 的现行口径为准。
+
 > 验收日期：2026-10-01 ｜ 验收对象：`qihang-pack` 及其 6 能力域所依赖的全部 Skill
 > 执行方式：**4 路并行子 agent**（2 路研究 + 2 路分维度测试）+ 主 agent 复核
 
@@ -133,7 +135,7 @@
 ## 六、待办（下一版）
 
 1. 补 `references/dlut-official-sites.md` 中 22 条「待核实」URL（需校园网或人工确认）。
-2. 在**真实 Claude Code 环境**跑完整安装（本机受批量保护限制，见 §七）。
+2. 在**真实 LearnBuddy 环境**跑完整安装（本机受批量保护限制，见 §七）。
 3. 学习档案（跨会话记忆）落地 —— 对应 ROADMAP 阶段 4。
 
 ---
@@ -165,8 +167,8 @@
 
 | 通道 | 结果 |
 |---|---|
-| `npx skills add <owner>/<repo>` | ✅ **可用** |
-| `/plugin marketplace add` | ⚠️ 须在 Claude Code 内执行 |
+| `npx skills add <owner>/<repo>` | ✅ **可用**（通用 skills CLI） |
+| LearnBuddy 原生：`find-skills` | ✅ 可用 |
 | 手动 clone / 复制 | ✅ 可用 |
 
 **实测装通 6 个仓库 / 70+ 个 skill**：
@@ -174,7 +176,7 @@
 `ielts-claude-skills`（4 个）· `ResumeSkills`（26 个）· `papers-skill` · `scientific-agent-skills`。
 
 **环境限制（非包缺陷）**：本机沙箱有**批量删除保护**（单轮 50 次上限），
-文件多的仓库（如 `school-skills`）安装会反复重试而变慢；**不影响真实 Claude Code 使用**。
+文件多的仓库（如 `school-skills`）安装会反复重试而变慢；**不影响真实 LearnBuddy 使用**（库内 skill 不依赖此通道）。
 
 ### 7.4 阶段 2 验收结论
 
@@ -187,5 +189,5 @@
 | archived / 404 清理 | ✅ 通过（0 archived；1 个 404 已替换） |
 | 安装通道实测 | ✅ 通过（`npx skills add` 可用，6 仓库装通） |
 | 降级链写入各域 `external.md` | ✅ 通过（19 域全部含降级链 + 许可证列） |
-| 真实 Claude Code 端到端安装 | ⏳ 转阶段 5 |
+| 真实 LearnBuddy 端到端安装 | ⏳ 转阶段 5 |
 

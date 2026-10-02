@@ -1,7 +1,7 @@
 ---
 name: qihang-service-log
 description: 「启航」F6 军训与志愿域库内 skill：军训期给体能/物资/防晒准备清单；志愿侧帮选项目并归档时长与收获。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -74,3 +74,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 军训与志愿记录 | `service-log` |
+| 志愿时长规划 | `volunteer-hours` |

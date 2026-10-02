@@ -4,4 +4,8 @@
 
 # 构建缓存
 __pycache__/
+
+# IDE
+.idea/
+.vscode/
 *.pyc

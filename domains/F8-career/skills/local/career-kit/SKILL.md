@@ -1,7 +1,7 @@
 ---
 name: qihang-career-kit
 description: 「启航」F8 求职与竞赛域库内 skill：按目标岗位/竞赛倒推能力缺口，改简历只做「相关性重构」，面试按 STAR 打磨。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -74,3 +74,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 求职竞赛工具箱 | `career-kit` |
+| 竞赛选型 | `competition-pick` |

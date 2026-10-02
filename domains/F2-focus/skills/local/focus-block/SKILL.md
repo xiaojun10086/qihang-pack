@@ -1,7 +1,7 @@
 ---
 name: qihang-focus-block
 description: 「启航」F2 作息与专注域库内 skill：先修作息再谈效率；每天只给 1 个最小可行动作（≤15 分钟）与固定专注窗口。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -71,3 +71,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 专注块排布 | `focus-block` |
+| 拖延拆解 | `task-decompose` |

@@ -358,7 +358,8 @@ def fix_selfcheck():
     rep(p,
         '.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh"',
         '.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh"',
-        label='必备文件清单补 regress.sh')
+        label='必备文件清单补 regress.sh',
+        required=False)   # 会被 fix_official_sites 的 aligncheck 版本进一步取代
 
     # b) 每域 external 必须含选优结论
     rep(p,
@@ -550,6 +551,236 @@ def fix_misc():
         '且整体占比不高（见 `skill-matrix-v3.md` 量化结论）。',
         label='更正「教育场景空白」过时结论')
 
+# ==================================================================== 19. DUT 公开信息库数据修复
+def fix_official_sites():
+    p = 'references/dlut-official-sites.md'
+    # 状态单元格被污染（"✅ 73" 疑似历史计数误并入）
+    rep(p,
+        '| 学生公寓服务中心 | 挂靠 https://houqin.dlut.edu.cn/ | ✅ 73 |',
+        '| 学生公寓服务中心 | 挂靠 https://houqin.dlut.edu.cn/ | ✅ |',
+        label='清理被污染的状态单元格（"✅ 73" → "✅"）')
+    # 「财务处」在 §3 与 §5 重复；§5 才是其正确归属 → 删除 §3 副本（count=1 只替换首次出现=§3）
+    rep(p,
+        '| 财务处 | http://cw.dlut.edu.cn/ | ⚠️ **登录后仍受限**（实测仍返回「系统提示」）→ 需校内网/VPN |\n'
+        '| 离校系统 | http://lx.dlut.edu.cn/ | ✅ |',
+        '| 离校系统 | http://lx.dlut.edu.cn/ | ✅ |',
+        label='删除 §3 中重复登记的「财务处」行（保留 §5 正式条目）')
+    rep(p,
+        '| 迎新网 | https://yx.dlut.edu.cn/ | ✅ |',
+        '| 迎新网 | https://yx.dlut.edu.cn/ | ✅ |\n'
+        '\n'
+        '> **服务类站点的完整清单见 §5 职能部门与服务**（本节只保留与教学直接相关的入口，避免同一单位两处登记）。',
+        label='§3 末尾加服务类站点指针')
+
+    # 归档版验收报告加「历史文档」横幅（避免与 v2.7 现状冲突）
+    rep('references/acceptance-v2.md',
+        '> 验收日期：2026-10-01 ｜ 对象：`qihang-pack` v2.6.0',
+        '> ⚠️ **历史文档**：本报告验收的是 **v2.6.0**，其中 L3 门禁与计数类结论已被\n'
+        '> `references/review-report-v2.4.md` 修订。**现行状态以 v2.7.0 为准。**\n'
+        '>\n'
+        '> 验收日期：2026-10-01 ｜ 对象：`qihang-pack` v2.6.0',
+        label='acceptance-v2 加「历史文档」横幅')
+
+    # aligncheck.py 纳入必备文件；.idea 等 IDE 目录加入忽略
+    rep('scripts/selfcheck.sh',
+        'scripts/audit.sh scripts/regress.sh"',
+        'scripts/audit.sh scripts/regress.sh scripts/aligncheck.py"',
+        label='必备文件清单补 aligncheck.py')
+    rep('.gitignore',
+        '__pycache__/',
+        '__pycache__/\n\n# IDE\n.idea/\n.vscode/',
+        label='.gitignore 补 IDE 目录',
+        required=False)
+
+
+# ==================================================================== 20. 第二轮对齐（全量重开每个文件后发现）
+def fix_align_round2():
+    # D1/D2 工作流已扩到 8 步，旧文档仍写「第 ⑦ 步 写入学习档案」
+    rep('library/memory.md',
+        '> 1 级 skill 库的第 4 份规则文件。负责工作流第 ⑦ 步「写入学习档案」，并与',
+        '> 1 级 skill 库的第 4 份规则文件。负责工作流第 **⑧** 步「归档（写入学习档案）」，并与',
+        label='memory.md 工作流步号 ⑦→⑧')
+    rep('references/platforms.md',
+        'LearnBuddy 有三层记忆，本包的工作流第 ⑦ 步「写入学习档案」直接落到这套记忆里：',
+        'LearnBuddy 有三层记忆，本包的工作流第 **⑧** 步「归档」直接落到这套记忆里：',
+        label='platforms.md 工作流步号 ⑦→⑧')
+    # D3 library 规则文件数已由 3 增至 7
+    rep('references/platforms.md',
+        '| **连小理**（= LearnBuddy） | 把 `domains/_registry.md` + `library/` 三份规则挂到平台的知识库；场景设计见 `qihang-scenario-design.html` |',
+        '| **连小理**（= LearnBuddy） | 把 `domains/_registry.md` + `library/` **7 份规则文件** 挂到平台的知识库；场景设计见 `qihang-scenario-design.html` |',
+        label='platforms.md 规则文件数 3→7')
+    # D4 赛道二提交物（HTML）仍称 19 个库内 skill
+    for old, new, lb in [
+        ('19 域 × 每域 1 个库内 skill = <b>19 个库内 skill</b>（已全部产品化，含可执行示例）；',
+         '19 域 × 每域 2 个库内 skill = <b>38 个库内 skill</b>（已全部产品化，含可执行示例）；',
+         'HTML 库内 skill 数 19→38'),
+        ('<li><b>许可证</b>：19 个库内 skill 中仅 2 个是摘录（MIT / Apache-2.0，均合法）',
+         '<li><b>许可证</b>：38 个库内 skill 中仅 2 个是摘录（MIT / Apache-2.0，均合法）',
+         'HTML 摘录校验基数 19→38'),
+        ('可行性：19 个库内 skill 已产品化，库外均开源',
+         '可行性：38 个库内 skill 已产品化，库外均开源',
+         'HTML 可行性标签 19→38'),
+    ]:
+        rep('qihang-scenario-design.html', old, new, label=lb)
+    # D5 话术模板里的占位符 XXX（易被误读为未填）
+    rep('library/login-policy.md',
+        '具体到你个人的信息需要你自己在 `XXX` 查看。',
+        '具体到你个人的信息需要你自己在**对应系统**（如教务系统 / 校园门户）查看。',
+        label='login-policy 去占位符 XXX')
+    # D6 通用表述「A 域/B 域」会被误读为 v1.1 遗留域名 → 改「甲域/乙域」
+    for p in ('library/domain-review-cases.md', 'scripts/_build/build_phase1.py'):
+        rep(p,
+            '## 一、改锁类（表面像 A 域，实际属 B 域）',
+            '## 一、改锁类（表面像甲域，实际属乙域）',
+            label='%s 去 A/B 域表述' % p)
+    # D7 自检只查了「D 域」，B/C/D/G 域同样要查
+    rep('scripts/selfcheck.sh',
+        "_od=$(grep -rlnE '\\bD 域\\b' domains/ library/ SKILL.md 2>/dev/null | wc -l | tr -d ' ')",
+        "_od=$(grep -rlnE '\\b[A-G] 域\\b' domains/ library/ SKILL.md 2>/dev/null | wc -l | tr -d ' ')",
+        label='自检旧域名匹配扩展为 [A-G] 域')
+    # D8 生成链无法复现现行 SKILL.md：v2 模板仍是 v1.1 的 7 步 / 三份规则
+    rep('scripts/_build/build_qihang_v2.py',
+        '  ↓ ⑦输出      library/output-spec.md        ≤6 条要点，写入学习档案\n'
+        '```\n'
+        '\n'
+        '## 三份规则文件（1 级库的本体）\n'
+        '\n'
+        '| 文件 | 职责 |\n'
+        '|---|---|\n'
+        '| `library/clarity.md` | 需求明确：6 槽位拆解 + 澄清门公式 + 追问优先级 |\n'
+        '| `library/domain-review.md` | 域审查：锁定 / 跨域 / 越界 / 无域兜底 |\n'
+        '| `library/output-spec.md` | 输出规范：统一模板 + 简略原则 |',
+        '  ↓ ⑦输出      library/output-spec.md        ≤6 条要点，过 output-checklist 校验\n'
+        '  ↓ ⑧归档      library/memory.md             写学习档案（F3/F5 敏感域除外）\n'
+        '```\n'
+        '\n'
+        '## 五份规则文件（1 级库的本体）\n'
+        '\n'
+        '| 文件 | 职责 |\n'
+        '|---|---|\n'
+        '| `library/clarity.md` | 需求明确：6 槽位拆解 + 澄清门公式 + 追问优先级 |\n'
+        '| `library/domain-review.md` | 域审查：锁定 / 跨域 / 越界 / 无域兜底 |\n'
+        '| `library/output-spec.md` | 输出规范：统一模板 + 简略原则 + 交付前校验 |\n'
+        '| `library/memory.md` | 学习档案：四类内容 + 分层落点 + 敏感域红线 |\n'
+        '| `library/login-policy.md` | 登录选择原则：A/B/C 三档 + 标准话术 + 安全保障 |',
+        label='v2 模板对齐现行 SKILL.md（8 步 + 五份规则）')
+
+
+# ==================================================================== 21. 公开站计数统一（去重后 160 → 159）
+def fix_counts_159():
+    """去重 §3 的「财务处」后，表格行由 160 降为 159，✅69 / ⚠️25 / 数据条目 146。
+    所有「现行口径」的文档必须同步；历史报告保留其历史值。"""
+    pairs = [
+        ('INSTALL.md',
+         '`[资源] DUT 公开站 160 行`', '`[资源] DUT 公开站 159 行`', 'INSTALL 159 行'),
+        ('library/login-policy.md',
+         '（信息库 160 条覆盖大量问题）', '（信息库 159 条覆盖大量问题）', 'login-policy 159 条'),
+        ('PROJECT.md',
+         '| 公开站      | `references/dlut-official-sites.md`    | **160 条**表格行（✅ 69 / ⚠️ 26），三校区 + 全部学院 + 职能部门 |',
+         '| 公开站      | `references/dlut-official-sites.md`    | **159 条**表格行（✅ 69 / ⚠️ 25），三校区 + 全部学院 + 职能部门 |',
+         'PROJECT §5 159 行'),
+        ('PROJECT.md',
+         '| DUT 公开信息库          | ✅ **160 条**表格行（✅ 69 / ⚠️ 26）',
+         '| DUT 公开信息库          | ✅ **159 条**表格行（✅ 69 / ⚠️ 25）',
+         'PROJECT §7 159 行'),
+        ('PROJECT.md',
+         '│   ├── dlut-official-sites.md     公开站 160 条',
+         '│   ├── dlut-official-sites.md     公开站 159 条',
+         'PROJECT 目录树 159 条'),
+        ('README.md',
+         '│   ├── dlut-official-sites.md      DUT 公开站信息库（160 条）',
+         '│   ├── dlut-official-sites.md      DUT 公开站信息库（159 条）',
+         'README 目录树 159 条'),
+        ('README.md',
+         '| 公开站 | `references/dlut-official-sites.md` | 160 条，19 个域的 `_domain.md` 各自标注绑定点 |',
+         '| 公开站 | `references/dlut-official-sites.md` | 159 条，19 个域的 `_domain.md` 各自标注绑定点 |',
+         'README §5 159 条'),
+        ('qihang-scenario-design.html',
+         '学院官网、教务处、一卡通、报修电话散落在 160+ 个站点',
+         '学院官网、教务处、一卡通、报修电话散落在 150+ 个站点',
+         'HTML 站点规模 150+'),
+        ('qihang-scenario-design.html',
+         '<tr><td>公开站</td><td><b>160 条</b>：三校区 + 全部学部学院 + 教务处/研院/图书馆/就业/保卫等职能部门</td>',
+         '<tr><td>公开站</td><td><b>159 条</b>：三校区 + 全部学部学院 + 教务处/研院/图书馆/就业/保卫等职能部门</td>',
+         'HTML 159 条'),
+        ('qihang-scenario-design.html',
+         '<td>160 条信息库 + 强制查表规则',
+         '<td>159 条信息库 + 强制查表规则',
+         'HTML 准确率行 159 条'),
+        ('references/dlut-official-sites.md',
+         '- 表格总行数：**160 条**',
+         '- 表格总行数：**159 条**（数据条目 146，含 ✅69 / ⚠️25）\n'
+         '- 维护口径：同一单位**只在最贴切的小节登记一次**（如「财务处」只出现在 §5）',
+         '信息库自述行数 159'),
+        ('references/stress-test-v3.md',
+         '| DUT 公开站表格行 | 160 ✅ |',
+         '| DUT 公开站表格行 | 159 ✅ |',
+         '压测报告 159 行'),
+        ('scripts/regress.sh',
+         '公开站表格行" "$(grep -c \'^|\' references/dlut-official-sites.md | tr -d \' \')" 160',
+         '公开站表格行" "$(grep -c \'^|\' references/dlut-official-sites.md | tr -d \' \')" 159',
+         'regress 期望值 160→159'),
+        ('scripts/selfcheck.sh',
+         '_pub=$(grep -c \'^|\' references/dlut-official-sites.md 2>/dev/null); pub=${pub:-0}',
+         '_pub=$(grep -c \'^|\' references/dlut-official-sites.md 2>/dev/null); pub=${pub:-0}',
+         '（占位，无改动）', False),
+    ]
+    for item in pairs:
+        p, o, n, lb = item[0], item[1], item[2], item[3]
+        rep(p, o, n, label=lb, required=(item[4] if len(item) > 4 else True))
+    # 复查报告补一行口径更新说明（避免报告里的旧值与现状冲突）
+    rep('references/review-report-v2.4.md',
+        '| **P2-14** | `PROJECT.md` 数字连环错',
+        '> **口径更新（v2.7 终版）**：本节修复后，因 §3 去重了重复登记的「财务处」一行，'
+        '表格行由 160 降为 **159**（✅69 / ⚠️25，数据条目 146）；全包声明已同步。\n\n'
+        '| **P2-14** | `PROJECT.md` 数字连环错',
+        label='复查报告补 159 口径说明')
+
+
+# ==================================================================== 22. 公开站口径终版（表格行 159 / 条目 139 / ✅67 · ⚠️21）
+def fix_counts_final():
+    """统一到**可复算**的口径：
+       表格行 159（含 表头 10 + 分隔 10）· 数据条目 139（✅67 / ⚠️21 / 未标注 51）。
+       此前用「✅/⚠️ 全文出现次数」当口径，会被正文里的标记污染，已弃用。"""
+    F = '**159 条**表格行 / **139 条**条目（✅ 67 / ⚠️ 21）'
+    pairs = [
+        ('PROJECT.md', '**159 条**表格行（✅ 69 / ⚠️ 25）', F, 'PROJECT §5 口径终版'),
+        ('PROJECT.md', '✅ **159 条**表格行（✅ 69 / ⚠️ 25）', '✅ ' + F, 'PROJECT §7 口径终版'),
+        ('PROJECT.md', '│   ├── dlut-official-sites.md     公开站 159 条',
+         '│   ├── dlut-official-sites.md     公开站 139 条条目', 'PROJECT 目录树'),
+        ('README.md', '│   ├── dlut-official-sites.md      DUT 公开站信息库（159 条）',
+         '│   ├── dlut-official-sites.md      DUT 公开站信息库（139 条条目）', 'README 目录树'),
+        ('README.md', '| 公开站 | `references/dlut-official-sites.md` | 159 条，19 个域的 `_domain.md` 各自标注绑定点 |',
+         '| 公开站 | `references/dlut-official-sites.md` | **139 条**条目（表格行 159），19 个域的 `_domain.md` 各自标注绑定点 |',
+         'README §5 口径终版'),
+        ('INSTALL.md', '`[资源] DUT 公开站 159 行`', '`[资源] DUT 公开站 139 条条目`', 'INSTALL 口径终版'),
+        ('library/login-policy.md', '（信息库 159 条覆盖大量问题）', '（信息库 139 条条目覆盖大量问题）',
+         'login-policy 口径终版'),
+        ('qihang-scenario-design.html', '<tr><td>公开站</td><td><b>159 条</b>：三校区',
+         '<tr><td>公开站</td><td><b>139 条</b>：三校区', 'HTML 条目数终版'),
+        ('qihang-scenario-design.html', '<td>159 条信息库 + 强制查表规则', '<td>139 条信息库 + 强制查表规则',
+         'HTML 准确率行终版'),
+        ('references/dlut-official-sites.md',
+         '- 表格总行数：**159 条**（数据条目 146，含 ✅69 / ⚠️25）',
+         '- 表格总行数：**159 条**（= 表头 10 + 分隔 10 + **数据条目 139**）\n'
+         '- 数据条目核验分布：**✅ 67 / ⚠️ 21 / 未标注 51**（合计 139）\n'
+         '- 计数口径：一律按**表格行/数据行**统计；不采用「✅ 全文出现次数」（会被正文标记污染）',
+         '信息库自述口径终版'),
+        ('references/stress-test-v3.md', '| DUT 公开站表格行 | 159 ✅ |',
+         '| DUT 公开站表格行 / 数据条目 | 159 / 139 ✅ |', '压测报告口径终版'),
+    ]
+    for p, o, n, lb in pairs:
+        rep(p, o, n, label=lb)
+    # 回归脚本：同时钉住「表格行」与「数据条目」两个数
+    rep('scripts/regress.sh',
+        '  _chk "公开站表格行" "$(grep -c \'^|\' references/dlut-official-sites.md | tr -d \' \')" 159',
+        '  _chk "公开站表格行" "$(grep -c \'^|\' references/dlut-official-sites.md | tr -d \' \')" 159\n'
+        '  _chk "公开站数据条目" "$(awk \'/^\\|/{if($0 ~ /^\\|[-: ]+\\|$/)next; print}\' references/dlut-official-sites.md \\\n'
+        '     | grep -vc \'名称\\|学院\\|站点\\|区块\\|平台\\|级别\\|网址\\|序号\' )" 139',
+        label='regress 增钉数据条目 139',
+        required=False)
+
+
 # ==================================================================== 17. 版本号统一（v2.7）
 def fix_versions():
     """把全包版本号统一到 v2.7.0（旧 19 个 skill 仍为 2.6.0，会与新版混用）"""
@@ -564,6 +795,12 @@ def fix_versions():
                 'INSTALL.md', 'qihang-scenario-design.html']
     SUBS = [
         ('version: 2.6.0', 'version: 2.7.0'),
+        # JSON 风格（plugin.json）：与 YAML 风格写法不同，早期版本漏改
+        ('"version": "2.6.0"', '"version": "2.7.0"'),
+        # 当前状态 / 提交物的版本声明（易漂移点；用精确串，避免误改历史修订注记）
+        ('## 7. 当前状态（v2.6.0）', '## 7. 当前状态（v2.7.0）'),
+        ('（v2.6.0）</title>', '（v2.7.0）</title>'),
+        ('<span class="ver">v2.6.0 三级结构</span>', '<span class="ver">v2.7.0 三级结构</span>'),
         ('版本 v2 ｜', '版本 v2.7 ｜'),
         ('# 「启航」学伴包 v2.6 ·', '# 「启航」学伴包 v2.7 ·'),
         ('「启航」学伴包 v2.6.0 ·', '「启航」学伴包 v2.7.0 ·'),
@@ -786,6 +1023,10 @@ def main():
     fix_acceptance()
     fix_redline_drift()   # 必须在 fix_counts 之后（依赖其写入的「文件数」中间值）
     fix_versions()        # 版本号统一到 v2.7.0（最后跑，覆盖前面所有文件）
+    fix_official_sites()  # DUT 公开信息库的数据级修复（污染单元格 / 重复登记）
+    fix_align_round2()    # 第二轮全量对齐（工作流步号 / 计数 / 提交物 / 生成器模板）
+    fix_counts_159()      # 公开站去重后 160→159，全包声明同步
+    fix_counts_final()    # 口径终版：表格行 159 / 条目 139 / ✅67 · ⚠️21
 
     print('=' * 62)
     for x in OK:   print('  ✅ ' + x)

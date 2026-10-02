@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>「启航」学伴包 · 赛道二场景设计书（v2.6.0）</title>
+<title>「启航」学伴包 · 赛道二场景设计书（v2.9.0）</title>
 <style>
   :root{
     --bg:#0d1117;--bg2:#131a24;--panel:#161d29;--line:#26303f;
@@ -75,7 +75,7 @@
 
 <header>
   <span class="kicker">赛道二 · 智能体场景设计 · 方案稿</span>
-  <h1>「启航」——大一新生<span class="hl">学习·生活·科研一体化</span>学伴包<span class="ver">v2.6.0 三级结构</span></h1>
+  <h1>「启航」——大一新生<span class="hl">学习·生活·科研一体化</span>学伴包<span class="ver">v2.9.0 三级结构</span></h1>
   <p class="meta">
     依托平台：<b>LearnBuddy</b>（赛道二场景名「连小理」，大连理工大学 × 腾讯）&nbsp;·&nbsp;
     适用对象：<b>2026 级本科新生</b>&nbsp;·&nbsp;
@@ -121,7 +121,7 @@
     </div>
     <div class="panel">
       <h4>🧭 痛点 4 · 校情信息碎片化</h4>
-      <p>学院官网、教务处、一卡通、报修电话散落在 160+ 个站点，新生最常问的恰是这些。</p>
+      <p>学院官网、教务处、一卡通、报修电话散落在 150+ 个站点，新生最常问的恰是这些。</p>
     </div>
   </div>
   <div class="note">
@@ -160,14 +160,14 @@
       <span class="dom"><b>R1</b> 文献检索与管理</span><span class="dom"><b>R2</b> 实验与数据</span><span class="dom"><b>R3</b> 科研工具与代码</span><span class="dom"><b>R4</b> 学术产出与投稿</span><span class="dom"><b>R5</b> 学术规范与伦理</span>
     </div>
   </div>
-  <p><b>方向自查结果</b>：19 域 × 每域 1 个库内 skill = <b>19 个库内 skill</b>（已全部产品化，含可执行示例）；
+  <p><b>方向自查结果</b>：19 域 × 每域 2 个库内 skill = <b>38 个库内 skill</b>（已全部产品化，含可执行示例）；
   15 域有库外候选；<b>4 域为方向空白</b>（F3/F4/F5/F6），无成熟开源 skill，全部自建并配专属安全护栏。</p>
 
   <h3>3.3 大工信息库融入（公开 + 需登录）</h3>
   <table>
     <tr><th style="width:130px">类型</th><th>内容</th><th>融入方式</th></tr>
-    <tr><td>公开站</td><td><b>160 条</b>：三校区 + 全部学部学院 + 教务处/研院/图书馆/就业/保卫等职能部门</td><td>19 个域的 <code>_domain.md</code> 各自标注绑定点</td></tr>
-    <tr><td>私密站</td><td><b>19 个</b>需登录站点（教务/门户/一卡通/借阅/网费/邮件…）</td><td><b>方案 A</b> 受控浏览器 + 独立 Profile，<b>只读、不外传、不落盘</b>；L3 级禁读</td></tr>
+    <tr><td>公开站</td><td><b>139 条</b>：三校区 + 全部学部学院 + 教务处/研院/图书馆/就业/保卫等职能部门</td><td>19 个域的 <code>_domain.md</code> 各自标注绑定点</td></tr>
+    <tr><td>私密站</td><td><b>19 个</b>需登录站点（教务/门户/一卡通/借阅 / 网费/邮件…）</td><td><b>方案 A</b> 受控浏览器 + 独立 Profile，<b>只读、不外传、不落盘</b>；L3 级禁读</td></tr>
   </table>
   <div class="note blue">
     <b>已实测</b>：<code>portal.dlut.edu.cn</code> 校园门户<b>首页单页即可拿到 6 类数据</b>（课表 / 借阅 / 一卡通 / 网费 / 邮件未读 / 日程通知），是全包最佳聚合点，无需逐站登录。
@@ -178,7 +178,7 @@
     <li><b>F3 身心与社交</b>：不做心理诊断、不做危机干预，识别危机信号立即转介</li>
     <li><b>红线拦截</b>：作业/报告/文书<b>只给结构与自查，不代写</b>；不代操作系统、不代缴费</li>
     <li><b>隐私</b>：私密站只读、不落盘；F3/F5 内容<b>不写入学习档案</b></li>
-    <li><b>许可证</b>：19 个库内 skill 中仅 2 个是摘录（MIT / Apache-2.0，均合法）；GPL 与无 LICENSE 的库外 skill 一律只作外部调用</li>
+    <li><b>许可证</b>：38 个库内 skill 中仅 2 个是摘录（MIT / Apache-2.0，均合法）；GPL 与无 LICENSE 的库外 skill 一律只作外部调用</li>
   </ul>
 </section>
 
@@ -220,7 +220,7 @@
     <tr><th style="width:150px">维度</th><th>预期提升</th></tr>
     <tr><td>需求命中率</td><td>澄清门把「答非所问」从常见降到少数；不确定度 &gt; 0.30 必被追问</td></tr>
     <tr><td>工具成本</td><td>从「装 8 个 App」降为「用 1 个学伴」；库内 skill 开箱即用，库外按需装载</td></tr>
-    <tr><td>校情回答准确率</td><td>160 条信息库 + 强制查表规则，<b>杜绝编造 URL</b>；未收录则明说</td></tr>
+    <tr><td>校情回答准确率</td><td>139 条信息库 + 强制查表规则，<b>杜绝编造 URL</b>；未收录则明说</td></tr>
     <tr><td>学习连续性</td><td>学习档案跨会话保留，薄弱点被记住并复考</td></tr>
     <tr><td>学习 × 生活 × 科研打通</td><td>作息（F2）、成绩（S4）、科研（R1）首次进入同一决策链</td></tr>
     <tr><td>可复用性</td><td>换学期只改 3 行配置；换能力只改路由表 1 行；整个文件夹可直接分享</td></tr>
@@ -228,7 +228,7 @@
   <div class="badge-row">
     <span class="tag blue">创新性：澄清门量化 + 三级可插拔 + 横切信息库</span>
     <span class="tag green">需求度：新生四大高频痛点全覆盖</span>
-    <span class="tag amber">可行性：19 个库内 skill 已产品化，库外均开源</span>
+    <span class="tag amber">可行性：38 个库内 skill 已产品化，库外均开源</span>
     <span class="tag pink">表达：五要素齐备 + 流程图 + 要点模板</span>
   </div>
 </section>

@@ -1,7 +1,7 @@
 ---
 name: qihang-lab-report
 description: 「启航」S3 作业与考核域库内 skill：按 IMRAD 给实验报告骨架，分配各节字数，并给出自查清单；正文由学生自己写。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -74,3 +74,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 实验报告脚手架 | `lab-report` |
+| 作业拆解 | `assignment-plan` |

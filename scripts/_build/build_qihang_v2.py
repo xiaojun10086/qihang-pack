@@ -10,7 +10,7 @@
    与 §0.2 实测记录）。如无必要不要重跑；确需重跑，请先备份该文件。
    生成顺序应为: build_qihang_v2.py → build_qihang_v2_extras.py → build_phase1.py
 """
-import os, sys, shutil, json
+import os, sys, shutil, json, tempfile
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "qihang-pack"
 
@@ -56,10 +56,10 @@ DOMAINS = [
                            "生成 3 个可自测问题（覆盖最高频考点）",
                            "标注 1–2 处未理解点，写入学习档案",
                            "给出笔记文件落点"]),
-         external=[("lecture-to-study-guide", "Jellypod-Inc/school-skills", "/plugin marketplace add Jellypod-Inc/school-skills"),
-                   ("obsidian-skills", "kepano/obsidian-skills", "/plugin marketplace add kepano/obsidian-skills"),
+         external=[("lecture-to-study-guide", "Jellypod-Inc/school-skills", "npx skills add Jellypod-Inc/school-skills"),
+                   ("obsidian-skills", "kepano/obsidian-skills", "npx skills add kepano/obsidian-skills"),
                    ("mindmap", "0x-man/mindmap-skill", "npx skills add 0x-man/mindmap-skill"),
-                   ("youtube-notetaker", "dair-ai/dair-academy-plugins", "/plugin marketplace add dair-ai/dair-academy-plugins")],
+                   ("youtube-notetaker", "dair-ai/dair-academy-plugins", "npx skills add dair-ai/dair-academy-plugins")],
          dut_public=["图书馆 https://lib.dlut.edu.cn/"],
          dut_private=["数字书院（超星）https://dlutzqsy.mh.chaoxing.com/",
                       "大工金课平台 https://dlut.fanya.chaoxing.com/",
@@ -78,7 +78,7 @@ DOMAINS = [
                            "给出格式自查清单（单位、有效数字、图表编号、引用）",
                            "输出 Markdown / docx 落点"]),
          external=[("paper-writer", "kgraph57/paper-writer-skill", "npx skills add kgraph57/paper-writer-skill"),
-                   ("document-skills", "anthropics/skills", "/plugin marketplace add anthropics/skills")],
+                   ("document-skills", "anthropics/skills", "npx skills add anthropics/skills")],
          dut_public=["教务处 https://teach.dlut.edu.cn/"],
          dut_private=["综合教务系统 http://jxgl.dlut.edu.cn/（作业与成绩）"]),
 
@@ -113,7 +113,7 @@ DOMAINS = [
                            "跑一次模拟审稿（挑 3 个最可能被质疑的点）",
                            "给引用格式规范（GB/T 7714 或 APA）",
                            "输出文件落点"]),
-         external=[("academic-research-skills", "Imbad0202/academic-research-skills", "/plugin marketplace add Imbad0202/academic-research-skills"),
+         external=[("academic-research-skills", "Imbad0202/academic-research-skills", "npx skills add Imbad0202/academic-research-skills"),
                    ("academic-pptx-skill", "Gabberflast/academic-pptx-skill", "手动上传 claude.ai"),
                    ("claude-latex-skill", "hameefy/claude-latex-skill", "npx skills add hameefy/claude-latex-skill")],
          dut_public=["图书馆 https://lib.dlut.edu.cn/"],
@@ -149,7 +149,7 @@ DOMAINS = [
                            "给出办理时长与常见卡点",
                            "未收录则固定回复：信息库未收录，建议访问 www.dlut.edu.cn 核实",
                            "输出办理卡片"]),
-         external=[("googleworkspace/cli", "googleworkspace/cli", "/plugin marketplace add googleworkspace/cli")],
+         external=[("googleworkspace/cli", "googleworkspace/cli", "npx skills add googleworkspace/cli")],
          dut_public=["校园门户 https://portal.dlut.edu.cn/", "学生工作处 https://xsc.dlut.edu.cn/",
                      "后勤处 https://houqin.dlut.edu.cn/", "保卫处 https://gach.dlut.edu.cn/"],
          dut_private=["一卡通 https://ecard.dlut.edu.cn/", "校园门户办事大厅", "离校系统 http://lx.dlut.edu.cn/"]),
@@ -166,7 +166,7 @@ DOMAINS = [
                            "排每日 1–2 个固定专注块，绑定trigger（如「图书馆坐下后」）",
                            "累计连续天数，断了只记录不评判",
                            "与 D 域备考排程联动"]),
-         external=[("deep-work", "alirezarezvani/claude-skills", "/plugin marketplace add alirezarezvani/claude-skills"),
+         external=[("deep-work", "alirezarezvani/claude-skills", "npx skills add alirezarezvani/claude-skills"),
                    ("habit-tracker", "eddiebelaval/squire", "手动 install.sh（需 API Key）"),
                    ("pomodoro", "jakedahn/pomodoro", "npx skills add jakedahn/pomodoro（仅 macOS ARM）")],
          dut_public=["文体场馆中心 https://tycgzx.dlut.edu.cn/"],
@@ -305,8 +305,8 @@ DOMAINS = [
                            "跑分析，出出版级图表（标注单位与误差棒）",
                            "给一句话结论 + 明确列出不能下的结论",
                            "输出脚本与图表"]),
-         external=[("scientific-agent-skills", "K-Dense-AI/scientific-agent-skills", "/plugin marketplace add K-Dense-AI/scientific-agent-skills"),
-                   ("jupyter-notebook", "openai", "/plugin marketplace add openai/skills")],
+         external=[("scientific-agent-skills", "K-Dense-AI/scientific-agent-skills", "npx skills add K-Dense-AI/scientific-agent-skills"),
+                   ("jupyter-notebook", "openai", "npx skills add openai/skills")],
          dut_public=["网络与信息化中心 https://its.dlut.edu.cn/（超算）"],
          dut_private=["超算账号（its 申请）"]),
 
@@ -339,7 +339,7 @@ DOMAINS = [
                            "返修：逐条拆解审稿意见 → 分类（接受/反驳/补充实验）",
                            "为每条意见写回复草稿 + 修改位置",
                            "输出返修对照表"]),
-         external=[("academic-research-skills", "Imbad0202/academic-research-skills", "/plugin marketplace add Imbad0202/academic-research-skills（CC-BY-NC）")],
+         external=[("academic-research-skills", "Imbad0202/academic-research-skills", "npx skills add Imbad0202/academic-research-skills（CC-BY-NC）")],
          dut_public=["科学技术研究院 https://scidep.dlut.edu.cn/", "研究生院 https://gs.dlut.edu.cn/"],
          dut_private=["科研管理系统（项目/成果登记）"]),
 
@@ -511,16 +511,19 @@ references/     数据与文档（DUT 官网库 / 私密站库 / 验收报告）
   ↓ ④锁定 skill domains/<域>/_domain.md      读该域的库内 skill
   ↓ ⑤库内优先  domains/<域>/skills/local/   命中即调用，无需安装
   ↓ ⑥库外兜底  domains/<域>/skills/external.md  仅当库内不满足才安装
-  ↓ ⑦输出      library/output-spec.md        ≤6 条要点，写入学习档案
+  ↓ ⑦输出      library/output-spec.md        ≤6 条要点，过 output-checklist 校验
+  ↓ ⑧归档      library/memory.md             写学习档案（F3/F5 敏感域除外）
 ```
 
-## 三份规则文件（1 级库的本体）
+## 五份规则文件（1 级库的本体）
 
 | 文件 | 职责 |
 |---|---|
 | `library/clarity.md` | 需求明确：6 槽位拆解 + 澄清门公式 + 追问优先级 |
 | `library/domain-review.md` | 域审查：锁定 / 跨域 / 越界 / 无域兜底 |
-| `library/output-spec.md` | 输出规范：统一模板 + 简略原则 |
+| `library/output-spec.md` | 输出规范：统一模板 + 简略原则 + 交付前校验 |
+| `library/memory.md` | 学习档案：四类内容 + 分层落点 + 敏感域红线 |
+| `library/login-policy.md` | 登录选择原则：A/B/C 三档 + 标准话术 + 安全保障 |
 
 ## 快捷调用
 
@@ -736,16 +739,20 @@ def login_sites_md():
 """
 
 def build(out):
-    # 安全护栏：拒绝危险输出路径（本函数会 rmtree(out)）
+    # 安全护栏（v2.9 修复 · P0）：
+    # 旧版在此处 `shutil.rmtree(out)`，而文档给的用法是 `python scripts/_build/build_qihang_v2.py .`，
+    # 于是它会**把整个仓库删空**（含 .git / .learnbuddy / scripts/），随后在沙箱里因「cwd 被占用」
+    # 于最后一步 os.rmdir('.') 抛 PermissionError 而中断 —— 表现为「目录半毁 + 生成链断裂」。
+    # 已实测复现：临时目录 161 个文件 → 0 个文件。
+    # 现改为「暂存目录生成 + 逐文件覆盖」：**绝不删除目标目录里的任何既有内容**。
     ap = os.path.abspath(out)
     if ap in ("/", "\\", os.path.expanduser("~")) or len(ap.rstrip("/\\")) <= 3:
-        raise SystemExit("拒绝执行：输出路径 %s 不安全（本函数会递归删除该目录）" % ap)
-    if os.path.isdir(out):
-        shutil.rmtree(out)
-    os.makedirs(out)
+        raise SystemExit("拒绝执行：输出路径 %s 不安全" % ap)
+
+    stage = tempfile.mkdtemp(prefix='qihang-stage-')
 
     def W(rel, content):
-        p = os.path.join(out, rel)
+        p = os.path.join(stage, rel)
         os.makedirs(os.path.dirname(p), exist_ok=True)
         with open(p, "w", encoding="utf-8", newline="\n") as f:
             f.write(content)
@@ -765,7 +772,12 @@ def build(out):
         W(f"{base}/skills/local/{d['local']['slug']}/SKILL.md", local_skill_md(d)); n += 1
     W("references/dlut-login-sites.md", login_sites_md()); n += 1
 
-    print(f"生成 {n} 个文件 → {out}")
+    # 覆盖式合并：只写入本层生成的文件，不删除目标目录里的其他内容
+    os.makedirs(out, exist_ok=True)
+    shutil.copytree(stage, out, dirs_exist_ok=True)
+    shutil.rmtree(stage, ignore_errors=True)
+
+    print(f"生成 {n} 个文件 → {out}（覆盖式合并；目标目录里的其他文件一律保留）")
     print(f"域数 {len(DOMAINS)}：", ", ".join(d["id"] for d in DOMAINS))
 
 if __name__ == "__main__":

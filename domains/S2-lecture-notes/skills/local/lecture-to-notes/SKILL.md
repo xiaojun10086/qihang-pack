@@ -1,7 +1,7 @@
 ---
 name: qihang-lecture-to-notes
 description: 「启航」S2 课堂与笔记域库内 skill：把讲义/录音/PPT 压成「5–8 条核心 + 概念图 + 3 个自测题」，并标注未理解点供下次复考。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -74,3 +74,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 讲义转笔记 | `lecture-to-notes` |
+| 笔记归一 | `note-normalize` |

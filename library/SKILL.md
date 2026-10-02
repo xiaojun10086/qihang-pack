@@ -1,13 +1,13 @@
 ---
 name: qihang
 description: 「启航」大连理工大学新生学习·生活·科研一体化学伴包（三级结构：skill 库 → 域 → skill）。当用户提出与大连理工大学校情（学院/校区/选课/校历/职能部门/联系方式）、大学课程学习、备考复习、课堂笔记、作业与实验报告、科研文献、作息专注、升学求职相关的**模糊求助**时使用。负责需求明确（澄清门）、域审查、库内优先路由与输出规范。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 agent_created: true
 tags: [dlut, campus, learning, freshman, library, orchestrator, learnbuddy]
 ---
 
-# 「启航」学伴包 · 入口（v2.7.0）
+# 「启航」学伴包 · 入口（v2.9.0）
 
 三级结构：**skill 库（本入口）→ 域 → skill**
 
@@ -48,14 +48,13 @@ references/     数据与文档（DUT 官网库 / 私密站库 / 合规自检 / 
 
 ## 快捷调用
 
-| 平台 | 用法 |
+| 入口 | 用法 |
 |---|---|
 | **LearnBuddy / WorkBuddy** | **自然语言即可**（靠 `description` 自动发现，无需命令）；装到 `~/.learnbuddy/skills/qihang/` |
-| Claude Code | `/qihang` `/qihang-dlut` + 19 个域命令，见 `commands/` |
-| Codex / Gemini CLI | 自然语言；装到各自 `skills/` 目录 |
+| 域入口卡 | `commands/` 21 张（库入口 + 校情 + 19 域），供人工检索 / 插件装载 |
 | 一键脚本 | `bash scripts/qihang.sh {status\|platform\|probe\|install\|domains\|registry\|records\|new-term}` |
 
-各平台差异详见 `references/platforms.md` 与 `INSTALL.md`。
+平台适配详见 `references/platforms.md` 与 `INSTALL.md`。
 
 
 ## 红线总览（v2.5.0 · 复核后新增，优先级高于澄清门）

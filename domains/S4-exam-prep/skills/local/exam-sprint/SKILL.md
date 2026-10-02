@@ -1,7 +1,7 @@
 ---
 name: qihang-exam-sprint
 description: 「启航」S4 备考与记忆域库内 skill：先要三件事（科目章节 / 剩余天数 / 要计划还是卡组），再出 3 步突击或 7 步系统两档方案，结束真出题判分。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -74,3 +74,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 考前冲刺排程 | `exam-sprint` |
+| 间隔复习排程 | `recall-schedule` |

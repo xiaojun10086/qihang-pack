@@ -86,8 +86,8 @@
 
 | 通道 | 结果 |
 |---|---|
-| `npx skills add <owner>/<repo>` | ✅ **可用**。下载 + 建立 `.claude/skills/<name>` 软链成功 |
-| `/plugin marketplace add <owner>/<repo>` | ⚠️ 属 Claude Code 内置斜杠命令，**须在 Claude Code 内执行**，本机无法代跑 |
+| `npx skills add <owner>/<repo>` | ✅ **可用**。通用 skills CLI（npm 包），下载 + 落地 skill 目录成功 |
+| LearnBuddy 原生：`find-skills` | ✅ 可用。检索后安装到 `~/.learnbuddy/skills/` |
 | 手动 clone / 复制 | ✅ 可用 |
 
 **实测逐项结果**
@@ -104,9 +104,9 @@
 | `Jellypod-Inc/school-skills` | — | ⏳ 单次安装耗时过长（环境**批量删除保护**反复重试） | **环境受限** |
 
 **关键结论**
-1. `npx skills add` 的**下载与 Claude Code 落地链路完全可用** —— 6 个仓库、70+ 个 skill 实测成功。
-2. 其余 agent 目录（Droid / Zed / Warp / OpenCode / Gemini CLI 等）因环境**批量删除保护**（单轮 50 次上限）未写入 —— **不影响 Claude Code 使用**。
-3. 部分仓库（skill 数量多、文件多）会因逐个重试而**显著变慢**，建议在真实 Claude Code 环境中安装，或改用 `git clone` + 手动复制。
+1. `npx skills add` 的**下载链路完全可用** —— 6 个仓库、70+ 个 skill 实测成功。
+2. 部分 agent 目录因环境**批量删除保护**（单轮 50 次上限）未写入 —— **不影响本包使用**（库内 38 个 skill 开箱即用，库外仅作增强）。
+3. 部分仓库（skill 数量多、文件多）会因逐个重试而**显著变慢**，建议改用 `git clone` + 手动复制到 `~/.learnbuddy/skills/`。
 
 **因此**：本文档的「可用性」列以 **GitHub API 客观数据**（存在性 / archived / 许可证 / 推送时间）为准，安装通道结论以本表实测为准。
 

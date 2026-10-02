@@ -1,7 +1,7 @@
 ---
 name: qihang-health-guide
 description: 「启航」F5 健康与运动域库内 skill：症状严重直接给就医路径（校医院 → 附属医院）；不诊断，只给流程与运动处方。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -76,3 +76,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 就医与运动指引 | `health-guide` |
+| 就医路径 | `clinic-path` |

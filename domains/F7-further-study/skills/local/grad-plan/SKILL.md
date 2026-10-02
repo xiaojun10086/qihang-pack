@@ -1,7 +1,7 @@
 ---
 name: qihang-grad-plan
 description: 「启航」F7 升学深造域库内 skill：先定路径（保研/考研/留学），再倒排时间线，标出每个节点的硬性材料。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -75,3 +75,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 升学路径规划 | `grad-plan` |
+| 升学时间线 | `grad-calendar` |

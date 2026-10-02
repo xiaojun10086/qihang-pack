@@ -1,7 +1,7 @@
 ---
 name: qihang-wellbeing-checkin
 description: 「启航」F3 身心与社交域库内 skill：先倾听再给方法；不评判、不诊断；识别危机信号并第一时间转介心理中心。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -77,3 +77,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 状态check-in | `wellbeing-checkin` |
+| 人际沟通脚本 | `peer-talk-script` |

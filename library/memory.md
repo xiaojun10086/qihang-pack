@@ -1,6 +1,6 @@
 # 学习档案与记忆对接（Level 1 · memory）
 
-> 1 级 skill 库的第 4 份规则文件。负责工作流第 ⑦ 步「写入学习档案」，并与
+> 1 级 skill 库的第 4 份规则文件。负责工作流第 **⑧** 步「归档（写入学习档案）」，并与
 > **LearnBuddy / WorkBuddy 的三层记忆系统**对接。
 
 ---
@@ -92,10 +92,11 @@
 
 ---
 
-## 6. 其他平台（无内置记忆系统时）
+## 6. 目标平台与回落落点
 
-| 平台 | 落点 |
+本包只面向 **LearnBuddy / WorkBuddy** 单一目标平台，三层记忆见 §2.1，无需为其他平台另设落点。
+
+| 场景 | 落点 |
 |---|---|
-| Claude Code | `~/.claude/skills/qihang/records/<域ID>.md` |
-| Codex / Gemini CLI | 同上，放在各自 skills 目录下 |
-| Cursor / Copilot | 放工作区 `.qihang/records/`，靠规则文件引用 |
+| 正常（LearnBuddy / WorkBuddy） | `{ws}/.learnbuddy/memory/qihang/<域ID>.md` |
+| 平台目录不可写时回落 | `<包根>/records/<域ID>.md`（由 `scripts/qihang.sh records` 管理） |

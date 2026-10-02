@@ -1,11 +1,11 @@
-# 安装指南（多平台）
+# 安装指南（LearnBuddy / WorkBuddy）
 
-> 「启航」是 `SKILL.md` 标准件，装到哪个平台就用在哪个平台。
-> 平台差异详见 `references/platforms.md`；自动探测用 `bash scripts/qihang.sh platform`。
+> 「启航」是 `SKILL.md` 标准件，**面向 LearnBuddy / WorkBuddy 单一目标平台**。
+> 平台差异详见 `references/platforms.md`；就绪度探测用 `bash scripts/qihang.sh platform`。
 
 ---
 
-## 一、LearnBuddy / WorkBuddy（推荐，一等公民）
+## 一、安装
 
 ```bash
 # ① 用户级安装（所有项目可用）
@@ -29,60 +29,32 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 ---
 
-## 二、Claude Code
+## 二、域入口卡（`commands/`）
 
-```bash
-cp -r qihang-pack ~/.claude/skills/qihang
-mkdir -p ~/.claude/commands && cp qihang-pack/commands/*.md ~/.claude/commands/
-bash ~/.claude/skills/qihang/scripts/qihang.sh status
-```
+`commands/` 里的 21 个文件是 **LearnBuddy 域入口卡**（库入口 1 + 校情 1 + 19 域），
+作用是「快速查到某域该读哪些规则文件」，**不是需要输入的命令**：
 
-**用法**：
-| 命令 | 作用 |
+| 入口卡 | 作用 |
 |---|---|
-| `/qihang` | 库入口（澄清门 → 锁域 → 锁 skill） |
-| `/qihang-dlut` | 查大工校情 |
-| `/qihang-s1` … `/qihang-r5` | 19 个域命令 |
+| `commands/qihang.md` | 库入口（澄清门 → 锁域 → 锁 skill） |
+| `commands/qihang-dlut.md` | 查大工校情（公开站 + 私密站） |
+| `commands/qihang-s1.md` … `qihang-r5.md` | 19 个域入口卡 |
 
-**库外 skill 安装**（库内不满足时才需要）：
-```bash
-npx skills add <owner>/<repo>              # 实测可用
-/plugin marketplace add <owner>/<repo>     # 备选
-```
+在 LearnBuddy 中直接说需求即可命中对应域，无需输入卡片名。
 
 ---
 
-## 三、Codex / Gemini CLI
+## 三、库外 skill 安装（仅库内不满足时）
 
-```bash
-# Codex
-cp -r qihang-pack ~/.codex/skills/qihang
-
-# Gemini CLI
-cp -r qihang-pack ~/.gemini/skills/qihang
-```
-
-用自然语言触发即可。
+| 通道 | 命令 |
+|---|---|
+| **LearnBuddy 原生（首选）** | 用 `find-skills` 技能检索并安装到 `~/.learnbuddy/skills/` |
+| 通用 skills CLI | `npx skills add <owner>/<repo>`（实测可用） |
+| 手动 | `git clone` 后复制 `<repo>/skills/*` 到 `~/.learnbuddy/skills/` |
 
 ---
 
-## 四、Cursor / GitHub Copilot
-
-这两个平台不吃 `SKILL.md`，需把入口内容转成它们的规则格式：
-
-```bash
-# Cursor
-mkdir -p .cursor/rules && cp qihang-pack/SKILL.md .cursor/rules/qihang.mdc
-
-# Copilot
-mkdir -p .github && cp qihang-pack/SKILL.md .github/copilot-instructions.md
-```
-
-再把 `qihang-pack/library/` 与 `domains/_registry.md` 作为附属文档放在仓库内，供引用。
-
----
-
-## 五、赛道二提交物（依托平台 = LearnBuddy，产品名「连小理」）
+## 四、赛道二提交物（依托平台 = LearnBuddy，产品名「连小理」）
 
 > **连小理就是 LearnBuddy**，不是两个平台 —— 本包在赛道二中的场景名即「连小理」。
 
@@ -90,22 +62,21 @@ mkdir -p .github && cp qihang-pack/SKILL.md .github/copilot-instructions.md
 2. 平台侧挂载：`domains/_registry.md`（域总表）+ `library/` 规则 + `references/dlut-*.md`（信息库）
 3. 场景与结构见 `PROJECT.md`
 
-安装与使用**完全按第一节（LearnBuddy / WorkBuddy）**即可，无需另做适配。
+---
 
-
-## 六、装完自检
+## 五、装完自检
 
 ```bash
 bash scripts/qihang.sh status      # 三级结构完整度
-bash scripts/qihang.sh platform    # 探测本机平台与安装路径
+bash scripts/qihang.sh platform    # 探测本机 LearnBuddy 安装位置
 bash scripts/qihang.sh domains     # 19 域清单
 bash scripts/qihang.sh registry    # DUT 信息库统计
 bash scripts/qihang.sh probe       # 库外候选缺失项（可选）
 ```
 
-**期望**：`[1级]` 逐行列出 **8 个** library 文件（SKILL + 7 份规则，含 `login-policy.md`） · `[2级] 19 个域 / **38 个**库内 skill` · `[资源] DUT 公开站 160 行`
+**期望**：`[1级]` 逐行列出 **8 个** library 文件（SKILL + 7 份规则，含 `login-policy.md`） · `[2级] 19 个域 / **38 个**库内 skill` · `[资源] DUT 公开站 139 条条目`
 
-**完整验收（v2.7 起 4 个脚本，职责不重叠）**：
+**完整验收（v2.8 起 4 个脚本，职责不重叠）**：
 
 | 脚本 | 管什么 | 期望 |
 |---|---|---|
@@ -116,7 +87,7 @@ bash scripts/qihang.sh probe       # 库外候选缺失项（可选）
 
 ---
 
-## 七、前置条件
+## 六、前置条件
 
 | 项 | 说明 |
 |---|---|

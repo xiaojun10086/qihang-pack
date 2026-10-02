@@ -1,7 +1,7 @@
 ---
 name: qihang-lit-map
 description: 「启航」R1 文献检索与管理域库内 skill：先出检索式与纳排标准，再按「主题—方法—结论」矩阵整理；每条引文给可核验锚点。
-version: 2.7.0
+version: 2.9.0
 license: MIT
 ---
 
@@ -72,3 +72,10 @@ license: MIT
 ## 失败与降级
 
 库内执行不满足 → 读上一级 `../../external.md` 走库外安装；仍失败 → 纯提示词模式并标注 `[已降级]`。
+
+## 与同域其他库内 skill 的分工
+
+| 场景 | 用哪个 |
+|---|---|
+| 文献地图 | `lit-map` |
+| 引文核验 | `citation-verify` |

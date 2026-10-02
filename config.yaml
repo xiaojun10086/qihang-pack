@@ -1,4 +1,4 @@
-# 「启航」学伴包 v2.7 · 唯一需要按学期 / 课程修改的文件
+# 「启航」学伴包 v2.9 · 唯一需要按学期 / 课程修改的文件
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 
 # ============ 学校绑定（强绑定） ============
@@ -59,7 +59,7 @@ private_sites:
   read_only: true
   persist_cookies: false
   persist_pages: false
-  # 实测最佳聚合点（2026-10-01 验证）：单页拿到课表/借阅/一卡通/网费/邮件/日程
+  # 实测最佳聚合点（2026-10-01 验证）：单页拿到课表 / 借阅/一卡通/网费/邮件/日程
   primary_aggregator: https://portal.dlut.edu.cn/
   level_rules:
     # v2.7 修复：去掉生成器拼接残留的重复项（原为 "…网费, 网费, 日程"）
