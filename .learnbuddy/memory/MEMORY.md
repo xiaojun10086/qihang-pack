@@ -51,7 +51,7 @@
 5. ~~「声明==实测」有白名单盲区~~ → **已修**：改为全量扫描 + 内容标记豁免（文件级「历史文档」/ 行级「历史口径」）。
 6. ~~`qihang.sh registry` 按全文出现次数统计~~ → **已修**：只统计表格数据行内（139 / 67 / 21 / 51）。
 7. ~~`SKILL.md` / `PROJECT.md` L3 清单重复「成绩明细」~~ → **已修**。
-8. ~~92 项改动未提交~~ → **v2.11 后累计 110 项**（其中 8 项为 `D` 索引删除），待用户 `git add -A && git commit`（含 6 个新文件：
+8. ~~92 项改动未提交~~ → **v2.11 全部 110 项已提交**（`7c7be83`，含 6 个新文件：
    `CHANGELOG.md` `LICENSE` `THIRD_PARTY_NOTICES.md` `library/README.md`
    `scripts/_build/build_phase19.py` `scripts/_build/make_release.py`）。
 9. **v2.11 新增盲区（已修，记类型）**：**「同名双入口」** —— 包根 `SKILL.md` 与 `library/SKILL.md`
