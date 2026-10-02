@@ -29,7 +29,14 @@ def rep(path, old, new, required=True, label=None, count=1):
 
     幂等护栏：**当 new 包含 old 时**（即"在旧内容后追加"型替换），
     先判 new 是否已整体出现在文件里 —— 出现过就跳过，避免重复追加。
+
+    退役护栏（与 phase16/17/18 对齐）：目标文件若已被后续提交删除
+    （如 `PROJECT.md` / `ROADMAP.md`），记 MISS 并跳过，**不抛 FileNotFoundError**。
     """
+    if not os.path.isfile(os.path.join(ROOT, path)):
+        if required:
+            MISS.append('%s :: %s（文件不存在）' % (path, (label or old)[:58]))
+        return
     t = rd(path)
     label = label or (old.strip().splitlines() or ['?'])[0][:58]
     if old in new and new in t:
@@ -46,6 +53,10 @@ def rep(path, old, new, required=True, label=None, count=1):
     OK.append('%s :: %s' % (path, label))
 
 def resub(path, pat, repl, label, required=True, flags=0):
+    if not os.path.isfile(os.path.join(ROOT, path)):
+        if required:
+            MISS.append('%s :: %s（文件不存在）' % (path, label))
+        return
     t = rd(path)
     t2, n = re.subn(pat, repl, t, flags=flags)
     if n == 0:

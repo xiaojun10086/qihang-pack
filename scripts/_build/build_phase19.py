@@ -733,13 +733,16 @@ def refresh_counts():
     # （含 `.idea` / `.learnbuddy` / 未随包分发的过程文档），与 PROJECT.md 口径不一致，
     # 且因本层新增/输出文件而**每轮漂移一次**（实测 r1=172 → r2=176）。
     # → 本层统一到同一口径（measure_files），两处一致且在链上稳定。
-    t = rd('ROADMAP.md')
-    t2 = re.sub(r'\d+ 文件，生成器驱动', '%d 文件，生成器驱动' % n, t)
-    if t2 != t:
-        wr('ROADMAP.md', t2)
-        OK.append('ROADMAP.md :: 文件数口径统一 → %d（与 PROJECT.md 同口径）' % n)
+    t = rd('ROADMAP.md') if os.path.isfile(os.path.join(ROOT, 'ROADMAP.md')) else None
+    if t is None:
+        DONE.append('[跳过·目标已退役] ROADMAP.md :: 文件数口径')
     else:
-        DONE.append('[已是最新] ROADMAP.md :: 文件数口径 %d' % n)
+        t2 = re.sub(r'\d+ 文件，生成器驱动', '%d 文件，生成器驱动' % n, t)
+        if t2 != t:
+            wr('ROADMAP.md', t2)
+            OK.append('ROADMAP.md :: 文件数口径统一 → %d（与 PROJECT.md 同口径）' % n)
+        else:
+            DONE.append('[已是最新] ROADMAP.md :: 文件数口径 %d' % n)
     # selfcheck 期望 OK 数（新增 [8b] 节 4 条）
     t = rd('INSTALL.md')
     m = re.search(r'`OK (\d+) ｜ WARN 0 ｜ FAIL 0 → 可交付`', t)

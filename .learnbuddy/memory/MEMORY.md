@@ -4,10 +4,11 @@
 
 ## 一、项目定位与结构（不要改的东西）
 
-- 三级结构：`library/`（1 级规则库）→ `domains/`（19 域）→ `domains/<域>/skills/local/<name>/SKILL.md`（3 级库内 skill）。
-- **库内优先是硬规则**：库内有 skill 就不装库外；库外只作降级增强。
-- 19 域 = S 学习 6 + F 生活 8 + R 科研 5。当前**每域 2 个库内 skill，共 38 个**。
-- **库外比对选优结论的唯一真相源**：`references/skill-matrix-v3.md`（由 `build_phase14.py` 生成）。
+- 三级结构：`library/`（1 级规则库）→ `domains/`（**20 域**）→ `domains/<域>/skills/local/<name>/SKILL.md`（3 级库内 skill）。
+- **库内唯一通道（v3.0.0 起）**：库内 skill 是唯一通道，`skills/external.md` 全库为 **0**；不再有库外安装层。
+- **20 域 = S 学习 6 + F 生活 8 + R 科研 6**。当前**每域 4–5 个，共 92 个**（自建 80 + 改造 12）。
+- 版本：**v3.0.0** · 92 库内 skill · 零外部依赖 · 红线仍从各 `_domain.md` **运行时解析**（不手抄）。
+- ~~`references/skill-matrix-v3.md` / `skill-sources.md` = 库外比对真相源~~ → **v3.0.0 已退役**（`e31f959`）。
 - 红线体系：**先判红线 → 再判登录档位（A/B/C）→ 再判澄清门 → 再锁域**。顺序不可换。
 - 澄清门：`U = 1 − Σ(wᵢcᵢ)/Σwᵢ`，权重 `O/T/D=1.5, W=0.8, C=0.6, B=0.2`；**关键槽 `O/T/D` 须 `cᵢ ≥ 0.8` 才放行**（0.5=歧义视同缺）。
 
@@ -24,7 +25,14 @@
 | **收敛层** | `build_phase17.py` | **v2.9 漏检缺陷修复 + 链末收敛**（见 §二之四）：检查器全量化 · L3 清单去重 · 口径统一 · `qihang.sh` 可复现 · 平台口径兜底 · 授权清单收敛 · 计数/去重归一化 · P0 破坏性重建护栏 |
 | **规则层** | `build_phase18.py` | **v2.10 规则可执行性修复**（见 §二之六）：裸词澄清 · 澄清门 §2.1 cᵢ 判定细则 · 例外 6 通用知识型 · 域冲突对齐 · 无对口 skill 降级链 · 红线体系补漏 · 输出规范补变体 |
 
-- 顺序：`v2 → extras → phase1…18`（见 `scripts/_build/README.md`）。**phase17 必须在 phase18 之前**（17 在 v2.10 树上单独重跑会报 4 处 MISS，属预期）。
+- **现行链（v3.0.0）= `scripts/_build/v3/`**，单入口 `scripts/_build/v3/rebuild.py`（层序见 `scripts/_build/v3/README.md`）。
+  该链在 v3.0.0 树上重跑**零变更**（实测 224 文件 0 变更）；`%TEMP%` 里那批一次性 `gen_*.py` 已收编入库。
+- **历史链（`v2 + phase1…19`）= 只读**，模型 ≤v2.11（19 域 / 38 skill）。**禁止在 v3.0.0 树上重跑**
+  （会把 `library/*`、`_registry.md`、文档计数、校验器阈值回退到 v2.11 口径）。
+  其最后**自洽基线 = `7c7be83`**（实测 21 层全 rc=0 · 连跑两遍 0 变更）：更晚的 `16d2dc3` 删了
+  `PROJECT.md`/`ROADMAP.md`/`CHANGELOG.md` 却没同步改链 → 在 v3.0.0 树上必报 MISS。
+  已给 `build_phase15.py` 的 `rep`/`resub` 与 `build_phase19.py` 的 `ROADMAP.md` 直读补「文件不存在即跳过」护栏（**不再抛异常**）。
+- 历史链顺序：`v2 → extras → phase1…18`，`phase19` 单独跑（见 `scripts/_build/README.md`）。
 - **两个铁律**：
   1. 生成器必须**幂等**：`new` 包含 `old` 的追加型替换要加护栏（否则第二遍会重复插入）；
      一次性正则替换要给「完成判据」（`already=` / `absent=`），否则第二遍误报未命中。
@@ -146,6 +154,9 @@ for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
   副本 135 文件 `OK 35/0/0` · `FAIL 0/WARN 1` · **`36/0/0`** · regress `FAIL 0`。
   副本 36 vs 工作区 37 **非缺陷**（随 `_build` 移除，那条 rmtree 护栏断言不再适用）。
   **发布器连导两遍必须逐文件一致**（实测 IDENTICAL）。
+- **验收基线（v3.0.0）**：源仓库 ↔ 交付副本 **逐字节一致**（`release/verify.py` 判定「两树完全一致」，
+  各 169 文件；差集恰为 8 份「未随包分发」过程文档）。v3 生成链连跑两遍逐文件一致。
+  `selfcheck OK 37/0/0` · `aligncheck FAIL 0 / WARN 1` · `runcheck FAIL 0`。
 - **环境**：`shutil.rmtree` 会被 safe-delete 拦（>50 文件）；导出用**原地覆盖**，
   陈旧文件由 `prune_stale()` **移出**到 `%TEMP%/qihang-release-retired/`（不删、可回滚；>20 个只报不动）。
 
@@ -160,11 +171,19 @@ for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
 ## 三、验证脚本（改完必跑）
 
 ```bash
-bash scripts/selfcheck.sh     # 结构/计数/交叉引用/红线一致性  期望 OK35 WARN0 FAIL0
-bash scripts/audit.sh         # 安全/合规/L3 门禁实测            期望 37 通过 0 警告 0 失败
-bash scripts/regress.sh 3     # 行为回归（连跑 3 轮）            期望 41 项/轮、累计 FAIL 0
+bash scripts/selfcheck.sh     # 结构/计数/交叉引用/红线一致性  期望 OK 37 / WARN 0 / FAIL 0
+bash scripts/audit.sh         # 安全/合规/L3 门禁实测            期望 46 通过 0 警告 0 失败
+bash scripts/regress.sh 3     # 行为回归（连跑 3 轮）            期望 累计 FAIL 0
 python scripts/aligncheck.py  # 全量文件级对齐                  期望 FAIL 0（常驻 WARN 1）
+python scripts/runcheck.py    # 端到端可跑性（20 域）            期望 FAIL 0 / WARN 0
+python scripts/_build/v3/rebuild.py <树>   # v3.0.0 生成链重跑    期望 零变更
+python scripts/_build/v3/release/verify.py <源> <副本>   # 两树终检  期望「两树完全一致」
 ```
+
+> ⚠️ **本机环境缺口（非缺陷，勿误判为回归）**：`dlut-read.sh --dry-run` 依赖 `agent-browser`。
+> 若它不在 PATH（实测：某个 node 版本被删后 `agent-browser` 随之消失），则
+> `audit.sh` 报 **43 通过 / 1 警告 / 2 失败**，`regress.sh` 每轮 **FAIL 6**（全部 `L1 路径异常 rc=4`）。
+> **HEAD 原样树实测同样数值** → 属环境项。
 
 **⚠️ 脚本全绿 ≠ 无问题**：断言集本身可能有盲区（见 §二之三.5）。每轮必须另加一条**不看脚本、直接比对原文**的人工透镜；用户限制「不要改动」时可作纯只读复核。
 
