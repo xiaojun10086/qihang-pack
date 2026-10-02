@@ -65,18 +65,18 @@ agent-browser open <url> --headed --profile "$HOME/.qihang/browser-profile"
 | 3 | 综合教务系统 | http://jxgl.dlut.edu.cn/student/ucas-sso/login | 课表、成绩、选课、考试安排 | S1 S3 S4 F1 | 方案 A（高频只读） |
 | 4 | 图书馆 | https://lib.dlut.edu.cn/ | 借阅、续借、座位/研讨间预约 | S2 S5 R1 | 方案 A |
 | 5 | 一卡通 / 玉兰卡 | https://ecard.dlut.edu.cn/ | 余额、消费流水 | F1 F4 | 方案 A（仅看余额流水） |
-| 6 | 学生工作系统 | https://xsc.dlut.edu.cn/ | 资助、评奖、请假、第二课堂 | F1 F3 F4 F6 | 方案 A |
+| 6 | 学生工作系统 | https://xsc.dlut.edu.cn/ | 资助、评奖、请假、第二课堂 | F1 F3 F4 F6 | 方案 A（资助/评奖状态属 **L2 需确认**；**心理记录 L3 禁读**） |
 | 7 | 统一支付平台 | http://pay.dlut.edu.cn/ | 缴费状态 | F4 | 方案 C（涉金额，只看状态） |
 | 8 | 财务处 | http://cw.dlut.edu.cn/ | 缴费、报销进度 | F4 | 方案 C |
-| 9 | 就业信息网 | https://job.dlut.edu.cn/ | 招聘、宣讲会、投递记录 | F8 | 方案 A |
-| 10 | 研究生系统 | https://gs.dlut.edu.cn/ | 培养、导师、开题 | R4 R5 F7 | 方案 A |
+| 9 | 就业信息网 | https://job.dlut.edu.cn/ | 招聘、宣讲会、投递记录 | F8 | 方案 A（投递记录属 **L2 需确认**） |
+| 10 | 研究生系统 | https://gs.dlut.edu.cn/ | 培养、导师、开题 | R4 R5 F7 | 方案 A（培养进度属 **L2 需确认**） |
 | 11 | 研究生招生报名 | https://yjszs.dlut.edu.cn/zsbm | 报名状态 | F7 | 方案 C |
 | 12 | 校园邮箱 | http://mail.dlut.edu.cn/ | 通知、导师往来 | 通用 | 方案 C（默认不读邮件正文） |
 | 13 | 数字书院（超星） | https://dlutzqsy.mh.chaoxing.com/ | 课程资源、作业、测验 | S2 S3 S4 | 方案 A |
 | 14 | 大工金课平台 | https://dlut.fanya.chaoxing.com/ | 课程资源 | S2 | 方案 A |
 | 15 | 雨课堂 | https://www.yuketang.cn/ | 课件、随堂测验 | S2 S3 | 方案 A |
 | 16 | 离校系统 | http://lx.dlut.edu.cn/ | 离校流程 | F1 | 方案 A |
-| 17 | 网络与信息化中心 | https://its.dlut.edu.cn/ | 网费、VPN、软件正版化 | R3 F1 | 方案 C |
+| 17 | 网络与信息化中心 | https://its.dlut.edu.cn/ | 网费、VPN、软件正版化 | R3 F1 | 方案 A（**网费属 L1**；涉账号类走方案 C） |
 | 18 | 校园网自助服务 | http://tulip.dlut.edu.cn/ ⚠️ | 网费自助 | F1 | 待核实域名 |
 | 19 | i大工 APP | 应用商店 | 场馆/心理/浴室/校车预约 | F1 F3 F5 F2 | **无网页版**，引导用户自行查看 |
 
@@ -84,9 +84,9 @@ agent-browser open <url> --headed --profile "$HOME/.qihang/browser-profile"
 
 | 级别 | 范围 | 授权 |
 |---|---|---|
-| **L1 只读·自动** | 课表、成绩、考试安排、借阅、一卡通余额、场馆预约状态 | 方案 A，可直接读取 |
+| **L1 只读·自动** | 课表、**成绩等级（含是否通过）**、考试安排、借阅、一卡通余额、场馆预约状态、网费、日程 | 方案 A，可直接读取 |
 | **L2 只读·确认后** | 资助申请状态 / 就业投递记录 / 培养进度 / 邮箱未读提示 | 方案 A，读前先问一句 |
-| **L3 禁止自动** | 缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细、成绩明细 | **方案 C**，只给入口不读取 |
+| **L3 禁止自动** | 缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细 | **方案 C**，只给入口不读取（关键词包含匹配） |
 
 ## 3. 会话与隐私
 

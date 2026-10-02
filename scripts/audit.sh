@@ -103,6 +103,12 @@ if [ -f scripts/dlut-read.sh ]; then
   fi
   out=$(bash scripts/dlut-read.sh 邮箱提示 </dev/null 2>&1); [ $? -eq 2 ] \
     && ok "L2 需确认（退出码 2）" || bad "L2 未要求确认"
+  # v2.7 新增：L3 语义变体必须同样被拒（旧版精确匹配可被「缴费金额」等绕开）
+  for t in 缴费金额 银行卡号 身份证号 邮件内容 成绩单 家庭信息卡; do
+    out=$(bash scripts/dlut-read.sh "$t" </dev/null 2>&1); rc=$?
+    if [ "$rc" -eq 3 ] && echo "$out" | grep -q "拒绝执行"; then ok "L3 变体拦截 [$t]"
+    else bad "L3 变体未拦截 [$t]（退出码 $rc）"; fi
+  done
   out=$(bash scripts/dlut-read.sh 课表 --dry-run </dev/null 2>&1)
   echo "$out" | grep -q "未启动浏览器" && ok "L1 dry-run 不启动浏览器" || warn "dry-run 未声明不启动浏览器"
   echo "$out" | grep -q "独立Profile" && ok "强制独立 Profile（不复用真实浏览器）" || bad "未声明独立 Profile"
@@ -127,7 +133,9 @@ nd=$(find domains -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
 nred=$(grep -rl '## ⚠️ 红线' domains/*/_domain.md 2>/dev/null | wc -l | tr -d ' ')
 nred2=$(grep -rl '红线\|安全护栏' domains/*/skills/local/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
 [ "$nred" -eq "$nd" ] && ok "域文件红线覆盖 $nred/$nd" || bad "域文件红线覆盖 $nred/$nd（应全覆盖）"
-[ "$nred2" -eq "$nd" ] && ok "库内 skill 红线覆盖 $nred2/$nd" || bad "库内 skill 红线覆盖 $nred2/$nd"
+# v2.7：每域 2 个库内 skill，故期望 2×域数
+_want=$((nd*2))
+[ "$nred2" -eq "$_want" ] && ok "库内 skill 红线覆盖 $nred2/$_want（每域 2 个）" || bad "库内 skill 红线覆盖 $nred2/$_want"
 grep -q '红线总览' SKILL.md 2>/dev/null && ok "入口含「红线总览」" || bad "入口缺「红线总览」"
 grep -q '红线优先' library/clarity.md 2>/dev/null && ok "澄清门已声明「红线优先级」" || warn "澄清门未声明红线优先级"
 
@@ -143,7 +151,16 @@ for d in F3 F5; do
 done
 [ "$bad_found" -eq 0 ] || true
 
-# ---------- 9. 脚本可执行性 ----------
+# ---------- 9. 多源比对与 DUT 适配 ----------
+echo "[8b] 库外候选合规与 DUT 适配"
+if [ -f references/skill-matrix-v3.md ]; then
+  grep -q "DUT 适配" references/skill-matrix-v3.md && ok "矩阵含 DUT 适配维度" || warn "矩阵缺 DUT 适配维度"
+  if grep -q "环境错位清单" references/skill-matrix-v3.md; then ok "含环境错位清单（防误装）"; fi
+else
+  bad "缺 references/skill-matrix-v3.md"
+fi
+
+# ---------- 9b. 脚本可执行性 ----------
 echo "[9] 脚本可执行性"
 for s in scripts/*.sh; do
   bash -n "$s" 2>/dev/null && ok "语法通过 $(basename "$s")" || bad "语法错误 $(basename "$s")"

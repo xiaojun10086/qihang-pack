@@ -1,4 +1,4 @@
-# 「启航」新生学习生活一体化学伴包 v2.6.0
+# 「启航」新生学习生活一体化学伴包 v2.7.0
 
 > **三级结构：skill 库（1级）→ 域（2级）→ skill（3级）**
 > 面向大连理工大学 2026 级本科新生 ｜ 强绑定 DUT 公开站与需登录的私密站
@@ -18,6 +18,7 @@ qihang-pack/
 ├── .codebuddy-plugin/        LearnBuddy / WorkBuddy 插件清单
 ├── library/                  ★1 级 · skill 库（既是 skill 也是库）
 │   ├── SKILL.md              库本体
+│   ├── login-policy.md       登录选择原则（A/B/C 三档）
 │   ├── clarity.md            职责1：需求明确（6 槽位 + 澄清门）
 │   ├── domain-review.md      职责2：域审查（锁定/越界/跨域/无域兜底）
 │   ├── output-spec.md        职责3：输出规范（模板 + 简略原则）
@@ -35,18 +36,27 @@ qihang-pack/
 │   ├── dlut-official-sites.md      DUT 公开站信息库（160 条）
 │   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
 │   ├── dlut-field-map.md           私密站字段映射表
-│   ├── skill-sources.md            12 个 skill 探测平台
+│   ├── skill-sources.md            12 个 skill 探测平台（含可达性实测）
+│   ├── skill-matrix-v3.md          **库外候选多源比对矩阵（19 域选优）**
 │   ├── skill-compliance-audit.md   合法性 + 可用性自检报告
 │   ├── platforms.md                各平台适配表
 │   ├── e2e-scenarios.md            3 条端到端演示路径
 │   ├── acceptance-v2.md            验收报告 v2（赛道二 5 要素 + 4 维度）
 │   ├── validation-report.md        阶段 1/2 验收报告
+│   ├── review-report-v2.2.md      复查报告 v2.2
+│   ├── review-report-v2.3.md      复查报告 v2.3
+│   ├── review-report-v2.4.md      **复查报告 v2.4（本轮）**
+│   ├── stress-test-v3.md          **多轮压测报告**
+│   ├── browser-matrix.md / dlut-site-profiles.md / dlut-url-verification.md
 │   └── 需求确认书-v2三级结构.md
 ├── commands/                    斜杠命令（Claude Code 用；LearnBuddy 不需要）
 └── scripts/
     ├── qihang.sh                管理脚本（多平台探测）
     ├── dlut-read.sh             DUT 私密站只读取数（L1/L2/L3 硬拦截）
-    └── build_*.py               结构生成器（改域后重跑）
+    ├── selfcheck.sh             结构自检（计数 / 交叉引用 / 红线一致性）
+    ├── audit.sh                 安全审计（危险命令 / 凭证 / L3 门禁实测）
+    ├── regress.sh               **行为回归**（澄清门算例 / L3 门禁矩阵，支持多轮）
+    └── _build/build_*.py        结构生成器（改域后按序重跑）
 ```
 
 ## 2. 工作流（严格按序）
@@ -73,7 +83,7 @@ qihang-pack/
 | **F 生活（8）** | F1 校园事务 ｜ F2 作息与专注 ｜ F3 身心与社交 ｜ F4 财务与安全 ｜ F5 健康与运动 ｜ F6 军训与志愿 ｜ F7 升学深造 ｜ F8 求职与竞赛 |
 | **R 科研（5）** | R1 文献检索与管理 ｜ R2 实验与数据 ｜ R3 科研工具与代码 ｜ R4 学术产出与投稿 ｜ R5 学术规范与伦理 |
 
-**自查结果**：19 域 × 每域 1 个库内 skill = 19 个库内 skill；15 个域有库外候选；**4 个域为方向空白**（F3、F4、F5、F6），直接依赖库内自建 skill。
+**自查结果**：19 域 × 每域 **2 个**库内 skill = **38 个库内 skill**；**14 个域**有「合规且适配 DUT」的库外候选；**7 个域为纯自建**（F1、F3、F4、F5、F6、F7、R5 —— 库外要么许可证不清、要么环境错位）。详见 `references/skill-matrix-v3.md`。
 
 ## 4. 安装与使用
 
@@ -102,6 +112,8 @@ bash scripts/qihang.sh platform   # 探测本机平台与安装路径
 ```
 
 ```bash
+bash scripts/selfcheck.sh         # 结构与计数自检（v2.7 起 38 skill）
+bash scripts/audit.sh             # 安全审计 + L3 门禁实测
 bash scripts/qihang.sh status     # 三级结构完整度
 bash scripts/qihang.sh platform   # 平台探测与安装路径
 bash scripts/qihang.sh domains    # 19 域清单

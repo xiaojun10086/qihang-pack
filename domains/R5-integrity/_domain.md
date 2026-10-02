@@ -16,6 +16,9 @@
 - **`integrity-check`** — 规范自检（自建）
   跑一份合规自查：引用、查重、署名、数据来源、AI 使用声明，逐项给可执行修正。
 
+- **`ai-disclosure`** — AI使用声明（自建）
+  生成合规的 AI 使用声明（工具名/使用环节/本人核验范围），不隐藏 AI 痕迹。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -30,7 +33,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `R5`（`library/domain-review.md`）
-3. 用**库内 skill** `integrity-check` 执行（首选）
+3. 用**库内 skill**（首选 `integrity-check`；不满足时用同域备选 `ai-disclosure`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并写入学习档案
 

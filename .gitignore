@@ -1,0 +1,7 @@
+# 自检脚本历史遗留的临时文件
+.selfcheck.tmp
+.selfcheck.tmp.refs
+
+# 构建缓存
+__pycache__/
+*.pyc

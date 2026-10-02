@@ -50,7 +50,7 @@
 
 - 场景设计书：五要素齐备 + 流程图 + 要素表
 - 包内文档：`README` / `INSTALL` / `PROJECT` / `ROADMAP` 四件套
-- 规则文件：`library/` 7 份（clarity / domain-review / output-spec / memory / cases / checklist / SKILL）
+- 规则文件：`library/` **8 份**（clarity / domain-review / output-spec / memory / **login-policy** / cases / checklist / SKILL）
 - 验收与自检：`validation-report` + `skill-compliance-audit`
 
 ---
@@ -64,9 +64,9 @@
 | 3 | 域审查含越界拦截 | ✅ | `domain-review-cases.md` 22 条（含 3 反例） |
 | 4 | 输出规范可校验 | ✅ | `output-checklist.md` 7 项硬校验 |
 | 5 | 库内优先机制 | ✅ | `SKILL.md` 硬规则 1 + 各域 `external.md` 使用规则 |
-| 6 | DUT 公开信息库 | ✅ | 160 条表格行，✅ 73 / ⚠️23 / 学院类 65 |
+| 6 | DUT 公开信息库 | ✅ | **160 条**表格行（✅ 69 / ⚠️ 26） |
 | 7 | DUT 私密站接入 | ✅ | 19 站 + 方案 A + 独立 Profile + L1/L2/L3 |
-| 8 | L3 硬拦截 | ✅ | `dlut-read.sh 缴费` → **退出码 3，拒绝执行** |
+| 8 | L3 硬拦截 | ✅ | `dlut-read.sh 缴费` / `缴费金额` / `银行卡号` / `邮件内容` → **均退出码 3**（v2.7 语义匹配后） |
 | 9 | L2 需确认 | ✅ | `dlut-read.sh 邮箱提示` → **退出码 2，要求 --yes** |
 | 10 | 一键取数 | ✅ | `dlut-read.sh`（含 `--dry-run`）+ `dlut-field-map.md` |
 | 11 | 学习档案规则 | ✅ | `library/memory.md` 四类内容 + 分层落点 + 敏感域红线 |

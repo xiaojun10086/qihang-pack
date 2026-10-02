@@ -16,6 +16,9 @@
 - **`money-guard`** — 生活费与防诈守门（自建）
   先算月度收支缺口，再给节流方案；遇到可疑信息一律先按诈骗流程核验。
 
+- **`budget-plan`** — 生活费预算（自建）
+  把月度生活费按必要/发展/弹性三分，给记账模板与超支刹车规则，不推荐任何金融产品。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -32,7 +35,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `F4`（`library/domain-review.md`）
-3. 用**库内 skill** `money-guard` 执行（首选）
+3. 用**库内 skill**（首选 `money-guard`；不满足时用同域备选 `budget-plan`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并按 `library/memory.md` §4 与 `library/output-spec.md` §5「禁止写入的域与内容」排除金额与债务后写入
 

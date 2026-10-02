@@ -16,6 +16,9 @@
 - **`paper-outline`** — 论文骨架与预审（自建）
   给结构大纲 + 各节字数 + 论证链自查 + 3 条改进建议，再做一次「审稿人视角」预审。
 
+- **`cite-normalize`** — 引用规范化（自建）
+  把引文按 GB/T 7714 与目标期刊格式规范化，并给出逐条自查表，不伪造引文。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -29,7 +32,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `S5`（`library/domain-review.md`）
-3. 用**库内 skill** `paper-outline` 执行（首选）
+3. 用**库内 skill**（首选 `paper-outline`；不满足时用同域备选 `cite-normalize`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并写入学习档案
 

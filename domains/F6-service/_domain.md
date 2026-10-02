@@ -16,6 +16,9 @@
 - **`service-log`** — 军训与志愿记录（自建）
   军训期给体能/物资/防晒准备清单；志愿侧帮选项目并归档时长与收获。
 
+- **`volunteer-hours`** — 志愿时长规划（自建）
+  把志愿时长/第二课堂要求拆到月，给选项目原则与记录模板，不鼓励带病硬撑。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -30,7 +33,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `F6`（`library/domain-review.md`）
-3. 用**库内 skill** `service-log` 执行（首选）
+3. 用**库内 skill**（首选 `service-log`；不满足时用同域备选 `volunteer-hours`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并按 `library/memory.md` §4 与 `library/output-spec.md` §5「禁止写入的域与内容」排除伤病记录后写入
 

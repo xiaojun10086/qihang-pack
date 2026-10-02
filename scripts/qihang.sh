@@ -31,8 +31,15 @@ platform_of() {
   esac
 }
 
-RECORDS_DIR_DEFAULT="${ROOT}/../.learnbuddy/memory/qihang"
-[ -d "${ROOT}/../.learnbuddy" ] || RECORDS_DIR_DEFAULT="${ROOT}/records"
+# v2.7 修复：安装到 ~/.learnbuddy/skills/qihang 时，ROOT/.. = ~/.learnbuddy/skills，
+# 旧式 "${ROOT}/../.learnbuddy/memory/qihang" 会解析成 ~/.learnbuddy/skills/.learnbuddy/... （错误路径）。
+# 现改为：优先工作区档案目录，其次平台技能目录旁，最后回落到包内 records/。
+RECORDS_DIR_DEFAULT=""
+for _c in "${ROOT}/../.learnbuddy/memory/qihang" "${ROOT}/../../memory/qihang" "${ROOT}/records"; do
+  case "$_c" in *"/skills/.learnbuddy/"*) continue ;; esac   # 排除已知错误拼接
+  if [ -d "$(dirname "$_c")" ]; then RECORDS_DIR_DEFAULT="$_c"; break; fi
+done
+[ -n "$RECORDS_DIR_DEFAULT" ] || RECORDS_DIR_DEFAULT="${ROOT}/records"
 
 # 域ID|目录slug|主库外仓库|安装命令
 REGISTRY="S1|course-qa|mattpocock/skills|npx skills add mattpocock/skills@teach
@@ -47,7 +54,7 @@ F7|further-study|Haadhi76/SOP_Consultant|npx skills add Haadhi76/SOP_Consultant
 F8|career|Paramchoudhary/ResumeSkills|npx skills add Paramchoudhary/ResumeSkills
 R1|literature|xwmxcz/papers-skill|npx skills add xwmxcz/papers-skill
 R2|experiment-data|K-Dense-AI/scientific-agent-skills|npx skills add K-Dense-AI/scientific-agent-skills
-R3|research-tools|egouilliard-leyton/python-tutor-skill|npx skills add egouilliard-leyton/python-tutor-skill
+R3|research-tools|mattpocock/skills|npx skills add mattpocock/skills@teach
 R4|publication|Imbad0202/academic-research-skills|npx skills add Imbad0202/academic-research-skills
 R5|integrity|NeoLabHQ/context-engineering-kit|npx skills add NeoLabHQ/context-engineering-kit"
 
@@ -76,7 +83,7 @@ cmd_status() {
   echo "----------------------------------------"
   echo "[1级] skill 库"
   for f in library/SKILL.md library/clarity.md library/domain-review.md library/output-spec.md \
-           library/memory.md library/domain-review-cases.md library/output-checklist.md; do
+           library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md; do
     [ -f "$ROOT/$f" ] && printf '  ✓ %s\n' "$f" || printf '  ✗ %s\n' "$f"
   done
   echo "[2级] 域"

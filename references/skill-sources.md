@@ -28,8 +28,25 @@
 ⑤ 通过 → 写入对应域的 skills/external.md
 ```
 
+## 平台可达性实测（2026-10-02 · 本机）
+
+| 平台 | HTTP | 结论 |
+|---|---|---|
+| skills.sh | ✅ 200 | 可达，1.5M 条目 |
+| officialskills.sh | ✅ 200 | 可达，仅厂商官方 |
+| claude-plugins.dev | ✅ 200 | 可达，自动索引 |
+| ClawHub | ✅ 200 | 可达，OpenClaw 生态 |
+| GitHub Topics / awesomeskills.dev / SkillsMP / LobeHub / StudentSuite / VoltAgent / ComposioHQ / yzfly | ❌ 超时 | **本机不可达**（`github.com` HTML 亦超时，但 `api.github.com` 正常） |
+
+**由此修正探测流程**：原流程把「浏览平台页」当第一步，在本机不可靠；
+现改为 **`api.github.com` 为主干**（可核验 stars/license/pushed_at/archived），平台页仅作发现渠道。
+
 ## 关键结论
 
 - **不存在**既有真实使用量、又深耕教育/校园场景的中文索引站。
-- 教育垂类 skill 中，仅 `mattpocock/skills · teach` 进入 skills.sh 榜单（**736.7K installs**）；其余教育类均无公开使用量。
+- 教育垂类 skill 中，仅 `mattpocock/skills · teach` 进入 skills.sh 榜单（**736.7K installs**）。
+- **v2.7 更正**：此前「教育场景空白」的结论已过时 —— GitHub 检索发现多个千星级教育垂类：
+  `bevibing/tutor-skills`（1,313★）、`GarethManning/education-agent-skills`（817★，教师侧）、
+  `bevibing/socrates-skill`（326★）、`Lucaswangzcx/literature-downloader-skill`（230★，中文）、
+  `flysheep-ai/education-skills`（106★，中文）。但**适配 DUT 本科新生**的仍以中文垂类为主，且整体占比不高（见 `skill-matrix-v3.md` 量化结论）。
 - 因此本包采用「**高星通用底座 + 垂类补充 + 自建库内 skill 兜底**」策略。

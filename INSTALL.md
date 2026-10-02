@@ -103,7 +103,16 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 bash scripts/qihang.sh probe       # 库外候选缺失项（可选）
 ```
 
-**期望**：`[1级] 7 个 library 文件 ✓`（逐行列出 SKILL + 6 份规则） · `[2级] 19 个域 / 19 个库内 skill ✓` · `[资源] DUT 公开站 160 行 ✓`
+**期望**：`[1级]` 逐行列出 **8 个** library 文件（SKILL + 7 份规则，含 `login-policy.md`） · `[2级] 19 个域 / **38 个**库内 skill` · `[资源] DUT 公开站 160 行`
+
+**完整验收（v2.7 起 4 个脚本，职责不重叠）**：
+
+| 脚本 | 管什么 | 期望 |
+|---|---|---|
+| `bash scripts/selfcheck.sh` | 结构对不对（计数 / 交叉引用 / 一致性） | `OK 31 ｜ WARN 0 ｜ FAIL 0 → 可交付` |
+| `bash scripts/audit.sh` | 安不安全（凭证 / 危险命令 / L3 门禁 / 合规） | `37 通过 ｜ 0 警告 ｜ 0 失败 → 通过` |
+| `bash scripts/regress.sh 3` | **行为对不对**（澄清门算例 / L3 门禁矩阵 / 红线一致性） | `120 项全 OK ｜ FAIL 0` |
+| `bash scripts/qihang.sh status` | 三级结构完整度 | 逐行 ✓ |
 
 ---
 

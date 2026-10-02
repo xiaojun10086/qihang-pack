@@ -16,6 +16,9 @@
 - **`career-kit`** — 求职竞赛工具箱（自建）
   按目标岗位/竞赛倒推能力缺口，改简历只做「相关性重构」，面试按 STAR 打磨。
 
+- **`competition-pick`** — 竞赛选型（自建）
+  按专业、投入产出与时间窗筛选竞赛清单并排备赛里程碑，不编造获奖。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -30,7 +33,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `F8`（`library/domain-review.md`）
-3. 用**库内 skill** `career-kit` 执行（首选）
+3. 用**库内 skill**（首选 `career-kit`；不满足时用同域备选 `competition-pick`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并写入学习档案
 

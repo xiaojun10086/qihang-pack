@@ -16,6 +16,9 @@
 - **`wellbeing-checkin`** — 状态check-in（自建）
   先倾听再给方法；不评判、不诊断；识别危机信号并第一时间转介心理中心。
 
+- **`peer-talk-script`** — 人际沟通脚本（自建）
+  为宿舍/社团/小组冲突准备沟通脚本与边界表达，不评判、不替用户出面。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -30,7 +33,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `F3`（`library/domain-review.md`）
-3. 用**库内 skill** `wellbeing-checkin` 执行（首选）
+3. 用**库内 skill**（首选 `wellbeing-checkin`；不满足时用同域备选 `peer-talk-script`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，**并明确不写入任何记忆层**（见 `library/memory.md` 红线）
 

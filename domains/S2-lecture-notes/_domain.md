@@ -16,6 +16,9 @@
 - **`lecture-to-notes`** — 讲义转笔记（摘录+自建）
   把讲义/录音/PPT 压成「5–8 条核心 + 概念图 + 3 个自测题」，并标注未理解点供下次复考。
 
+- **`note-normalize`** — 笔记归一（自建）
+  把散乱笔记、讲义、录音转写整成「章节-概念-例题-待补」统一结构，不做讲解。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -31,7 +34,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `S2`（`library/domain-review.md`）
-3. 用**库内 skill** `lecture-to-notes` 执行（首选）
+3. 用**库内 skill**（首选 `lecture-to-notes`；不满足时用同域备选 `note-normalize`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并写入学习档案
 

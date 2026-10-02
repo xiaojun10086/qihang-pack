@@ -16,6 +16,9 @@
 - **`explain-stepwise`** — 分步讲解（自建）
   先让学习者自己写一步，再按「定位卡点 → 给提示 → 给解法 → 出同类题」四步走，不直接抛答案。
 
+- **`error-diagnose`** — 错因归因（自建）
+  把做错的题按「概念 / 方法 / 计算 / 审题」四类归因，输出错因清单与再练顺序，不代做。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -30,7 +33,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `S1`（`library/domain-review.md`）
-3. 用**库内 skill** `explain-stepwise` 执行（首选）
+3. 用**库内 skill**（首选 `explain-stepwise`；不满足时用同域备选 `error-diagnose`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并写入学习档案
 

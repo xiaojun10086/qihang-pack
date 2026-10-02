@@ -1,13 +1,13 @@
 ---
 name: qihang
 description: 「启航」大连理工大学新生学习·生活·科研一体化学伴包（三级结构：skill 库 → 域 → skill）。当用户提出与大连理工大学校情（学院/校区/选课/校历/职能部门/联系方式）、大学课程学习、备考复习、课堂笔记、作业与实验报告、科研文献、作息专注、升学求职相关的**模糊求助**时使用。负责需求明确（澄清门）、域审查、库内优先路由与输出规范。
-version: 2.6.0
+version: 2.7.0
 license: MIT
 agent_created: true
 tags: [dlut, campus, learning, freshman, library, orchestrator, learnbuddy]
 ---
 
-# 「启航」学伴包 · 入口（v2.5.0）
+# 「启航」学伴包 · 入口（v2.7.0）
 
 三级结构：**skill 库（本入口）→ 域 → skill**
 

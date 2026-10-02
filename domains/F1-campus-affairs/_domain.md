@@ -16,6 +16,9 @@
 - **`campus-desk`** — 校园事务办理台（自建·DUT）
   先查 DUT 信息库锁定入口与电话，再给「去哪办 / 带什么 / 多久」，查不到就明说未收录。
 
+- **`campus-proof-guide`** — 证明开具指引（自建）
+  把「要开什么证明」映射到对口部门、材料清单与办理周期，只给路径不代操作。
+
 ## DUT 绑定点
 
 **公开站（无需登录）**
@@ -34,7 +37,7 @@
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
 1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
 2. 1 级库完成**域审查**，确认命中 `F1`（`library/domain-review.md`）
-3. 用**库内 skill** `campus-desk` 执行（首选）
+3. 用**库内 skill**（首选 `campus-desk`；不满足时用同域备选 `campus-proof-guide`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装
 5. 按 `library/output-spec.md` 输出，并写入学习档案
 
