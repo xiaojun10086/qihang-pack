@@ -19,14 +19,15 @@ echo "========================================"
 
 # ---------- 1. 必备文件 ----------
 echo "[1] 必备文件完整性"
-REQ="SKILL.md README.md INSTALL.md PROJECT.md ROADMAP.md config.yaml
-library/SKILL.md library/clarity.md library/domain-review.md library/output-spec.md
+REQ="SKILL.md README.md INSTALL.md PROJECT.md ROADMAP.md CHANGELOG.md config.yaml
+LICENSE THIRD_PARTY_NOTICES.md
+library/README.md library/clarity.md library/domain-review.md library/output-spec.md
 library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md
 domains/_registry.md
 references/dlut-official-sites.md references/dlut-login-sites.md references/dlut-field-map.md
 references/dlut-url-verification.md references/dlut-site-profiles.md references/browser-matrix.md
-references/skill-sources.md references/skill-compliance-audit.md references/platforms.md
-references/e2e-scenarios.md references/acceptance-v2.md references/validation-report.md
+references/skill-sources.md references/skill-compliance-audit.md references/skill-matrix-v3.md
+references/platforms.md references/e2e-scenarios.md
 .codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh scripts/aligncheck.py"
 miss=0; cnt=0
 for f in $REQ; do
@@ -69,9 +70,15 @@ else bad "$nfm 处不合规"; printf '%s\n' "$_ff" | head -6 | sed 's/^/       /
 # ---------- 4. 交叉引用（零临时文件版） ----------
 echo "[4] 文档交叉引用"
 # v2.7：单遍 grep -r 取全部引用，再在 shell 内用内建 test 判定（原为逐文件 ~280 个子进程）
-# v2.10：扫描范围排除 .learnbuddy / .git / .idea —— 记忆日志会「提及」文件名，不属产品文档引用
+# v2.11：扫描范围排除 .learnbuddy / .git / .idea —— 记忆日志会「提及」文件名，不属产品文档引用
+# v2.11：开发侧过程文档（见 .gitignore）**未随包分发**，不参与交付物的交叉引用契约。
+# 排除项从 .gitignore 派生（单一真相源）—— 克隆者本就没有这些文件，判据才能两边一致。
+_exdev=""
+for _g in $(grep -E '^references/.*[.]md$' .gitignore 2>/dev/null); do
+  _exdev="$_exdev --exclude=$(basename "$_g")"
+done
 _refs=$(grep -rhoE '(library|references|domains|scripts|commands)/[^ )），、；;"“”<>*]+[.]md' \
-        --include='*.md' --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | sort -u)
+        --include='*.md' $_exdev --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | sort -u)
 nbroke=0; nref=0
 while IFS= read -r p; do
   [ -n "$p" ] || continue
@@ -81,12 +88,12 @@ while IFS= read -r p; do
     [ "$nbroke" -le 8 ] && printf '       %s\n' "$p"
   fi
 done <<< "$_refs"
-# v2.10 新增：**裸文件名**引用（无目录前缀，如 `xxx-review.md`）同样必须存在。
+# v2.11 新增：**裸文件名**引用（无目录前缀，如 `xxx-review.md`）同样必须存在。
 # 原正则只认「带目录前缀」的路径，此类断链会被漏检（实测：曾有文件引用不存在的 review 副本）。
 # 口径：只取反引号内、不含斜杠的 *.md 名，按「全仓库是否存在同名文件」判定。
 # _BARE_SKIP = 故意不存在于仓库的名字（见 [5] 陈旧文件清单中的历史文件名）。
 _BARE_SKIP="references/routing-table.md routing-table.md"
-_bare=$(grep -rhoE '`[A-Za-z0-9][A-Za-z0-9_.-]*[.]md`' --include='*.md' \
+_bare=$(grep -rhoE '`[A-Za-z0-9][A-Za-z0-9_.-]*[.]md`' --include='*.md' $_exdev \
         --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | tr -d '`' | sort -u)
 while IFS= read -r b; do
   [ -n "$b" ] || continue
@@ -185,6 +192,42 @@ cmdn=$(ls -1 commands/*.md 2>/dev/null | wc -l | tr -d ' ')
 pub=$(grep -c '^|' references/dlut-official-sites.md 2>/dev/null); pub=${pub:-0}
 echo "   info DUT 公开站表格行: $pub"
 [ -f .codebuddy-plugin/plugin.json ] && ok "插件清单有效" || bad "插件清单缺失"
+
+# ---------- 8b. 入口唯一性与声明 ----------
+echo "[8b] 入口唯一性与声明"
+# v2.11 新增：堵住「同名双入口」盲区 —— 此前包根 SKILL.md 与 library/SKILL.md
+# 都写 `name: qihang` 且红线表已分叉，而四个校验器当时**全绿**（纯结构性盲区）。
+#
+# ⚠️ 为什么编号是 8b 而不是 11（**锚点冲突，实测踩过**）：
+#   phase15 用 `rep('# ---------- 汇总 ----------', '[9]+[10] + 汇总')` 插入第 9/10 节，
+#   其幂等护栏要求「[9]…[10]…汇总」**整块连续**。若本节插在 [10] 与「汇总」之间，
+#   该连续性被破坏 → phase15 每跑一轮就再追加一份 [9]/[10]；
+#   而本节自己的护栏（要求「[11] + 汇总」相邻）同样失效 → 两个区块**互相引爆**，
+#   实测第 2 轮 selfcheck.sh 出现两份 [9]/[10]/[11]，第 3 轮 phase17 直接 rc=1。
+#   → 本节必须插在 **[9] 之前**，两个护栏才同时成立。编号 8b 保证输出顺序单调。
+_dupname=$(awk '
+  FNR==1{fm=0; inname=0}
+  FNR==1 && $0=="---"{fm=1;next}
+  fm && /^name:/{v=$0; sub(/^name:[[:space:]]*/,"",v); print v; fm=0; next}
+  fm && /^[A-Za-z_][A-Za-z0-9_-]*:/{next}
+' $(find . -name SKILL.md -not -path './.git/*' -not -path './.learnbuddy/*' 2>/dev/null | sort) 2>/dev/null \
+  | sed 's/[[:space:]]*$//' | grep -v '^$' | sort | uniq -d | tr '\n' ' ')
+if [ -z "$_dupname" ]; then ok "SKILL.md 的 name 全域唯一（无同名入口）"
+else bad "SKILL.md 存在同名入口: $_dupname"; fi
+
+if [ -f SKILL.md ] && [ ! -e library/SKILL.md ]; then
+  ok "入口唯一：包根 SKILL.md 在位 · library/ 下无 SKILL.md"
+else bad "入口不唯一（library/SKILL.md 不应存在，应为 library/README.md）"; fi
+
+_dmiss=0
+for d in LICENSE CHANGELOG.md THIRD_PARTY_NOTICES.md; do
+  [ -f "$d" ] || { bad "缺声明文件: $d"; _dmiss=$((_dmiss+1)); }
+done
+[ "$_dmiss" -eq 0 ] && ok "LICENSE / CHANGELOG.md / THIRD_PARTY_NOTICES.md 三件齐全"
+
+_gi=$(grep -c '^references/.*[.]md$' .gitignore 2>/dev/null); _gi=${_gi:-0}
+[ "$_gi" -ge 8 ] && ok "开发侧过程文档已由 .gitignore 排除（$_gi 项）" \
+  || bad "gitignore 排除不足（$_gi 项，期望 ≥8）"
 
 # ---------- 9. 多源比对与 DUT 适配 ----------
 echo "[9] 库外多源比对"

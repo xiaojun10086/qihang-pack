@@ -48,11 +48,24 @@ def rd(p):
     with open(p, 'r', encoding='utf-8', errors='replace') as fh:
         return fh.read()
 
+# v2.11：开发侧过程文档（评审 / 审计 / 验收 / 需求书）已移出版本控制、未随包分发。
+# 它们**不在交付物里**，因此必须同时从「文件总数」等全量统计中排除 ——
+# 否则克隆者跑 aligncheck 会因「PROJECT.md 声明值 != 实测值」而误报。
+# phase19 回写 PROJECT.md 的声明值时用的是同一口径（见 measure_files()）。
+DEV_ONLY_DOCS = {
+    'validation-report.md', 'acceptance-v2.md',
+    'review-report-v2.2.md', 'review-report-v2.3.md', 'review-report-v2.4.md',
+    'stress-test-v3.md', 'alignment-audit-v3.md', '需求确认书-v2三级结构.md',
+}
+
+
 def walk_files():
     out = []
     for base, dirs, files in os.walk('.'):
         dirs[:] = [d for d in dirs if d not in ('.git', '.idea', '.learnbuddy', '__pycache__')]
         for fn in files:
+            if fn in DEV_ONLY_DOCS:
+                continue
             out.append(os.path.join(base, fn).replace('\\', '/')[2:])
     return sorted(out)
 
@@ -158,8 +171,8 @@ def run_round(r):
             if k not in head:
                 bad(f, 'frontmatter 缺 %s' % k)
         vm = re.search(r'version:\s*([\d.]+)', head)
-        if vm and vm.group(1) != '2.10.0':
-            bad(f, '版本号 %s（期望 2.10.0）' % vm.group(1))
+        if vm and vm.group(1) != '2.11.0':
+            bad(f, '版本号 %s（期望 2.11.0）' % vm.group(1))
         if '/skills/local/' in f:
             for h in NEED:
                 if h not in t:
@@ -279,13 +292,13 @@ def run_round(r):
         m = re.search(r'^version:\s*([\d.]+)', fm.group(1), re.M)
         if m:
             vers.add(m.group(1))
-    if vers - {'2.10.0'}:
+    if vers - {'2.11.0'}:
         bad('（frontmatter）', '版本号不唯一: %s' % sorted(vers))
     # 插件清单（JSON 风格，易与 YAML 风格一起被漏改）
     try:
         pv = json.loads(rd('.codebuddy-plugin/plugin.json')).get('version')
-        if pv != '2.10.0':
-            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 2.10.0）' % pv)
+        if pv != '2.11.0':
+            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 2.11.0）' % pv)
     except Exception:
         pass
     # 当前状态/提交物 的版本声明（易漂移点，显式点名）
@@ -293,8 +306,8 @@ def run_round(r):
                     ('qihang-scenario-design.html', r'<title>[^<]*（v([\d.]+)）')):
         t = rd(f)
         m = re.search(pat_, t)
-        if m and m.group(1) != '2.10.0':
-            bad(f, '版本声明 %s（期望 2.10.0）' % m.group(1))
+        if m and m.group(1) != '2.11.0':
+            bad(f, '版本声明 %s（期望 2.11.0）' % m.group(1))
 
     # ---------- I commands ----------
     for f in sorted(glob.glob('commands/*.md')):
@@ -310,8 +323,8 @@ def run_round(r):
     try:
         pj = json.loads(rd('.codebuddy-plugin/plugin.json'))
         v = json.dumps(pj)
-        if '2.10.0' not in v:
-            warn('.codebuddy-plugin/plugin.json', '未声明版本 2.10.0')
+        if '2.11.0' not in v:
+            warn('.codebuddy-plugin/plugin.json', '未声明版本 2.11.0')
     except Exception as e:
         bad('.codebuddy-plugin/plugin.json', 'JSON 无法解析: %s' % e)
 
@@ -559,7 +572,7 @@ def run_round(r):
                         bad(_f2, '「未核实清单」项数 %s ≠ 实测 %d'
                             % (_m2.group(1), _n8))
 
-    # 文件总数声明（口径：不含 .git/.idea/.learnbuddy）
+    # 文件总数声明（口径：不含 .git/.idea/.learnbuddy/开发侧过程文档）
     _pt = rd('PROJECT.md') if os.path.exists('PROJECT.md') else ''
     for m in re.finditer(r'\*\*(\d{2,4})\s*个文件\*\*', _pt):
         if int(m.group(1)) != len(FILES):

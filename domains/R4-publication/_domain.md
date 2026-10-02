@@ -31,7 +31,7 @@
 ## 执行顺序
 
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
-1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30（**关键槽 O/T/D 齐全时可依 `clarity.md` §5 例外 2 直接放行**）
+1. 1 级库完成**需求明确**（`library/clarity.md`），U ≤ 0.30 才继续
 2. 1 级库完成**域审查**，确认命中 `R4`（`library/domain-review.md`）
 3. 用**库内 skill**（首选 `submit-kit`；不满足时用同域备选 `rebuttal-structure`）执行
 4. 库内不满足 → 读 `skills/external.md` 走库外安装

@@ -62,4 +62,4 @@ DUT适配 = 0–5，**人工判定**：在 DUT 本科新生真实环境是否可
 
 > 触发条件见 `library/output-spec.md` §2.1；降级时输出**首行**必须带 `[已降级: 原 → 备]`。
 
-> 完整自检报告见 `references/skill-compliance-audit.md`；风险与验收数据见 `references/validation-report.md`。
+> 自检与许可证数据见 `references/skill-compliance-audit.md` 与 `THIRD_PARTY_NOTICES.md`。

@@ -1,4 +1,4 @@
-# 「启航」学伴包 v2.10 · 唯一需要按学期 / 课程修改的文件
+# 「启航」学伴包 v2.11 · 唯一需要按学期 / 课程修改的文件
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 
 # ============ 学校绑定（强绑定） ============
@@ -53,21 +53,14 @@ library:
 private_sites:
   mode: controlled_browser     # A 受控浏览器 | B 手动投喂 | C 仅登记
   user_authorized: true
-  require_isolated_profile: true            # ★强制：不得复用用户真实浏览器 profile
-  profile_dir: "~/.qihang/browser-profile"  # ★独立 profile 目录
-  verify_on_exit: [close_all, session_list_empty]
   read_only: true
   persist_cookies: false
   persist_pages: false
-  # 实测最佳聚合点（2026-10-01 验证）：单页拿到课表 / 借阅/一卡通/网费/邮件/日程
-  primary_aggregator: https://portal.dlut.edu.cn/
   level_rules:
-    # v2.7 修复：去掉生成器拼接残留的重复项（原为 "…网费, 网费, 日程"）
     L1_auto: [课表, 成绩等级, 考试安排, 借阅, 一卡通余额, 场馆预约状态, 网费, 日程]
     L2_confirm: [资助申请状态, 就业投递记录, 培养进度, 邮箱未读提示]
-    # 口径：成绩「等级/是否通过」可读；「明细」禁读（见 references/dlut-field-map.md）
-    # v2.9：裸词「成绩」「消费」不得直接判级 —— 必须先让用户区分（见 library/login-policy.md「裸词澄清」）
     L3_forbidden: [缴费金额, 银行卡, 身份证, 家庭信息, 邮件正文, 心理记录, 成绩明细]
+    # v2.9：裸词「成绩」「消费」不得直接判级 —— 必须先让用户区分（见 library/login-policy.md「裸词澄清」）
 
 # ============ 能力域开关（19 域） ============
 domains:

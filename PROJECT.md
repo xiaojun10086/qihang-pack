@@ -1,6 +1,6 @@
 # 「启航」学伴包 · 项目文档
 
-> 版本 v2.10 ｜ 更新 2026-10-02 ｜ 面向大连理工大学 2026 级本科新生  
+> 版本 v2.11 ｜ 更新 2026-10-02 ｜ 面向大连理工大学 2026 级本科新生  
 > 适配：**LearnBuddy（= 连小理）**（单一目标平台）
 
 ---
@@ -74,7 +74,7 @@
 | 私密站      | `references/dlut-login-sites.md`       | **19 个**需登录站 + 方案 A 流程 + L1/L2/L3 授权 + Profile 隔离要求   |
 | Skill 来源 | `references/skill-sources.md`          | 12 个探测平台                                              |
 | **合规自检** | `references/skill-compliance-audit.md` | 合法性（MIT/GPL/CC-BY-NC/无 LICENSE 四档）+ 可用性逐项             |
-| 验收       | `references/validation-report.md`      | 4 路并行子 agent 的测试结论                                    |
+| 验收       | 开发侧验收报告（未随包分发）            | 4 路并行子 agent 的测试结论                                    |
 
 **三大入口**：`sso.dlut.edu.cn` → `portal.dlut.edu.cn` → `jxgl.dlut.edu.cn`
 
@@ -121,11 +121,11 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 ---
 
-## 7. 当前状态（v2.10.0）
+## 7. 当前状态（v2.11.0）
 
 | 项                  | 状态                                                                                                                           |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| 三级结构               | ✅ 完成（生成器驱动 · 19 域 / **38 库内 skill** / **162 个文件**）                                                                                                            |
+| 三级结构               | ✅ 完成（生成器驱动 · 19 域 / **38 库内 skill** / **159 个文件**）                                                                                                            |
 | 19 域 + **38 库内 skill** | ✅ **已产品化**：**每域 2 个**、均含可执行示例；4 空白域含安全护栏                                                                                               |
 | 越界用例集 / 输出校验清单     | ✅ **22 条**用例（含 3 反例）· **7 项**硬校验                                                                                                     |
 | DUT 公开信息库          | ✅ **159 条**表格行 / **139 条**条目（✅ 67 / ⚠️ 21）                                                                                                                      |
@@ -136,7 +136,7 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 | **平台适配** | ✅ **LearnBuddy / WorkBuddy 单一目标平台**（`~/.learnbuddy/skills/` + `.codebuddy-plugin/`）；v2.8 起移除 Claude Code 适配 |
 | 学习档案（跨会话记忆）        | ✅ 规则与工具就绪（`library/memory.md` + `qihang.sh records`）；跨会话实跑待验                                                                 |
 | 赛道二提交物             | ✅ 设计书已对齐当前结构（19 域三级结构）                                                                                                      |
-| **端到端验收**          | ✅ `e2e-scenarios.md` 3 条路径 + `acceptance-v2.md`（15 项通过 14 项）                                                              |
+| **端到端验收**          | ✅ `e2e-scenarios.md` 3 条路径 + 开发侧验收报告（15 项通过 14 项）                                                              |
 
 ---
 
@@ -151,22 +151,23 @@ qihang-pack/
 ├── config.yaml               学校绑定 + 学期配置 + 域开关
 ├── .codebuddy-plugin/        LearnBuddy / WorkBuddy 插件清单
 ├── library/                  1级 skill 库
-│   ├── SKILL.md  clarity.md  domain-review.md  output-spec.md  memory.md
+│   ├── README.md clarity.md  domain-review.md  output-spec.md  memory.md
 │   ├── domain-review-cases.md   越界用例集（22 条）
 │   └── output-checklist.md      输出 7 项硬校验
 ├── domains/                  2级 19 个域
 │   └── <ID>-<slug>/{_domain.md, skills/{local/, external.md}}
-├── references/
+├── references/                随包分发的数据与外部依据
 │   ├── dlut-official-sites.md     公开站 139 条条目   ├── dlut-login-sites.md   私密站 19 站
 │   ├── dlut-field-map.md          字段映射表       ├── dlut-url-verification.md  URL 核验
 │   ├── dlut-site-profiles.md      站点画像         ├── browser-matrix.md     浏览器矩阵
-│   ├── skill-sources.md           12 个探测平台     ├── skill-matrix-v3.md    库外比对矩阵
+│   ├── skill-sources.md           26 个探测平台     ├── skill-matrix-v3.md    库外比对矩阵
 │   ├── skill-compliance-audit.md  合规自检         ├── platforms.md          平台适配表
-│   ├── e2e-scenarios.md           3 条端到端演示   ├── acceptance-v2.md      验收报告 v2
-│   ├── validation-report.md       阶段 1/2 验收    ├── alignment-audit-v3.md 全量对齐复核
-│   ├── review-report-v2.2.md      复查报告 v2.2    ├── review-report-v2.3.md  复查报告 v2.3
-│   ├── review-report-v2.4.md      复查报告 v2.4    ├── stress-test-v3.md      多轮压测
-│   └── 需求确认书-v2三级结构.md
+│   └── e2e-scenarios.md           3 条端到端演示
+│
+│   （开发侧过程文档 8 份 —— 已移出版本控制、未随包分发，见 .gitignore）
+│   validation-report.md · acceptance-v2.md · review-report-v2.2.md ·
+│   review-report-v2.3.md · review-report-v2.4.md · stress-test-v3.md ·
+│   alignment-audit-v3.md · 需求确认书-v2三级结构.md
 ├── commands/                 21 张 LearnBuddy 域入口卡（库 + 校情 + 19 域）
 ├── scripts/
 │   ├── qihang.sh             管理脚本（平台探测 / 状态 / 档案 / 信息库统计）
@@ -174,6 +175,7 @@ qihang-pack/
 │   ├── selfcheck.sh          结构自检    ├── audit.sh       安全审计
 │   ├── regress.sh            行为回归    ├── aligncheck.py  全量对齐审计
 │   └── _build/build_*.py     结构生成器（改域后按序重跑）
+├── LICENSE / CHANGELOG.md / THIRD_PARTY_NOTICES.md   声明与归属
 └── qihang-scenario-design.html  赛道二设计书
 ```
 

@@ -51,7 +51,18 @@
 5. ~~「声明==实测」有白名单盲区~~ → **已修**：改为全量扫描 + 内容标记豁免（文件级「历史文档」/ 行级「历史口径」）。
 6. ~~`qihang.sh registry` 按全文出现次数统计~~ → **已修**：只统计表格数据行内（139 / 67 / 21 / 51）。
 7. ~~`SKILL.md` / `PROJECT.md` L3 清单重复「成绩明细」~~ → **已修**。
-8. ~~92 项改动未提交~~ → 待用户 `git add -A && git commit`（v2.8+v2.9 成果）。
+8. ~~92 项改动未提交~~ → **v2.11 后累计 110 项**（其中 8 项为 `D` 索引删除），待用户 `git add -A && git commit`（含 6 个新文件：
+   `CHANGELOG.md` `LICENSE` `THIRD_PARTY_NOTICES.md` `library/README.md`
+   `scripts/_build/build_phase19.py` `scripts/_build/make_release.py`）。
+9. **v2.11 新增盲区（已修，记类型）**：**「同名双入口」** —— 包根 `SKILL.md` 与 `library/SKILL.md`
+   都写 `name: qihang`、红线表已各自演化，而当时**四个校验器全绿**（纯结构性盲区）。
+   → 已由 `phase19` 消除（`library/` 改不带 frontmatter 的 `README.md`），并在 `selfcheck.sh` 新增
+   **`[8b] 入口唯一性与声明`**（4 条断言：`name` 全域唯一 / 入口唯一 / 三件声明文件 / `.gitignore` 排除 ≥8 项）。
+   ⚠️ `[8b]` 的编号**必须是 8b 而不是 11**：`phase15` 的 `[9]/[10]` 锚在「汇总」行上，
+   若本段插在 `[10]` 与「汇总」之间会破坏其「整块连续」护栏 → 两个区块**互相引爆**、每轮各多插一份。
+10. **v2.11 新增盲区（已修）**：`ROADMAP.md` 的「工作区笔记」原写作裸 `` `MEMORY.md` `` ——
+    真实树里只是**碰巧**因 `.learnbuddy/memory/MEMORY.md` 存在而通过 `selfcheck [4]` 的裸文件名检查；
+    发布副本不含 `.learnbuddy/` → 立刻 FAIL。已改为全路径。
 
 **仍需注意（未修，属设计取舍）**：
 - 全量链中 `build_phase1…16` 仍有约 20 处精确替换 MISS（历史层文本与手改后状态漂移）。**这是可接受的**：`phase17` 作为链末收敛层负责把结果修回规范态 —— 判断链是否正常，看**链产物能否通过四项校验 + 两遍哈希一致**，不要看中间层的 MISS 数。
@@ -108,15 +119,35 @@ for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
 - 门禁矩阵实测：L1 `rc=0` / 邮箱提示 `rc=2` / 9 个 L3 变体 `rc=3` / 裸「成绩」`rc=1`。**全部正确。**
 - 收尾必须 `agent-browser close --all`；核验 `session list` 返回 `No active sessions`。
 
-## 二之九、发布交付（提交用）
+## 二之九、发布交付（v2.11 起收进仓库）
 
-- **工具**：`C:\Users\xiaojun\Desktop\qihang-release-tools\make_release.py`（**包外**，避免扰动工作区的「声明==实测」断言与生成链）。
-- **产物**：`C:\Users\xiaojun\Desktop\qihang-pack-release\`（含 `MANIFEST.md`）+ `qihang-pack-v2.10.0.zip`。
-- **排除 4 类**：8 份内部过程报告 · `scripts/_build/`(20 个生成器) · `.idea`/缓存/临时 · `.learnbuddy/`；另去 `.git`/`.gitignore`/`.gitattributes`。
-- **铁律：排除必须连带重写引用** —— `validation-report.md` 被 23 个文件引用、`_build` 被 6 个引用、`selfcheck.sh` 把它们列为「必备文件」。
-  导出后必须跑 **dangling 检查**（构建器已内置）＋ 在副本里**实跑四个校验器**。
-- 已知差异：副本里 `audit.sh` 是 **36 通过**（工作区 37）——随 `_build` 移除，那条 rmtree 护栏检查不再适用，**非缺陷**。
-- **环境**：`shutil.rmtree` 会被 safe-delete 拦（>50 文件）；导出用**原地覆盖**，残留文件由 `report_stale()` 列出交人工。
+- **工具**：`scripts/_build/make_release.py`（**已收进仓库**，与生成器同目录、同样**不交付**）。
+  用法：`python scripts/_build/make_release.py [目标目录]`（默认 `<仓库同级>/qihang-pack-release`）。
+  ⚠️ 本文件模块文档串里**禁止出现危险 API 字面量**：`scripts/audit.sh` 的 rmtree 子检查
+  **不区分代码与注释**（第一版只在文档里写了那个 API 名就被判 ❌）。
+- **产物**：`Desktop/新建文件夹/qihang-pack-release/`（含 `MANIFEST.md`）+ `qihang-pack-v2.11.0.zip`。
+- **导出集合 = 单一真相源 git + `.gitignore`**（**不要另写第二份排除清单**）：
+  `git ls-files -z --cached --others --exclude-standard` ∩ 磁盘存在 − `scripts/_build/` − `.gitignore`/`.gitattributes`。
+  排除项只登记在 `.gitignore`（8 份过程文档），导出时从它派生。
+- **四个必须叠加的修正**（少一条就出错，均已实测）：
+  1. 与**磁盘取交集** —— 索引里可能残留「已删未提交」路径（`library/SKILL.md`），否则 `copy2` 抛 `FileNotFoundError`；
+  2. 再按**目录名**滤 `NOISE_DIRS` —— `.learnbuddy/` **被 git 跟踪却不在 `.gitignore`**，不滤就会把记忆日志打进交付物；
+  3. **显式移出陈旧文件** —— 覆盖式导出不删「上版有、本版没有」的文件（实测旧副本留着已退役的重复入口）；
+  4. **发布期改写不回写仓库** —— 副本里校验器口径不同（见下）。
+- **发布期改写清单**（都在导出脚本里做）：目录树登记行删除 · 句子级提及改写 ·
+  依赖 `.gitignore` 的 `[8b]` 断言**降级为说明项** · 文件总数刷新为「副本实测 + MANIFEST」
+  （⚠️ 重复导出时**先排除已存在的根级 `MANIFEST.md`** 再固定 +1，否则声明比实测多 1）·
+  **本机绝对路径归一化**（`%USERPROFILE%` / `%LOCALAPPDATA%`）· MANIFEST 里的文件名写成
+  `` `目录/` 下 `文件名` ``（路径式写法会被判失效引用）。
+- **铁律：排除必须连带重写引用** —— `validation-report.md` 被 23 个文件引用、`_build` 被 6 个引用、
+  `selfcheck.sh` 把它们列为「必备文件」。导出后必须跑 **dangling 检查**（构建器已内置）
+  ＋ 在**副本内**（不是工作区）**实跑四个校验器 + 行为回归**。
+- **验收基线（v2.11）**：工作区 167 文件 `OK 35/0/0` · `FAIL 0/WARN 1` · `37/0/0`；
+  副本 135 文件 `OK 35/0/0` · `FAIL 0/WARN 1` · **`36/0/0`** · regress `FAIL 0`。
+  副本 36 vs 工作区 37 **非缺陷**（随 `_build` 移除，那条 rmtree 护栏断言不再适用）。
+  **发布器连导两遍必须逐文件一致**（实测 IDENTICAL）。
+- **环境**：`shutil.rmtree` 会被 safe-delete 拦（>50 文件）；导出用**原地覆盖**，
+  陈旧文件由 `prune_stale()` **移出**到 `%TEMP%/qihang-release-retired/`（不删、可回滚；>20 个只报不动）。
 
 ## 二之十、行为验证方法（可复用，成本约 6 个子代理）
 
@@ -129,7 +160,7 @@ for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
 ## 三、验证脚本（改完必跑）
 
 ```bash
-bash scripts/selfcheck.sh     # 结构/计数/交叉引用/红线一致性  期望 OK31 WARN0 FAIL0
+bash scripts/selfcheck.sh     # 结构/计数/交叉引用/红线一致性  期望 OK35 WARN0 FAIL0
 bash scripts/audit.sh         # 安全/合规/L3 门禁实测            期望 37 通过 0 警告 0 失败
 bash scripts/regress.sh 3     # 行为回归（连跑 3 轮）            期望 41 项/轮、累计 FAIL 0
 python scripts/aligncheck.py  # 全量文件级对齐                  期望 FAIL 0（常驻 WARN 1）
@@ -148,6 +179,13 @@ python scripts/aligncheck.py  # 全量文件级对齐                  期望 FA
 - 不要用 `seq`（本机 Git Bash 无）。
 - 用 `node fetch` 而不是 `curl` 访问外网（`curl` 返回 000，`node` 正常 200）。
 - 删除文件：`shutil.move` 到 `%TEMP%` 可行；`os.remove` 会被 shim 拦。
+- **Python 两个格式化陷阱**（v2.11 实测）：
+  · `re.sub(pat, '替代串\\', s)` → `re.PatternError: bad escape (end of pattern)`（替换串末尾反斜杠被当转义）
+    → 替换串改用**函数** `lambda m: '...\\'`；
+  · `'…%d 个（%USERPROFILE%）' % n` → `TypeError: not enough arguments`（字面量 `%` 与 `%`-格式化冲突）
+    → 字符串拼接或写 `%%`。
+- **校验危险 API 字面量的脚本不区分代码与注释**：`scripts/audit.sh` 扫描 `shutil.rmtree` 只看文本出现，
+  文档串里写这个 API 名同样判 ❌ → 正文一律改述（「递归删除整棵目录树」）。
 
 ## 五、DUT 数据铁律
 

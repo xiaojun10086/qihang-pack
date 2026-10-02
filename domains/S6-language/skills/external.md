@@ -64,4 +64,4 @@ DUT适配 = 0–5，**人工判定**：在 DUT 本科新生真实环境是否可
 
 - **`ielts`**（`YANZHANLIN/ielts-claude-skills`）：完整版 v3 为付费
 
-> 完整自检报告见 `references/skill-compliance-audit.md`；风险与验收数据见 `references/validation-report.md`。
+> 自检与许可证数据见 `references/skill-compliance-audit.md` 与 `THIRD_PARTY_NOTICES.md`。

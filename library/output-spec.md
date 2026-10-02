@@ -1,8 +1,5 @@
 # 输出规范（Level 1 · output-spec）
 
-> **版本书写约定**：形如「v2.x 修订：…」的标注是**修订历史**（记录该节何时改的），
-> **不是**当前版本声明。当前版本以 `config.yaml` 与 `.codebuddy-plugin/plugin.json` 为准。
-
 > 所有 3 级 skill 的输出都必须走本模板，并过 `output-checklist.md` 校验。
 > v2.5.0 修订：明确**要点计数口径**、补充**降级触发条件**、明确**跨域折算**。
 
