@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 v2.9.0 · 三级结构管理脚本（LearnBuddy 目标平台）
+# 「启航」学伴包 v2.10.0 · 三级结构管理脚本（LearnBuddy 目标平台）
 # 用法: bash qihang.sh {status|platform|probe|install|domains|registry|records|new-term}
 set -uo pipefail
 
@@ -80,7 +80,7 @@ cmd_platform() {
 }
 
 cmd_status() {
-  echo "「启航」学伴包 v2.9.0 · 状态"
+  echo "「启航」学伴包 v2.10.0 · 状态"
   echo "平台: $(platform_of "$SKILLS_DIR")  |  skills: ${SKILLS_DIR}"
   echo "----------------------------------------"
   echo "[1级] skill 库"

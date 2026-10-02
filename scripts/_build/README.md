@@ -10,10 +10,10 @@
 | `build_phase2.py` | 给 19 个 external.md 补许可证列与合规标注 | 接上一个 |
 | `build_phase3.py` | **复核修复层**：澄清门公式 / 红线体系(19域) / 域档案矛盾 / 触发词消歧 / 降级链 / 校验清单扩展 | 接上一个 |
 
-**严格顺序（v2.9 全量）**：`v2 → extras → phase1 … phase17`
+**严格顺序（v2.10 全量）**：`v2 → extras → phase1 … phase18`
 
 ```bash
-for p in v2 v2_extras 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17; do
+for p in v2 v2_extras 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
   case "$p" in v2|v2_extras) f="build_qihang_${p}.py" ;; *) f="build_phase${p}.py" ;; esac
   python "scripts/_build/$f" .
 done
@@ -28,6 +28,7 @@ bash scripts/selfcheck.sh && bash scripts/audit.sh   # 跑完必自检
 | **`build_phase15`** | **复查修复层（v2.6 → v2.7，21 条缺陷 / 20 组修复）** |
 | **`build_phase16`** | **LearnBuddy 专向化层（v2.7 → v2.8）：移除 Claude Code 适配 + `commands/` 改写为域入口卡** |
 | **`build_phase17`** | **漏检缺陷修复层（v2.8 → v2.9）：检查器全量化 · L3 清单去重 · 口径统一 · `qihang.sh` 可复现性** |
+| **`build_phase18`** | **规则可执行性修复层（v2.9 → v2.10）：裸词澄清 · 澄清门 cᵢ 判定细则 · 域冲突对齐 · 无对口 skill 降级链 · 红线体系补漏** |
 
 ✅ **全量重跑已安全**（v2.9 起）：
 - `build_qihang_v2.py` 改为**暂存目录生成 + 逐文件覆盖**，不再 `rmtree` 目标目录

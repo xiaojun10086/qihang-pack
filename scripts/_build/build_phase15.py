@@ -923,8 +923,9 @@ def fix_selfcheck_perf():
         '  done\n'
         'done',
         '# v2.7：单遍 grep -r 取全部引用，再在 shell 内用内建 test 判定（原为逐文件 ~280 个子进程）\n'
+        '# v2.10：扫描范围排除 .learnbuddy / .git / .idea —— 记忆日志会「提及」文件名，不属产品文档引用\n'
         '_refs=$(grep -rhoE \'(library|references|domains|scripts|commands)/[^ )），、；;"“”<>*]+[.]md\' \\\n'
-        '        --include=\'*.md\' . 2>/dev/null | sort -u)\n'
+        '        --include=\'*.md\' --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | sort -u)\n'
         'nbroke=0; nref=0\n'
         'while IFS= read -r p; do\n'
         '  [ -n "$p" ] || continue\n'
@@ -933,7 +934,23 @@ def fix_selfcheck_perf():
         '    nbroke=$((nbroke+1))\n'
         '    [ "$nbroke" -le 8 ] && printf \'       %s\\n\' "$p"\n'
         '  fi\n'
-        'done <<< "$_refs"',
+        'done <<< "$_refs"\n'
+        '# v2.10 新增：**裸文件名**引用（无目录前缀，如 `xxx-review.md`）同样必须存在。\n'
+        '# 原正则只认「带目录前缀」的路径，此类断链会被漏检（实测：曾有文件引用不存在的 review 副本）。\n'
+        '# 口径：只取反引号内、不含斜杠的 *.md 名，按「全仓库是否存在同名文件」判定。\n'
+        '# _BARE_SKIP = 故意不存在于仓库的名字（见 [5] 陈旧文件清单中的历史文件名）。\n'
+        '_BARE_SKIP="references/routing-table.md routing-table.md"\n'
+        '_bare=$(grep -rhoE \'`[A-Za-z0-9][A-Za-z0-9_.-]*[.]md`\' --include=\'*.md\' \\\n'
+        '        --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | tr -d \'`\' | sort -u)\n'
+        'while IFS= read -r b; do\n'
+        '  [ -n "$b" ] || continue\n'
+        '  case " $_BARE_SKIP " in *" $b "*) continue ;; esac\n'
+        '  nref=$((nref+1))\n'
+        '  if [ -z "$(find . -name "$b" -not -path \'./.git/*\' -print -quit 2>/dev/null)" ]; then\n'
+        '    nbroke=$((nbroke+1))\n'
+        '    [ "$nbroke" -le 8 ] && printf \'       %s（裸文件名，全仓库无同名文件）\\n\' "$b"\n'
+        '  fi\n'
+        'done <<< "$_bare"',
         label='[4] 交叉引用改单遍 grep（消除逐文件子进程）')
 
 

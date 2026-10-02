@@ -1,7 +1,7 @@
 ---
 name: qihang-peer-talk-script
 description: 「启航」F3 身心与社交域库内 skill：为宿舍/社团/小组冲突准备沟通脚本与边界表达。
-version: 2.9.0
+version: 2.10.0
 license: MIT
 agent_created: true
 ---

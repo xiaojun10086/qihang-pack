@@ -24,6 +24,10 @@
   · **幂等**：重复运行结果一致；第二遍必须 0 变更
   · 不触碰历史层（`build_phase16.py`）与历史报告里刻意保留的旧数字
 用法: python scripts/_build/build_phase17.py .
+
+⚠️ **执行顺序约束**：本层必须在 `build_phase18.py` **之前**运行。
+在 v2.10 树上**单独**重跑本层，会因「版本号 / 构建链文本」已被 phase18 改写而报 4 处 MISS —— 属预期，不是缺陷。
+（链内不会发生：17 永远在 18 前拿到 v2.9 版文本。）
 """
 import os
 import re
@@ -43,11 +47,11 @@ def wr(p, s):
         f.write(s)
 
 
-def rep(path, old, new, label='', required=True, already=None):
+def rep(path, old, new, label='', required=True, already=None, already_re=None):
     """精确替换 + 幂等。
 
     完成判据（任一成立即视为已应用，不再改写）：
-      · `already` 给定且已在文本中；
+      · `already` 给定且已在文本中；· `already_re` 正则命中（用于「已被下游层超越」的情形）；
       · `new` 已在文本中。
     否则：`old` 存在 → 替换（OK）；不存在 → MISS（required=False 时降级为提示）。
     """
@@ -56,7 +60,7 @@ def rep(path, old, new, label='', required=True, already=None):
         MISS.append('%s :: 文件不存在（%s）' % (path, label))
         return
     t = rd(path)
-    if (already and already in t) or (new and new in t):
+    if (already and already in t) or (already_re and re.search(already_re, t)) or (new and new in t):
         DONE.append('%s :: %s' % (path, label or old[:28]))
         return
     if old in t:
@@ -564,11 +568,11 @@ def fix_build_readme():
     rep('scripts/_build/README.md',
         '**严格顺序（v2.8 全量）**：`v2 → extras → phase1 … phase16`',
         '**严格顺序（v2.9 全量）**：`v2 → extras → phase1 … phase17`',
-        '_build/README 构建链加 phase17')
+        '_build/README 构建链加 phase17', already_re=r'phase1 … phase1[7-9]')
     rep('scripts/_build/README.md',
         'for p in v2 v2_extras 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do',
         'for p in v2 v2_extras 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17; do',
-        '_build/README 循环加 17')
+        '_build/README 循环加 17', already_re=r'16 17( 18)?; do')
     rep('scripts/_build/README.md',
         '| **`build_phase16`** | **LearnBuddy 专向化层（v2.7 → v2.8）：移除 Claude Code 适配 + `commands/` 改写为域入口卡** |',
         '| **`build_phase16`** | **LearnBuddy 专向化层（v2.7 → v2.8）：移除 Claude Code 适配 + `commands/` 改写为域入口卡** |\n'
@@ -640,8 +644,10 @@ def bump_version():
     else:
         DONE.append('版本号（已为 %s）' % new)
     # 少数「当前版本」的短写
-    rep('config.yaml', '# 「启航」学伴包 v2.8 ·', '# 「启航」学伴包 v2.9 ·', 'config.yaml 版本短写')
-    rep('PROJECT.md', '> 版本 v2.8 ｜ 更新 2026-10-02', '> 版本 v2.9 ｜ 更新 2026-10-02', 'PROJECT 版本短写')
+    rep('config.yaml', '# 「启航」学伴包 v2.8 ·', '# 「启航」学伴包 v2.9 ·',
+        'config.yaml 版本短写', already_re=r'^# 「启航」学伴包 v2\.(9|1\d)')
+    rep('PROJECT.md', '> 版本 v2.8 ｜ 更新 2026-10-02', '> 版本 v2.9 ｜ 更新 2026-10-02',
+        'PROJECT 版本短写', already_re=r'> 版本 v2\.(9|1\d) ｜')
 
 
 # ==================================================================== 11. P0 护栏：禁止破坏性重建

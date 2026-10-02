@@ -69,8 +69,9 @@ else bad "$nfm 处不合规"; printf '%s\n' "$_ff" | head -6 | sed 's/^/       /
 # ---------- 4. 交叉引用（零临时文件版） ----------
 echo "[4] 文档交叉引用"
 # v2.7：单遍 grep -r 取全部引用，再在 shell 内用内建 test 判定（原为逐文件 ~280 个子进程）
+# v2.10：扫描范围排除 .learnbuddy / .git / .idea —— 记忆日志会「提及」文件名，不属产品文档引用
 _refs=$(grep -rhoE '(library|references|domains|scripts|commands)/[^ )），、；;"“”<>*]+[.]md' \
-        --include='*.md' . 2>/dev/null | sort -u)
+        --include='*.md' --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | sort -u)
 nbroke=0; nref=0
 while IFS= read -r p; do
   [ -n "$p" ] || continue
@@ -80,6 +81,22 @@ while IFS= read -r p; do
     [ "$nbroke" -le 8 ] && printf '       %s\n' "$p"
   fi
 done <<< "$_refs"
+# v2.10 新增：**裸文件名**引用（无目录前缀，如 `xxx-review.md`）同样必须存在。
+# 原正则只认「带目录前缀」的路径，此类断链会被漏检（实测：曾有文件引用不存在的 review 副本）。
+# 口径：只取反引号内、不含斜杠的 *.md 名，按「全仓库是否存在同名文件」判定。
+# _BARE_SKIP = 故意不存在于仓库的名字（见 [5] 陈旧文件清单中的历史文件名）。
+_BARE_SKIP="references/routing-table.md routing-table.md"
+_bare=$(grep -rhoE '`[A-Za-z0-9][A-Za-z0-9_.-]*[.]md`' --include='*.md' \
+        --exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea . 2>/dev/null | tr -d '`' | sort -u)
+while IFS= read -r b; do
+  [ -n "$b" ] || continue
+  case " $_BARE_SKIP " in *" $b "*) continue ;; esac
+  nref=$((nref+1))
+  if [ -z "$(find . -name "$b" -not -path './.git/*' -print -quit 2>/dev/null)" ]; then
+    nbroke=$((nbroke+1))
+    [ "$nbroke" -le 8 ] && printf '       %s（裸文件名，全仓库无同名文件）\n' "$b"
+  fi
+done <<< "$_bare"
 # 说明：路径字符集排除了 </>* 等，故「domains/<域>/_domain.md」这类**占位符**不会被误判为失效引用。
 if [ "$nbroke" -eq 0 ]; then ok "无失效引用（检查 $nref 处）"
 else bad "$nbroke 处失效引用"; fi

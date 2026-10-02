@@ -21,9 +21,10 @@
 | **比对** | `build_phase14.py` | 库外多源比对选优 + 生成矩阵 + 回写 registry 候选数 |
 | **修复** | `build_phase15.py` | v2.7 复查修复层（精确替换 + 幂等护栏） |
 | **专向化** | `build_phase16.py` | **v2.8 平台专向化**：移除 Claude Code 适配 + 21 个 `commands/` 重建为 LearnBuddy 域入口卡 + 版本 2.7→2.8 |
-| **收敛层** | `build_phase17.py` | **v2.9 漏检缺陷修复 + 链末收敛**（最新一层，见 §二之四）：检查器全量化 · L3 清单去重 · 口径统一 · `qihang.sh` 可复现 · 平台口径兜底 · 授权清单收敛 · 计数/去重归一化 · P0 破坏性重建护栏 |
+| **收敛层** | `build_phase17.py` | **v2.9 漏检缺陷修复 + 链末收敛**（见 §二之四）：检查器全量化 · L3 清单去重 · 口径统一 · `qihang.sh` 可复现 · 平台口径兜底 · 授权清单收敛 · 计数/去重归一化 · P0 破坏性重建护栏 |
+| **规则层** | `build_phase18.py` | **v2.10 规则可执行性修复**（见 §二之六）：裸词澄清 · 澄清门 §2.1 cᵢ 判定细则 · 例外 6 通用知识型 · 域冲突对齐 · 无对口 skill 降级链 · 红线体系补漏 · 输出规范补变体 |
 
-- 顺序：`v2 → extras → phase1…17`（见 `scripts/_build/README.md`）。
+- 顺序：`v2 → extras → phase1…18`（见 `scripts/_build/README.md`）。**phase17 必须在 phase18 之前**（17 在 v2.10 树上单独重跑会报 4 处 MISS，属预期）。
 - **两个铁律**：
   1. 生成器必须**幂等**：`new` 包含 `old` 的追加型替换要加护栏（否则第二遍会重复插入）；
      一次性正则替换要给「完成判据」（`already=` / `absent=`），否则第二遍误报未命中。
@@ -76,6 +77,54 @@ for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
 - 判据 ①：链**跑完不中断**，`phase17` 报 **0 未命中**；
 - 判据 ②：**连跑两遍逐文件哈希完全一致**（实测 161 文件 0 变更）；
 - 判据 ③：链产物**四项校验器全绿**。
+
+## 二之六、规则可执行性缺陷（2026-10-02 修复状态）
+
+> 报告：`C:\Users\xiaojun\Desktop\qihang-agent-test\行为验证报告-v1.md`。
+> 与「文档一致性」**零重叠** —— 机器断言全绿**完全不能**反映规则可执行性。
+
+**行为验证结果**（137 次执行）：域锁定 **116/117**、跨代理域层面 **20/20 一致**；红线 **40/41** 且 **41/41 给了替代**；22 条官方越界用例 **20 ✅/1 ⚠️/1 ❌**；3 条反例全部正确放行；F3 危机 + F5 急症 100% 达标。澄清门跨代理一致率原为 **16/20**。
+
+**✅ v2.10 已修（`build_phase18.py`）**
+1. 裸「成绩」口径统一 → **先让用户区分等级/明细**（`login-policy.md`「裸词澄清」；与 `dlut-read.sh` 的 `rc=1` 一致）。
+2. `clarity.md` 新增 **§2.1 关键槽判定细则**：指代型/泛指型/泛化动词 → `cᵢ=0.5`（必须追问）；有内容可定位 → `1.0`。**这是 20% 翻转的唯一根因。**
+3. `§3` 阈值与 `§5` 例外的主从关系显式化 + 新增**例外 6「通用知识型」**（放行，末尾问缺的槽）。
+4. 网费域冲突对齐（仅问入口 → F1；请求代交/涉金额 → F4）；失眠统一为 **F2**；A/B/C（动作档）与 L1/L2/L3（数据级别）**并行不换算**。
+5. 「命中域但无对口 skill」补 3 级降级链；红线体系补漏（代操作 + F6、新增「编造/代写文书」、安全兜底补 24h 通道）。
+6. **复测（新代理盲跑 8 例）8/8 符合新规则** —— 4 例翻转归零、3 处冲突统一、1 例错锁纠正。
+
+**⚠️ 仍未修（下一步优先）**
+- **`--profile` 可被静默忽略（P0 隐私）**：`agent-browser` 已有 daemon 在跑时，`open --profile <dir>` 会打印
+  `⚠ --profile ignored: daemon already running` 并**忽略该参数**；而 `scripts/dlut-read.sh:116` 直接 `open … --profile`，
+  **没有先 `close --all`** → 隔离可被绕过。修法：open 前先 `close --all`，并**校验 open 输出里没有 ignored 警告**，否则中止。
+
+## 二之七、浏览器试跑的环境事实（本机实测）
+
+- `agent-browser@0.27.0` 位于 `~/.workbuddy/binaries/node/versions/22.22.2/node_modules/agent-browser`。
+- **Git Bash 下 npm shim 不可用** → 必须 `node "<前缀>/node_modules/agent-browser/bin/agent-browser.js" <args>`。
+- **给 node 传参必须用 Windows 路径**（`C:/…`）；传 POSIX `/c/…` 会被拼成 `c:\c\…` → `MODULE_NOT_FOUND`。
+- `--profile <path>` 受支持；**冷启动时确实生效**（实测隔离 Profile 的 mtime 前进）。
+- 浏览器**能联网**：成功打开 `https://www.dlut.edu.cn/`（HeadlessChrome/154）。
+- 门禁矩阵实测：L1 `rc=0` / 邮箱提示 `rc=2` / 9 个 L3 变体 `rc=3` / 裸「成绩」`rc=1`。**全部正确。**
+- 收尾必须 `agent-browser close --all`；核验 `session list` 返回 `No active sessions`。
+
+## 二之九、发布交付（提交用）
+
+- **工具**：`C:\Users\xiaojun\Desktop\qihang-release-tools\make_release.py`（**包外**，避免扰动工作区的「声明==实测」断言与生成链）。
+- **产物**：`C:\Users\xiaojun\Desktop\qihang-pack-release\`（含 `MANIFEST.md`）+ `qihang-pack-v2.10.0.zip`。
+- **排除 4 类**：8 份内部过程报告 · `scripts/_build/`(20 个生成器) · `.idea`/缓存/临时 · `.learnbuddy/`；另去 `.git`/`.gitignore`/`.gitattributes`。
+- **铁律：排除必须连带重写引用** —— `validation-report.md` 被 23 个文件引用、`_build` 被 6 个引用、`selfcheck.sh` 把它们列为「必备文件」。
+  导出后必须跑 **dangling 检查**（构建器已内置）＋ 在副本里**实跑四个校验器**。
+- 已知差异：副本里 `audit.sh` 是 **36 通过**（工作区 37）——随 `_build` 移除，那条 rmtree 护栏检查不再适用，**非缺陷**。
+- **环境**：`shutil.rmtree` 会被 safe-delete 拦（>50 文件）；导出用**原地覆盖**，残留文件由 `report_stale()` 列出交人工。
+
+## 二之十、行为验证方法（可复用，成本约 6 个子代理）
+
+1. **盲跑**：子代理只拿「用户原话 + 输出字段」，**不给预期**；
+2. **隔离 oracle**：禁止子代理读 `library/domain-review-cases.md`（含官方判定）；
+3. **预期引自包内声明**（触发词 / 消歧表 / cases / config / 红线总览），用包自己的尺子量；
+4. **独立复核**：疑似失败项回原始文件核对，判定「包的错」还是「代理的错」；
+5. **跨代理复跑**：同批输入交另一个代理再判 → 度量规则可复现性（本次揪出澄清门 20% 翻转）。
 
 ## 三、验证脚本（改完必跑）
 

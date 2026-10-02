@@ -158,8 +158,8 @@ def run_round(r):
             if k not in head:
                 bad(f, 'frontmatter 缺 %s' % k)
         vm = re.search(r'version:\s*([\d.]+)', head)
-        if vm and vm.group(1) != '2.9.0':
-            bad(f, '版本号 %s（期望 2.9.0）' % vm.group(1))
+        if vm and vm.group(1) != '2.10.0':
+            bad(f, '版本号 %s（期望 2.10.0）' % vm.group(1))
         if '/skills/local/' in f:
             for h in NEED:
                 if h not in t:
@@ -279,13 +279,13 @@ def run_round(r):
         m = re.search(r'^version:\s*([\d.]+)', fm.group(1), re.M)
         if m:
             vers.add(m.group(1))
-    if vers - {'2.9.0'}:
+    if vers - {'2.10.0'}:
         bad('（frontmatter）', '版本号不唯一: %s' % sorted(vers))
     # 插件清单（JSON 风格，易与 YAML 风格一起被漏改）
     try:
         pv = json.loads(rd('.codebuddy-plugin/plugin.json')).get('version')
-        if pv != '2.9.0':
-            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 2.9.0）' % pv)
+        if pv != '2.10.0':
+            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 2.10.0）' % pv)
     except Exception:
         pass
     # 当前状态/提交物 的版本声明（易漂移点，显式点名）
@@ -293,8 +293,8 @@ def run_round(r):
                     ('qihang-scenario-design.html', r'<title>[^<]*（v([\d.]+)）')):
         t = rd(f)
         m = re.search(pat_, t)
-        if m and m.group(1) != '2.9.0':
-            bad(f, '版本声明 %s（期望 2.9.0）' % m.group(1))
+        if m and m.group(1) != '2.10.0':
+            bad(f, '版本声明 %s（期望 2.10.0）' % m.group(1))
 
     # ---------- I commands ----------
     for f in sorted(glob.glob('commands/*.md')):
@@ -310,8 +310,8 @@ def run_round(r):
     try:
         pj = json.loads(rd('.codebuddy-plugin/plugin.json'))
         v = json.dumps(pj)
-        if '2.9.0' not in v:
-            warn('.codebuddy-plugin/plugin.json', '未声明版本 2.9.0')
+        if '2.10.0' not in v:
+            warn('.codebuddy-plugin/plugin.json', '未声明版本 2.10.0')
     except Exception as e:
         bad('.codebuddy-plugin/plugin.json', 'JSON 无法解析: %s' % e)
 

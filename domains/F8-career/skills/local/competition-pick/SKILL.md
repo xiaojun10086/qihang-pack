@@ -1,7 +1,7 @@
 ---
 name: qihang-competition-pick
 description: 「启航」F8 求职与竞赛域库内 skill：按专业/投入产出/时间窗筛选竞赛并排备赛里程碑。
-version: 2.9.0
+version: 2.10.0
 license: MIT
 agent_created: true
 ---
