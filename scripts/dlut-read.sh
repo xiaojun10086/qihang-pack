@@ -116,8 +116,12 @@ else
   done
 fi
 if [ -z "$AB" ]; then
-  echo "❌ 未找到 agent-browser。安装：npm install -g agent-browser && agent-browser install" >&2
-  exit 4
+  # 不在此处直接退出：--dry-run 只是「打印执行计划」，不该被「本机是否装了浏览器」绑死。
+  # 否则受限环境里 L1 的 dry-run 契约（独立 Profile / 未启动浏览器）无法被回归验证。
+  AB_PENDING=1
+  AB="agent-browser（本机未安装）"
+else
+  AB_PENDING=0
 fi
 
 # ---------- 执行计划 ----------
@@ -140,8 +144,15 @@ if [ "$DRYRUN" -eq 1 ]; then
   echo "  3) $AB snapshot -c           # 只读读取当前页面"
   echo "  4) 抽取「$DESC」相关字段后直接输出"
   echo "  5) $AB close --all           # 结束会话，不保存 Cookie"
+  [ "$AB_PENDING" -eq 1 ] && \
+    echo "[dry-run] ⚠️ 本机未安装 agent-browser；正式读取前先执行：npm install -g agent-browser && agent-browser install"
   echo "[dry-run] 未启动浏览器，未读任何数据。"
   exit 0
+fi
+
+if [ "$AB_PENDING" -eq 1 ]; then
+  echo "❌ 未找到 agent-browser。安装：npm install -g agent-browser && agent-browser install" >&2
+  exit 4
 fi
 
 mkdir -p "$PROFILE_DIR"

@@ -148,7 +148,7 @@ while [ "$r" -le "$ROUNDS" ]; do
   _chk "库内 skill 总数" "$(find domains -path '*skills/local/*/SKILL.md' | wc -l | tr -d ' ')" 92
   _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 9
   _chk "commands 数" "$(ls -1 commands/*.md | wc -l | tr -d ' ')" 22
-  _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 159
+  _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 162
   # 数据条目 = 表格行 − 分隔行 − 表头行（表头 = 下一行是分隔行的那些行）
   _entries=$(awk '{L[NR]=$0} END{
       for(i=1;i<=NR;i++){
@@ -159,7 +159,7 @@ while [ "$r" -le "$ROUNDS" ]; do
       }
       print c+0
     }' references/dlut-official-sites.md)
-  _chk "公开站数据条目" "$_entries" 139
+  _chk "公开站数据条目" "$_entries" 142
   _chk "无库外通道 external.md" "$(find domains -path '*/skills/external.md' | wc -l | tr -d ' ')" 0
   _chk "无自检临时文件残留" "$(find . -maxdepth 1 -name '.selfcheck.tmp*' | wc -l | tr -d ' ')" 0
 
@@ -192,6 +192,29 @@ while [ "$r" -le "$ROUNDS" ]; do
     if bash -n "$s" 2>/dev/null; then _ok "$(basename "$s")"
     else _fail "$(basename "$s") 语法错误"; fi
   done
+  echo "[7] 输出标准固化（output-spec 硬契约）"
+  # 本段是**轻量断言**：只锁「规范文本 + 词表 + 校验器接线」这类成文契约，
+  # 内容级全量扫描由 runcheck.py（首块）与 aligncheck.py（全量输出块）承担。
+  for _k in '三条铁律' '快通道' '内部名禁止词表' '【结论】' '【依据】' '【结果】' '【建议】' '【下一步】' '【假设】'; do
+    if grep -qF -- "$_k" library/output-spec.md 2>/dev/null; then _ok "output-spec 含「$_k」"
+    else _fail "output-spec 缺「$_k」"; fi
+  done
+  if grep -qF '【步骤】' library/output-spec.md 2>/dev/null; then
+    _fail "output-spec 仍残留旧字段【步骤】（输出标准未固化）"
+  else _ok "output-spec 已无旧字段【步骤】"; fi
+  # 旧格式降级标注「[已降级: X → Y]」全域必须清零
+  _old=$(grep -rEl '\[已降级[:：]' domains 2>/dev/null | wc -l | tr -d ' ')
+  _chk "旧格式降级标注残留文件数" "$_old" 0
+  # 两个 Python 校验器必须内建内部名词表（防重构时被悄悄摘掉 → 契约失效）
+  for _f in scripts/runcheck.py scripts/aligncheck.py; do
+    if grep -q 'internal_leaks' "$_f" 2>/dev/null && grep -q 'PROC_INTERNAL' "$_f" 2>/dev/null \
+       && grep -q "'红线'" "$_f" 2>/dev/null; then
+      _ok "$(basename "$_f") 内建内部名词表断言"
+    else _fail "$(basename "$_f") 缺内部名词表断言（输出标准未固化）"; fi
+  done
+  if grep -q '只讲结果与建议（零内部名）' library/output-checklist.md 2>/dev/null; then
+    _ok "output-checklist 校验 4 已点名「零内部名」"
+  else _fail "output-checklist 校验 4 未点名「零内部名」"; fi
   echo "=========================================="
   echo ""
   r=$((r + 1))

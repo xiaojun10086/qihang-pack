@@ -56,11 +56,11 @@ agent_created: true
 
 ```
 【结论】能合，按 4 段结构归一，缺的是第 5 章的例题。
-【依据】笔记归一流程（库内 skill note-normalize）
-【步骤】① 以板书讲次为骨架对齐 3 份来源
+【依据】笔记归一流程
+【结果】① 以板书讲次为骨架对齐 3 份来源
 　　　　② 概念以讲义为准，补充录音里的口述例子
 　　　　③ 生成待补清单：第 5 章例题缺失
-【产物】notes/归一笔记.md · 待补清单.md
+　　　　→ 产出：notes/归一笔记.md · 待补清单.md
 【下一步】下次课只记第 5 章例题，回来补齐
 ```
 
@@ -75,8 +75,8 @@ agent_created: true
 **输出**
 
 ```
-[已降级: note-normalize → link-notes]
-【结论】属双链构网，改由 link-notes 承接。
+[已降级] 由「笔记归一」改为「双链笔记法」
+【结论】这属于「双链笔记法」类需求，已改按该方式处理。
 【下一步】提交笔记目录，走链接规划
 ```
 
@@ -103,7 +103,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `lecture-to-notes` 降级承接（输出首行标 `[已降级: note-normalize → lecture-to-notes]`）；`lecture-to-notes` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `lecture-to-notes` 降级承接（输出首行标 `[已降级] 由「笔记归一」改为「讲义转笔记」`）；`lecture-to-notes` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

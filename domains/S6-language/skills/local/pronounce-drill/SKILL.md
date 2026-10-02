@@ -56,11 +56,11 @@ agent_created: true
 
 ```
 【结论】先练 3 组最小对立对，每天 10 分钟，两周见效。
-【依据】发音偏误对照（库内 skill pronounce-drill）
-【步骤】① 采样 1 分钟，定位 /θ/ /v/ 两个偏误
+【依据】发音偏误对照
+【结果】① 采样 1 分钟，定位 /θ/ /v/ 两个偏误
 　　　　② 练 thank/think、very/wary 两组对立对
 　　　　③ 跟读 → 复述 → 录音自评，各 3 分钟
-【产物】oral/每日10分钟脚本.md · 自评表.md
+　　　　→ 产出：oral/每日10分钟脚本.md · 自评表.md
 【下一步】今天先录 1 分钟，把最卡的 3 个词发我
 ```
 
@@ -75,8 +75,8 @@ agent_created: true
 **输出**
 
 ```
-[已降级: pronounce-drill → listening-drill]
-【结论】属精听训练，改由 listening-drill 承接。
+[已降级] 由「口语跟读」改为「精听训练」
+【结论】这属于「精听训练」类需求，已改按该方式处理。
 【下一步】提交目标分与考试日期，排精听计划
 ```
 
@@ -100,7 +100,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `lang-drill` 降级承接（输出首行标 `[已降级: pronounce-drill → lang-drill]`）；`lang-drill` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `lang-drill` 降级承接（输出首行标 `[已降级] 由「口语跟读」改为「语言训练」`）；`lang-drill` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

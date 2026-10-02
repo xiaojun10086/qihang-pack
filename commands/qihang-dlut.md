@@ -10,7 +10,7 @@ description: 「启航」校情入口卡：查大连理工大学学院 / 校区 
 
 **硬性规则**
 1. **先读** `references/dlut-official-sites.md`（公开站）；涉及登录项再读 `references/dlut-login-sites.md`。
-2. 命中 → 输出 `【结论】+【网址】+【状态 ✅/⚠️】+【备注】`。
+2. 命中 → 输出 `【结论】+【网址】+【状态 ✅/⚠️】+【建议】`（口径见 `library/output-spec.md` §2「校情查询」）。
 3. **未命中 → 固定回复**：「信息库未收录该条目，建议访问 https://www.dlut.edu.cn/ 核实」。
 4. **禁止编造**任何 dlut.edu.cn 下的 URL、电话或单位名。
 5. 标 ⚠️ 的条目必须带上「待核实」。

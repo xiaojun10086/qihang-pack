@@ -29,7 +29,7 @@ qihang-pack/
 │       └── skills/
 │           └── local/<name>/SKILL.md    ★3 级 · 库内 skill（唯一通道，无需安装）
 ├── references/                  数据与依据
-│   ├── dlut-official-sites.md      DUT 公开站信息库（139 条条目 / 表格行 159）
+│   ├── dlut-official-sites.md      DUT 公开站信息库（142 条条目 / 表格行 162）
 │   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
 │   ├── dlut-field-map.md           私密站字段映射表
 │   ├── dlut-url-verification.md    URL 核验台账（22 项待人工补）
@@ -100,7 +100,7 @@ bash scripts/qihang.sh new-term   # 换学期重置
 
 | 类型 | 文件 | 融入方式 |
 |---|---|---|
-| 公开站 | `references/dlut-official-sites.md` | **139 条**条目（表格行 159），20 个域的 `_domain.md` 各自标注绑定点 |
+| 公开站 | `references/dlut-official-sites.md` | **142 条**条目（表格行 162），20 个域的 `_domain.md` 各自标注绑定点 |
 | 私密站 | `references/dlut-login-sites.md` | 19 个需登录站点，**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
 | 校内信息搜集 | `domains/R6-info-retrieval/` | 导师/教师公开资料（`faculty.dlut.edu.cn`、`gs.dlut.edu.cn`）+ 公开信息检索与路由 |
 

@@ -57,11 +57,11 @@ agent_created: true
 
 ```
 【结论】按"工具 / 环节 / 核验"三段写，落点在方法节末尾。
-【依据】AI 使用声明模板（库内 skill ai-disclosure）
-【步骤】① 工具：列出所用模型与版本
+【依据】AI 使用声明模板
+【结果】① 工具：列出所用模型与版本
 　　　　② 环节：仅"语言润色"，不含内容生成
 　　　　③ 核验：全部结论与数据由本人复核
-【产物】submit/ai-disclosure.md
+　　　　→ 产出：submit/ai-disclosure.md
 【下一步】先确认学校模板是否要求写明版本号，再定稿
 ```
 
@@ -77,8 +77,8 @@ agent_created: true
 
 ```
 【结论】不协助隐瞒 AI 使用；应如实声明使用环节。
-【依据】R5 红线：不隐瞒 AI 痕迹
-【可替代】给规范的 AI 使用声明模板（工具 / 环节 / 核验范围）
+【依据】合规边界：不隐瞒 AI 痕迹
+【替代方案】给规范的 AI 使用声明模板（工具 / 环节 / 核验范围）
 【下一步】把使用过的工具与环节列给我，我生成合规声明
 ```
 
@@ -103,7 +103,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `integrity-check` 降级承接（输出首行标 `[已降级: ai-disclosure → integrity-check]`）；`integrity-check` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `integrity-check` 降级承接（输出首行标 `[已降级] 由「AI使用声明」改为「规范自检」`）；`integrity-check` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

@@ -55,11 +55,11 @@ agent_created: true
 
 ```
 【结论】能统一格式，但有 2 条缺卷期页，需要你去补。
-【依据】引用规范化流程（库内 skill cite-normalize）
-【步骤】① 按 GB/T 7714 重排 12 条
+【依据】引用规范化流程
+【结果】① 按 GB/T 7714 重排 12 条
 　　　　② 标缺字段：#4 缺卷期页、#9 缺 DOI
 　　　　③ 正文标号与列表交叉核对，发现 1 处错位
-【产物】cite/references-规范版.md · 待补字段.md
+　　　　→ 产出：cite/references-规范版.md · 待补字段.md
 【下一步】先补齐 #4 的卷期页，回我
 ```
 
@@ -74,10 +74,10 @@ agent_created: true
 **输出**
 
 ```
-[已降级: cite-normalize → R1 引文核验]
+[已降级] 由「引用规范化」改为「引文核验」
 【结论】不补造 DOI；缺字段需回源核验。
-【依据】S5 红线：不伪造参考文献，未核验条目不得进终稿
-【下一步】把题录发我，走 R1 citation-verify 回源核验
+【依据】合规边界：不伪造参考文献，未核验条目不得进终稿
+【下一步】把题录发我，引文核验 回源核验
 ```
 
 ## ⚠️ 红线（不得绕过）
@@ -100,7 +100,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `paper-outline` 降级承接（输出首行标 `[已降级: cite-normalize → paper-outline]`）；`paper-outline` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `paper-outline` 降级承接（输出首行标 `[已降级] 由「引用规范化」改为「论文骨架与预审」`）；`paper-outline` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

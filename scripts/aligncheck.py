@@ -36,6 +36,8 @@
   P 三级路由链可解：触发词数 / 执行顺序覆盖库内 skill、输出规范（库内唯一通道）
   Q 文档声明数 == 实测数：表格行 / 条目 / ✅⚠️ 分项 / §8 项数 / 文件总数
   S 小节正文非空（空壳标题）：正文完全为空 → FAIL；仅 <8 字 → WARN
+  T **输出形态硬契约**：全量输出块零内部名（域代号 / skill 名 / 脚本与库文件名 / 流程词 /
+    「红线」）/ 结论前置 / 恰好 1 个【下一步】/ 降级标注只写能力级
 """
 import os, re, sys, json, glob, io, hashlib, collections
 
@@ -78,6 +80,39 @@ SKILLS = [f for f in FILES if f.endswith('SKILL.md')]
 LOCAL = [f for f in SKILLS if '/skills/local/' in f]
 DOMAIN = [f for f in FILES if f.endswith('/_domain.md')]
 DOMS = sorted(d for d in os.listdir('domains') if os.path.isdir(os.path.join('domains', d)))
+
+# ---------- 输出形态硬契约：内部名禁止词表 ----------
+# 口径唯一真相源 = library/output-spec.md §1.2。**三处必须同源**：
+# 本文件的 T 组 / runcheck.py 的 internal_leaks() / regress.sh 的 [7] 段。
+ALL_SKILLS = sorted({f.split('/skills/local/')[1].split('/')[0] for f in LOCAL})
+FILE_INTERNAL = ['output-spec', 'output-checklist', 'general-fallback', 'domain-review-cases',
+                 'clarity', 'domain-review', 'memory', 'login-policy', '_registry', '_domain',
+                 'SKILL', 'config.yaml', 'dlut-read.sh', 'qihang.sh',
+                 'selfcheck.sh', 'audit.sh', 'regress.sh', 'aligncheck.py', 'runcheck.py']
+PROC_INTERNAL = ['库内 skill', '库外通道', '库外', '域审查', '需求明确', '归属域', '降级承接', '红线']
+CODE_RE = re.compile(r'(?<![A-Za-z0-9_])([SFR][1-8])(?![A-Za-z0-9_])')
+# 交付物路径 / URL 里的同名片段不算泄漏（如「→ 产出：submit/ai-disclosure.md」）
+_FILE_TOKEN = re.compile(r'(?:https?://\S+|[\w./-]+\.(?:md|json|ya?ml|sh|py|html?|csv|'
+                         r'xlsx?|pptx?|docx?|txt|pdf|ipynb|js|ts)\b)')
+
+
+def internal_leaks(o):
+    """返回输出块里泄漏的内部名（已剔除路径/URL 里的同名片段）。"""
+    s = _FILE_TOKEN.sub(' ▒ ', o)
+    out = []
+    for nm in ALL_SKILLS + FILE_INTERNAL:
+        if re.search(r'(?<![A-Za-z0-9_])%s(?![A-Za-z0-9_-])' % re.escape(nm), s):
+            out.append(nm)
+    for nm in PROC_INTERNAL:
+        if nm in s:
+            out.append(nm)
+    out += [m.group(1) for m in CODE_RE.finditer(s)]
+    return sorted(set(out))
+
+
+def output_blocks(t):
+    """取出 SKILL.md 里全部 `**输出**` 代码块。"""
+    return re.findall(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', t, re.S)
 
 def run_round(r):
     del FIND[:]
@@ -460,6 +495,7 @@ def run_round(r):
         if '[已降级]' not in t:
             warn(f, '未声明降级标注 [已降级]')
         # O6 示例输出按 output-spec 校验（**变体无关**，只查规格真约束）
+        # 口径真相源 = library/output-spec.md §0–§2，与 runcheck.py 的 L3-5 同源。
         ob = re.search(r'\*\*输出\*\*\n\n```\n(.*?)```', t, re.S)
         if not ob:
             bad(f, '示例缺「输出」代码块')
@@ -474,8 +510,13 @@ def run_round(r):
             extra = [x for x in labels if x != '结论']
             if len(extra) > 6:
                 bad(f, '示例输出要点 %d 条（>6，违反 output-spec §1.1）: %s' % (len(extra), extra))
-            if not ('步骤' in labels or '网址' in labels):
-                bad(f, '示例输出既无【步骤】也无【网址】（内容不足）')
+            if not any(x in labels for x in ('结果', '网址', '替代方案', '还需确认')):
+                bad(f, '示例输出无实质内容字段（须有【结果】/校情【网址】/红线【替代方案】/追问【还需确认】）')
+            lk = internal_leaks(o)
+            if lk:
+                bad(f, '示例输出泄漏内部名 %d 处: %s' % (len(lk), '、'.join(lk[:6])))
+            if re.search(r'\[已降级\s*[:：]', o):
+                bad(f, '降级标注用旧格式「[已降级: X → Y]」（须写 [已降级] 由「能力」改为「能力」）')
 
     # O7 跨域标题唯一（重名会导致路由歧义）
     for title, fs in titles.items():
@@ -648,6 +689,28 @@ def run_round(r):
                     if int(_m2.group(1)) != _n8:
                         bad(_f2, '「未核实清单」项数 %s ≠ 实测 %d'
                             % (_m2.group(1), _n8))
+
+    # ---------- T 输出形态硬契约（全量输出块零内部名） ----------
+    # 与 runcheck.py 的 L3-5 的差别：runcheck 只校验**首块**（正常路径示例），
+    # 本组扫**全部**输出块（含边界 / 降级 / 拒绝示例），确保任何示例都不泄内部名。
+    n_blk = 0
+    for f in LOCAL:
+        t = rd(f)
+        for o in output_blocks(t):
+            n_blk += 1
+            lk = internal_leaks(o)
+            if lk:
+                bad(f, '输出块泄漏内部名 %d 处: %s' % (len(lk), '、'.join(lk[:6])))
+            labels = re.findall(r'^【([^】]+)】', o, re.M)
+            if labels and labels[0] != '结论' and '还需确认' not in labels[0]:
+                bad(f, '输出块未「结论前置」（首节为【%s】）' % labels[0])
+            if len([x for x in labels if '下一步' in x]) != 1:
+                bad(f, '输出块【下一步】应恰好 1 个，实为 %d 个'
+                    % len([x for x in labels if '下一步' in x]))
+            if len([x for x in labels if x != '结论']) > 6:
+                bad(f, '输出块要点 %d 条（>6，违 output-spec §1.1）' % len([x for x in labels if x != '结论']))
+    if n_blk == 0:
+        bad('（全域）', '未检出任何输出块（output-spec 契约无法落地）')
 
     # ---------- 汇总 ----------
     nf = sum(1 for x in FIND if x[0] == 'FAIL')

@@ -58,14 +58,13 @@ license: MIT
 
 ```
 【结论】用 conda 建独立环境，别在 base 里装。
-【依据】库内 skill tool-setup（自建）
-【步骤】① 建环境：conda create -n ml python=3.11
+【结果】① 建环境：conda create -n ml python=3.11
        ② 先装 torch 再装其余（顺序敏感）
        ③ 报错处理：复现 → 最小化 → 假设 → 插桩 → 修复
        ④ 固化：pip freeze > requirements.txt
-【产物】env/requirements.txt + README
+       → 产出：env/requirements.txt + README
 【下一步】把完整报错贴给我，我定位
-【提醒】网信中心有正版软件与超算资源 https://its.dlut.edu.cn/
+【建议】网信中心有正版软件与超算资源 https://its.dlut.edu.cn/
 ```
 
 **示例 2（边界 / 失败例 —— 不该命中的情形）**
@@ -81,7 +80,7 @@ license: MIT
 ```
 【结论】信息不足，先补齐再给方案（盲猜易给错命令）。
 【依据】报错五步法：先复现再诊断
-【追问】① 什么系统与版本 ② 装什么工具 ③ 完整报错原文（三问即可定位）
+【还需确认】① 什么系统与版本 ② 装什么工具 ③ 完整报错原文（三问即可定位）
 【下一步】回我这三项，我按五步法带你排查
 ```
 
@@ -105,7 +104,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `repro-env` 降级承接（输出首行标 `[已降级: tool-setup → repro-env]`）；`repro-env` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `repro-env` 降级承接（输出首行标 `[已降级] 由「科研环境搭建」改为「可复现环境」`）；`repro-env` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

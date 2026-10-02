@@ -56,8 +56,8 @@ agent_created: true
 
 ```
 【结论】3 道题里 2 道是"方法不会"、1 道是"计算失误"，先补方法再练计算。
-【依据】错因归因流程（库内 skill error-diagnose）
-【步骤】① 第 1 题：等价无穷小误用 → 方法类（改泰勒展开）
+【依据】错因归因流程
+【结果】① 第 1 题：等价无穷小误用 → 方法类（改泰勒展开）
 　　　　② 第 2 题：分部积分公式记反 → 方法类
 　　　　③ 第 3 题：因式分解算错符号 → 计算类
 【下一步】先把"分部积分公式"抄写 3 遍默写一遍，回我
@@ -74,8 +74,8 @@ agent_created: true
 **输出**
 
 ```
-[已降级: error-diagnose → explain-stepwise]
-【结论】属分步讲解，改由 explain-stepwise 承接。
+[已降级] 由「错因归因」改为「分步讲解」
+【结论】这属于「分步讲解」类需求，已改按该方式处理。
 【下一步】提交题目原文，走四步讲解
 ```
 
@@ -99,7 +99,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `explain-stepwise` 降级承接（输出首行标 `[已降级: error-diagnose → explain-stepwise]`）；`explain-stepwise` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `explain-stepwise` 降级承接（输出首行标 `[已降级] 由「错因归因」改为「分步讲解」`）；`explain-stepwise` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

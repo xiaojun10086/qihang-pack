@@ -57,13 +57,13 @@ license: MIT
 ```
 【结论】先定检索式与纳排标准，再做矩阵，别一上来就读全文。
 【依据】图书馆 https://lib.dlut.edu.cn/（含校外访问）
-【步骤】① 拆概念：LLM / hallucination / detection|mitigation
+【结果】① 拆概念：LLM / hallucination / detection|mitigation
        ② 检索式中英各一版（已给）
        ③ 纳排标准：2022 年后、有实验、同行评议
        ④ 建矩阵：方法 | 数据集 | 指标 | 局限
-【产物】lit/matrix.md
+       → 产出：lit/matrix.md
 【下一步】先用检索式跑一遍，回我命中数量再筛
-【提醒】每条引文留 DOI，方便回源核验
+【建议】每条引文留 DOI，方便回源核验
 ```
 
 **示例 2（边界 / 失败例 —— 不该命中的情形）**
@@ -77,8 +77,8 @@ license: MIT
 **输出**
 
 ```
-[已降级: lit-map → lit-fetch]
-【结论】属全文获取，改由 lit-fetch 承接。
+[已降级] 由「文献地图」改为「合法文献获取」
+【结论】这属于「合法文献获取」类需求，已改按该方式处理。
 【下一步】把 20 篇的题名 + DOI 列表发我，按合法渠道逐条取
 ```
 
@@ -101,7 +101,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `citation-verify` 降级承接（输出首行标 `[已降级: lit-map → citation-verify]`）；`citation-verify` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `citation-verify` 降级承接（输出首行标 `[已降级] 由「文献地图」改为「引文核验」`）；`citation-verify` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

@@ -16,8 +16,9 @@
   L2  注册表路由可解：registry 行在位 / 触发词 ⊆ 域文件 / 每个触发词命中自身 /
       跨域共享词有裁决 / 声明 skill == 实体目录
   L2b 域执行顺序：先判红线前置为第 0 步 / 覆盖全部库内 skill / 接输出规范 / 无库外通道
-  L3  逐 skill：归属域 / 前置 / 步骤可跑 / 示例可复现 / 输出合 spec / 网址入库 /
-      红线可拦且与域一致 / **降级目标指名同域真实 skill** / 分工表引用可解析
+  L3  逐 skill：归属域 / 前置 / 步骤可跑 / 示例可复现 / **输出形态硬契约**（结论前置 ·
+      恰好 1 个【下一步】· ≤6 条 · 有实质字段 · **零内部名泄漏** · 降级标注只写能力级）/
+      网址入库 / 红线可拦且与域一致 / **降级目标指名同域真实 skill** / 分工表引用可解析
 
 用法:
   python scripts/runcheck.py .            # 1 轮
@@ -29,7 +30,9 @@
   ② 触发词位置      默认 domain 文件 `## 触发词` 段；**只取列表行**，`>` 注释行必须排除
   ③ registry 触发词 默认 `_registry.md` 表格第 3 列，是**缩写摘要**（「、」分隔 + 「…」截断）
   ④ 官方站库        默认 references/dlut-official-sites.md（输出 URL 合规校验源）
-  ⑤ 输出小节标签    默认 【结论】【下一步】【步骤】/【网址】（按 output-spec 调整）
+  ⑤ 输出小节标签    默认 【结论】【依据】【结果】【建议】【下一步】【假设】
+                    （口径唯一真相源 = library/output-spec.md §0–§2；改规范必同步本文件
+                     的「输出形态硬契约」段 + aligncheck.py 的 O6/T 组 + regress.sh 的 [7] 段）
 """
 import os, re, sys, io, collections
 
@@ -112,6 +115,65 @@ def local_skills(ddir):
     if not os.path.isdir(p):
         return []
     return sorted(x for x in os.listdir(p) if os.path.isdir('%s/%s' % (p, x)))
+
+
+# ---------- 输出形态硬契约：内部名禁止词表 ----------
+# 口径唯一真相源 = library/output-spec.md §1.2。**三处必须同源**：
+# 本文件的 internal_leaks() / aligncheck.py 的 T 组 / regress.sh 的 [7] 段。
+# 违反后果：用户看到的是内部机器名而非「结果与建议」，即违背 output-spec 铁律 2。
+ALL_SKILLS = sorted({s for d in DOMS for s in local_skills('domains/%s' % d)})
+FILE_INTERNAL = ['output-spec', 'output-checklist', 'general-fallback', 'domain-review-cases',
+                 'clarity', 'domain-review', 'memory', 'login-policy', '_registry', '_domain',
+                 'SKILL', 'config.yaml', 'dlut-read.sh', 'qihang.sh',
+                 'selfcheck.sh', 'audit.sh', 'regress.sh', 'aligncheck.py', 'runcheck.py']
+# 注：`README` 不入表 —— 它既是库内文件名，也是学生自己要产出的交付物名
+#     （如「→ 产出：env/requirements.txt+README」），入表会误伤合规输出。
+PROC_INTERNAL = ['库内 skill', '库外通道', '库外', '域审查', '需求明确', '归属域', '降级承接', '红线']
+CODE_RE = re.compile(r'(?<![A-Za-z0-9_])([SFR][1-8])(?![A-Za-z0-9_])')
+# 交付物路径 / URL 里的同名片段**不算**泄漏：如「→ 产出：submit/ai-disclosure.md」
+# 里的 ai-disclosure 是文件名，用户读到的是「产出了哪个文件」，不是内部机器名。
+_FILE_TOKEN = re.compile(r'(?:https?://\S+|[\w./-]+\.(?:md|json|ya?ml|sh|py|html?|csv|'
+                         r'xlsx?|pptx?|docx?|txt|pdf|ipynb|js|ts)\b)')
+
+
+def internal_leaks(o):
+    """返回输出块里泄漏的内部名（已剔除路径/URL 里的同名片段）。"""
+    s = _FILE_TOKEN.sub(' ▒ ', o)
+    out = []
+    for nm in ALL_SKILLS + FILE_INTERNAL:
+        if re.search(r'(?<![A-Za-z0-9_])%s(?![A-Za-z0-9_-])' % re.escape(nm), s):
+            out.append(nm)
+    for nm in PROC_INTERNAL:
+        if nm in s:
+            out.append(nm)
+    out += [m.group(1) for m in CODE_RE.finditer(s)]
+    return sorted(set(out))
+
+
+def check_output_block(o):
+    """输出形态硬契约（output-spec §0–§2）。返回 (FAIL 列表, WARN 列表)。"""
+    F, W = [], []
+    labels = re.findall(r'^【([^】]+)】', o, re.M)
+    if not labels:
+        return ['输出块无【】小节 → 不合输出规范'], []
+    if labels[0] != '结论':
+        F.append('输出未「结论前置」（首节为【%s】）' % labels[0])
+    if len([x for x in labels if '下一步' in x]) != 1:
+        F.append('【下一步】应恰好 1 个，实为 %d 个' % len([x for x in labels if '下一步' in x]))
+    extra = [x for x in labels if x != '结论']
+    if len(extra) > 6:
+        F.append('输出要点 %d 条（>6，违 output-spec §1.1）' % len(extra))
+    if not any(x in labels for x in ('结果', '网址', '替代方案', '还需确认')):
+        F.append('输出无实质内容字段（须有【结果】/校情【网址】/红线【替代方案】/追问【还需确认】）')
+    lk = internal_leaks(o)
+    if lk:
+        F.append('输出块泄漏内部名 %d 处: %s' % (len(lk), '、'.join(lk[:6])))
+    if re.search(r'\[已降级\s*[:：]', o):
+        F.append('降级标注用旧格式「[已降级: X → Y]」（须写 [已降级] 由「能力」改为「能力」）')
+    for mm in re.finditer(r'\[已降级\][^\n]*', o):
+        if not re.match(r'\[已降级\]\s*由「[^」]+」改为「[^」]+」', mm.group(0)):
+            F.append('降级标注格式不合规: %s' % mm.group(0)[:46])
+    return F, W
 
 
 def run_round(r):
@@ -258,31 +320,19 @@ def run_round(r):
                 if mu and not re.search(r'例外|追问|问后|/\s*6\.1', verdict):
                     warn(sp, '澄清判定给 U=%s 但未附依据' % mu.group(1))
 
-            # L3-5 输出块合规格
+            # L3-5 输出形态硬契约（口径真相源 = library/output-spec.md §0–§2）
             ob = re.search(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', st, re.S)
             if not ob:
                 bad(sp, '示例缺「输出」代码块 → 级别3 返回结果为空')
             else:
                 o = ob.group(1)
-                labels = re.findall(r'^【([^】]+)】', o, re.M)
-                if not labels:
-                    bad(sp, '输出块无【】小节 → 不合输出规范')
-                else:
-                    if labels[0] != '结论':
-                        bad(sp, '输出未「结论前置」（首节为【%s】）' % labels[0])
-                    nxt = [x for x in labels if '下一步' in x]
-                    if len(nxt) != 1:
-                        bad(sp, '【下一步】应恰好 1 个，实为 %d 个' % len(nxt))
-                    extra = [x for x in labels if x != '结论']
-                    if len(extra) > 6:
-                        bad(sp, '输出要点 %d 条（>6，违 output-spec §1.1）' % len(extra))
-                    if not any(('步骤' in x or '网址' in x) for x in labels):
-                        bad(sp, '输出既无【步骤】也无【网址】（内容不足以运行）')
-                    # L3-6 输出里的 dlut URL 必须已在官方站库登记
-                    for u in re.findall(r'https?://[\w./?=&%#-]+', o):
-                        u2 = u.rstrip('.,)（）、；;')
-                        if 'dlut.edu.cn' in u2 and not url_in_lib(u2):
-                            bad(sp, '输出引用了未入库的 DUT 网址: %s' % u2)
+                for _m in check_output_block(o)[0]:
+                    bad(sp, _m)
+                # L3-6 输出里的 dlut URL 必须已在官方站库登记
+                for u in re.findall(r'https?://[\w./?=&%#-]+', o):
+                    u2 = u.rstrip('.,)（）、；;')
+                    if 'dlut.edu.cn' in u2 and not url_in_lib(u2):
+                        bad(sp, '输出引用了未入库的 DUT 网址: %s' % u2)
 
             # L3-7 红线可拦 + 与域一致
             red = red_lines(st) or []

@@ -55,11 +55,11 @@ agent_created: true
 
 ```
 【结论】你卡在"太大"：今天只写"研究问题一句话"。
-【依据】拖延拆解四类阻力（库内 skill task-decompose）
-【步骤】① 打开空白文档，写下标题
+【依据】拖延拆解四类阻力
+【结果】① 打开空白文档，写下标题
 　　　　② 只写研究问题一句话（≤25 分钟）
 　　　　③ 写完记一句"结果"，今天就停
-【产物】plan/开题-最小启动.md
+　　　　→ 产出：plan/开题-最小启动.md
 【下一步】现在开文档，25 分钟后把那一句话发我
 ```
 
@@ -74,8 +74,8 @@ agent_created: true
 **输出**
 
 ```
-[已降级: task-decompose → anti-procrastinate]
-【结论】属启动型拖延，改由 anti-procrastinate 承接。
+[已降级] 由「拖延拆解」改为「拖延干预」
+【结论】这属于「拖延干预」类需求，已改按该方式处理。
 【下一步】描述最近一次拖延情境，判类型
 ```
 
@@ -99,7 +99,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `focus-block` 降级承接（输出首行标 `[已降级: task-decompose → focus-block]`）；`focus-block` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `focus-block` 降级承接（输出首行标 `[已降级] 由「拖延拆解」改为「专注块排布」`）；`focus-block` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

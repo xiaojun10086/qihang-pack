@@ -58,11 +58,11 @@ agent_created: true
 
 ```
 【结论】主因是没固定随机种子与依赖版本；三步就能锁死。
-【依据】可复现三件套（库内 skill repro-env）
-【步骤】① 记下 python/numpy 版本并写进 requirements.txt
+【依据】可复现三件套
+【结果】① 记下 python/numpy 版本并写进 requirements.txt
 　　　　② 脚本开头固定 seed（random/numpy/torch）
 　　　　③ 数据划分改成固定索引而非随机打乱
-【产物】env/requirements.txt · src/seed.py · 复现说明.md
+　　　　→ 产出：env/requirements.txt · src/seed.py · 复现说明.md
 【下一步】先把三处 seed 加上重跑一次，看数字是否稳定
 ```
 
@@ -78,8 +78,8 @@ agent_created: true
 
 ```
 【结论】不代跑代交；可给可复现脚本与环境锁定清单。
-【依据】R3 红线：不代做课业 / 科研代码
-【可替代】给环境文件 + 种子设定 + 一键运行脚本，由你执行
+【依据】合规边界：不代做课业 / 科研代码
+【替代方案】给环境文件 + 种子设定 + 一键运行脚本，由你执行
 【下一步】把你的依赖清单与目标环境发我，我出可复现脚本
 ```
 
@@ -104,7 +104,7 @@ agent_created: true
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `tool-setup` 降级承接（输出首行标 `[已降级: repro-env → tool-setup]`）；`tool-setup` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `tool-setup` 降级承接（输出首行标 `[已降级] 由「可复现环境」改为「科研环境搭建」`）；`tool-setup` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 
