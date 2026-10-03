@@ -1,7 +1,7 @@
 ---
 name: qihang-patent-draft
 description: 「启航」R4 学术产出与投稿域库内 skill：交底书结构与「技术问题—方案—效果」三要素自查，梳理权利要求思路。
-version: 3.2.6
+version: 3.2.7
 license: MIT
 ---
 

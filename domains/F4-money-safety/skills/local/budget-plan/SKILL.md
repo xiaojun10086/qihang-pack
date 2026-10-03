@@ -1,7 +1,7 @@
 ---
 name: qihang-budget-plan
 description: 「启航」F4 财务与安全域库内 skill：月度生活费三分法预算 + 记账模板 + 超支刹车规则。
-version: 3.2.6
+version: 3.2.7
 license: MIT
 agent_created: true
 ---

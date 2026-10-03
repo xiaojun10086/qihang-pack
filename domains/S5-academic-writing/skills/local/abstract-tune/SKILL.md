@@ -1,7 +1,7 @@
 ---
 name: qihang-abstract-tune
 description: 「启航」S5 学术表达域库内 skill：按「背景—问题—方法—结果—意义」五要素诊断摘要缺失项并给改写方向。
-version: 3.2.6
+version: 3.2.7
 license: MIT
 ---
 

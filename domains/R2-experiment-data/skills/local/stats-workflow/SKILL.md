@@ -1,7 +1,7 @@
 ---
 name: qihang-stats-workflow
 description: 「启航」R2 实验与数据域库内 skill：统计分析流程——先框定问题再碰数据、看原始数据再选检验、前提检查必须报告、效应量与 p 值并重；面向实验课与课设数据的规范分析流程。
-version: 3.2.6
+version: 3.2.7
 license: MIT
 ---
 
