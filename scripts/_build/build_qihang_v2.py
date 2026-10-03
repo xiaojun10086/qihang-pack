@@ -42,7 +42,7 @@ DOMAINS = [
                    ("gurukul-ai", "somenssarkar/gurukul-ai", "手动 clone（需 API Key）"),
                    ("chem-skill", "ghutchis/chem-skill", "手动 zip（纯本地）")],
          dut_public=["教务处 https://teach.dlut.edu.cn/", "数学科学学院 https://math.dlut.edu.cn/"],
-         dut_private=["综合教务系统 http://jxgl.dlut.edu.cn/（考试安排、培养方案）"]),
+         dut_private=["综合教务系统 http://jxgl.dlut.edu.cn/student/home （考试安排、培养方案）"]),
 
     dict(id="S2", cat="S", name="课堂与笔记", slug="lecture-notes",
          triggers=["笔记", "讲义", "录音", "整理", "概念图", "思维导图", "听课", "这节课"],
@@ -80,7 +80,7 @@ DOMAINS = [
          external=[("paper-writer", "kgraph57/paper-writer-skill", "npx skills add kgraph57/paper-writer-skill"),
                    ("document-skills", "anthropics/skills", "npx skills add anthropics/skills")],
          dut_public=["教务处 https://teach.dlut.edu.cn/"],
-         dut_private=["综合教务系统 http://jxgl.dlut.edu.cn/（作业与成绩）"]),
+         dut_private=["综合教务系统 http://jxgl.dlut.edu.cn/student/home （作业与成绩）"]),
 
     dict(id="S4", cat="S", name="备考与记忆", slug="exam-prep",
          triggers=["考试", "复习", "背诵", "突击", "卡组", "刷题", "期末", "期中", "四六级"],

@@ -1,7 +1,7 @@
 ---
 name: qihang-money-guard
 description: 「启航」F4 财务与安全域库内 skill：先算月度收支缺口，再给节流方案；遇到可疑信息一律先按诈骗流程核验。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 ---
 

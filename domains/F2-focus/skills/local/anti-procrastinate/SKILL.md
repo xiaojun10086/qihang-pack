@@ -1,7 +1,7 @@
 ---
 name: qihang-anti-procrastinate
 description: 「启航」F2 作息与专注域库内 skill：先判定拖延类型，再给对应的最小启动动作与承诺机制。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 ---
 

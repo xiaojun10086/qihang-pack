@@ -47,6 +47,7 @@ LAYERS = [
     ('step57_risk_fixes.py',         '风险自检修复（记忆不跟踪 · INSTALL 前置澄清 · .gitattributes 注释纠错）+ 修订号 3.2.5→3.2.6'),
     ('step58_readme_download.py',    'README 下载区（release 分支 ZIP / clone 指引）+ 修订号 3.2.6→3.2.7'),
     ('step59_link_integrity.py',     '链接可用性修复（URL 边界归一 + 仅HTTP标注 + 排查话术 + 断言与负向注入）+ 修订号 3.2.7→3.2.8'),
+    ('step60_url_audit.py',          '外链核验订正（教务裸根 404 改可用入口 + 信息库 5 处事实订正 + §十一 三通道复核）+ 修订号 3.2.8→3.2.9'),
 ]
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)
