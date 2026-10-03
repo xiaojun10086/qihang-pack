@@ -181,17 +181,24 @@ exit 0
 '''
 write('scripts/_build/hooks/post-checkout', POSTCO, mode=0o755)
 
-hook_src = os.path.join(ROOT, 'scripts', '_build', 'hooks', 'pre-commit')
-hook_dst = os.path.join(ROOT, '.git', 'hooks', 'pre-commit')
+# 安装**全部** hooks（实测踩过：先前这里只装 pre-commit，而 install.sh 里已加了 post-checkout，
+#   两者不一致 → post-checkout 从未真正落位，分支警示静默失效。现改为遍历目录，避免再漏。）
+HOOKS = ['pre-commit', 'post-checkout']
 if os.path.isdir(os.path.join(ROOT, '.git')):
-    same = os.path.isfile(hook_dst) and \
-        io.open(hook_dst, encoding='utf-8', errors='replace').read() == HOOK
-    if same:
-        print('  [SAME] .git/hooks/pre-commit（已安装）')
-    else:
-        shutil.copyfile(hook_src, hook_dst)
-        os.chmod(hook_dst, 0o755)
-        print('  [OK]   已安装 .git/hooks/pre-commit')
+    for _h in HOOKS:
+        src = os.path.join(ROOT, 'scripts', '_build', 'hooks', _h)
+        dst = os.path.join(ROOT, '.git', 'hooks', _h)
+        if not os.path.isfile(src):
+            print('  [SKIP] 无源文件 scripts/_build/hooks/%s' % _h)
+            continue
+        want = io.open(src, encoding='utf-8', errors='replace').read()
+        cur = io.open(dst, encoding='utf-8', errors='replace').read() if os.path.isfile(dst) else None
+        if cur == want:
+            print('  [SAME] .git/hooks/%s（已安装）' % _h)
+        else:
+            shutil.copyfile(src, dst)
+            os.chmod(dst, 0o755)
+            print('  [OK]   已安装 .git/hooks/%s' % _h)
 else:
     print('  [SKIP] 无 .git（交付树）：钩子不适用')
 
