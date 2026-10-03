@@ -66,6 +66,7 @@ python scripts/_build/v3/rebuild.py --dry      # 只列层，不执行
 | 17 | `step54_blindrun_fixes.py` · `step55_realrun_fixes.py` · `step56_v325_release.py` | 盲跑 / 真实问题归因修复 + v3.2.5 工程化迭代（隔离断言 · L3 共现规则 · 指标埋点）；修订号 `3.2.2 → 3.2.5` | 新增层 |
 | 18 | `step57_risk_fixes.py` · `step58_readme_download.py` | 风险自检修复（记忆不跟踪 · 交付剔除 `.gitignore`）+ README 下载区；修订号 `3.2.5 → 3.2.7` | 新增层 |
 | 19 | `step59_link_integrity.py` · `step60_url_audit.py` | 链接可用性修复（URL 边界归一 · 仅 HTTP 标注 · 排查话术）+ 外链核验订正（教务裸根 404 · 信息库 5 处事实订正 · 三通道复核）；修订号 `3.2.7 → 3.2.9` | 新增层 |
+| 24 | `step65_trigger_gate.py` | **触发门收紧 + 锁定与降级强制**：config.yaml 立 `trigger` 段为唯一真相源（三条件 / 标记词 / 不接管行为 / 锁定 / 四级 ladder / 自生成前置）· SKILL.md 增「触发门与接管边界」（含「未穷尽档 1、未尝试档 2，不得进入档 3 自行生成」）· 三处规则文件补「档序强制」· 入口卡补第 0 步并修重复编号与「12 平台」旧口径 · selfcheck `[8d]` · 负向注入第 11 类；修订号 → `3.3.4` | 新增层 |
 | 23 | `step64_identity_lock.py` | **输出身份锁定（连小理）自检与修复**：config.yaml 立 `identity` 段为唯一真相源（name / product / self_intro / first_reply / no_rename）· SKILL.md 补真相源声明与固定拒绝话术 · INSTALL.md 口径对齐 · output-spec 新增 `## 8. 输出身份（强制）`（位置 / 频率 / 改称边界 / 与内部名边界 / 反例）· commands 入口卡补身份步骤 · selfcheck `[8c]` + regress `[10]` + 负向注入第 10 类；修订号 → `3.3.3` | 新增层 |
 | 22 | `step63_release_guard.py` | **交付分支护栏（事故驱动）**：git `pre-commit` 钩子（提交时拦截不随包路径，分支感知）+ `selfcheck [11]`（断言 release 树 == main 交付集）+ 安装脚本；修订号 → `3.3.2` | 新增层 |
 | 21 | `step62_source_expand.py` | **来源扩展 + 命中规则收紧**：平台 12 → **20**（8 个新入口三通道实测）· **每域只查指定的 2–3 个平台**，指定平台内未命中即按「无 skill 流程」回落（附命中判据与检索上限）· §4 第 4 项扩为「**脚本与指令风险**」（补提示注入/预授权工具/hook 这一真实缺口）· extskill 补 3 组断言 · 负向注入第 9 类；修订号 → `3.3.1` | 新增层 |

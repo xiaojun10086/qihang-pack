@@ -1,7 +1,7 @@
 ---
 name: qihang-focus-block
 description: 「启航」F2 作息与专注域库内 skill：先修作息再谈效率；每天只给 1 个最小可行动作（≤15 分钟）与固定专注窗口。
-version: 3.3.3
+version: 3.3.4
 license: MIT
 ---
 

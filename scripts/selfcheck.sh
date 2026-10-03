@@ -356,6 +356,33 @@ if grep -qF '身份锁定' commands/qihang.md 2>/dev/null; then
   ok "库入口卡已接入身份锁定"
 else bad "commands/qihang.md 未接入身份锁定（只加载入口卡时会漏）"; fi
 
+# ---------- 8d. 触发门与降级顺序（v3.3.4） ----------
+# 为什么单列：触发口径原先只是 frontmatter 里的一句软描述，**无可判定门槛、也无人保证它不被删**；
+#   降级虽已三档，但「未走完前两档不得自生成」没有明文与断言 → 模型很容易直接自生成。
+echo "[8d] 触发门与降级顺序"
+for _k in '^trigger:' '^  when_any:' '^  dlut_markers:' '^  learning_markers:' '^  learning_intents:' \
+          '^  not_triggered_behavior:' '^  lock_after_trigger:' '^  ladder:' '^  self_generate_requires:'; do
+  if grep -q "$_k" config.yaml 2>/dev/null; then ok "config.yaml 含 $_k"
+  else bad "config.yaml 缺 $_k（触发门真相源不完整）"; fi
+done
+for _k in '触发门与接管边界' '不接管' '必须走三级结构' '未穷尽档 1、未尝试档 2，不得进入档 3 自行生成'; do
+  if grep -qF "$_k" SKILL.md 2>/dev/null; then ok "SKILL.md 触发门含「$_k」"
+  else bad "SKILL.md 触发门缺「$_k」"; fi
+done
+for _t in 明确涉及大连理工大学 知识学习 自述为大连理工大学学生; do
+  if grep -qF "$_t" SKILL.md 2>/dev/null; then ok "触发条件在位：$_t"
+  else bad "触发条件缺：$_t"; fi
+done
+for _f in library/domain-review.md library/general-fallback.md library/external-bridge.md; do
+  if grep -qF '档序强制' "$_f" 2>/dev/null; then ok "$(basename "$_f") 已声明「档序强制」"
+  else bad "$(basename "$_f") 缺「档序强制」（降级顺序未强制）"; fi
+done
+if grep -qF '触发门' commands/qihang.md 2>/dev/null; then ok "入口卡已接入触发门"
+else bad "commands/qihang.md 未接入触发门"; fi
+if grep -qF '检索 12 平台' commands/qihang.md 2>/dev/null; then
+  bad "入口卡仍写「检索 12 平台」（v3.3.1 起已改为按域指定 2–3 个）"
+else ok "入口卡平台口径已更新"; fi
+
 # ---------- 9. 库内唯一通道（纯 DUT 特化库） ----------
 echo "[9] 库内唯一通道"
 # 纯本地化后，唯一的「通道」就是库内 skill；不得存在任何库外通道残留。

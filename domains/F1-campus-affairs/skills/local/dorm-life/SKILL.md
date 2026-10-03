@@ -1,7 +1,7 @@
 ---
 name: qihang-dorm-life
 description: 「启航」F1 校园事务域库内 skill：梳理宿舍入住、报修、调宿、退宿与离校手续的材料与入口。
-version: 3.3.3
+version: 3.3.4
 license: MIT
 ---
 
