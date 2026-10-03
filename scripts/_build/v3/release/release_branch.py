@@ -180,6 +180,9 @@ def _guard(n_dst, dele, applying):
         print('     请在 main 上先修回：`git checkout HEAD~1 -- <路径>` 或 `git restore --source=<好提交> -- <路径>`。')
         print('     确认确要删除时：加 `--allow-delete` 重跑。')
         stop = True
+    if stop and ALLOW_DELETE:
+        print('  → 已按**显式授权**放行（--allow-delete）。请自行确认这份交付包是完整的。')
+        return False
     if stop and applying:
         print('  → 未做任何修改（--apply 已被闸门拦下）。')
     elif stop:
