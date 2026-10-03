@@ -46,6 +46,9 @@ if '--msg' in sys.argv:
 VDIR = None
 if '--verify-dir' in sys.argv:
     VDIR = sys.argv[sys.argv.index('--verify-dir') + 1]
+ALLOW_DELETE = '--allow-delete' in sys.argv
+# 交付文件数下界（当前 174）。低于它几乎必然意味着 **main 树被误删过**，而不是「本版真的删了东西」。
+MIN_FILES = 150
 
 
 def norm(b):
@@ -141,7 +144,11 @@ def main():
 
     if not APPLY:
         print('（只比对模式；确认无误后加 --apply 执行）')
+        _guard(n_dst, locals().get('dele', []), applying=False)
         return 0
+
+    if _guard(n_dst, locals().get('dele', []), applying=True):
+        return 2
 
     base = git('rev-parse', DST) if ref_exists(DST) else git('rev-parse', SRC)
     msg = MSG or ('chore(release): 由 %s 刷新交付分支（%s）' % (SRC, git('rev-parse', '--short', base)))
@@ -152,6 +159,32 @@ def main():
     print('提示：工作树未受影响。分发用 `git archive release | tar -x` 或 `git clone -b release <url>`；')
     print('      推送用 `git push origin %s %s`。' % (SRC, DST))
     return 0
+
+
+def _guard(n_dst, dele, applying):
+    """**防误删闸**（2026-10-03 实测事故换来）。
+
+    事故：worktree 里少了 10 个 `scripts/*`（例如刚 `git checkout release` 过、或写入被打断），
+    随后一条 `git commit -a`（= `git add -u`）**把这些「缺失」当成删除提交进 main**（3179 行删除），
+    而本脚本会**忠实照搬** → 交付包静默少了 10 个核心脚本。
+    工具没错（garbage in, garbage out），但**「照搬误删」必须在 --apply 前挡住**。
+    返回 True = 应当中止。
+    """
+    stop = False
+    if n_dst < MIN_FILES:
+        print('  ‼️ 交付文件数 %d < 下界 %d —— main 树疑似被误删，已中止。' % (n_dst, MIN_FILES))
+        stop = True
+    if dele:
+        print('  ‼️ 本次刷新包含 %d 个「删除」：%s' % (len(dele), [r[-1] for r in dele][:8]))
+        print('     交付物删除必须是**有意的**。若这些文件是「worktree 里缺失后被 git commit -a 提交掉的」，')
+        print('     请在 main 上先修回：`git checkout HEAD~1 -- <路径>` 或 `git restore --source=<好提交> -- <路径>`。')
+        print('     确认确要删除时：加 `--allow-delete` 重跑。')
+        stop = True
+    if stop and applying:
+        print('  → 未做任何修改（--apply 已被闸门拦下）。')
+    elif stop:
+        print('  → 以上仅为提示（当前是只比对模式，未改动任何东西）。')
+    return stop
 
 
 if __name__ == '__main__':
