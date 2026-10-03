@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-search
 description: 「启航」R6 信息搜集与输出域库内 skill：校内公开信息检索——从 DUT 官方站点体系（信息公开网 / 部门联系表 / 新闻网 / 组织机构 / 校园地图）检索公开信息，输出带来源的要点；未收录即明说，不编造。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

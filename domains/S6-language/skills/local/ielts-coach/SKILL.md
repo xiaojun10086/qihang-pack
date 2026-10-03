@@ -1,7 +1,7 @@
 ---
 name: qihang-ielts-coach
 description: 「启航」S6 语言能力域库内 skill：留学语言考试应考策略——摸底三问 + 算分公式（0.25/0.75 进位）+ 时间分配（80/20）+ 分数换算表，用数字管理备考而不是凭感觉。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

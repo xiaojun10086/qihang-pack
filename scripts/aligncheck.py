@@ -56,6 +56,14 @@ def rd(p):
     with open(p, 'r', encoding='utf-8', errors='replace') as fh:
         return fh.read()
 
+# ---------- 版本号：**单一真相源 = config.yaml**（v3.2.5 起，勿再写死字面量）----------
+# 为什么改：修订号字面量曾硬编码在 101 个文件 / 120 处，其中本文件 10 处；
+# 两次迭代各因「同一字面量多处出现、只换首处」而报出自相矛盾的 FAIL。
+# 现在改版本只需改 config.yaml 一处 + 生成器全量替换，断言强度不变。
+_cv = re.search(r'^version:\s*([\d.]+)', rd('config.yaml'), re.M) if os.path.isfile('config.yaml') else None
+REV = _cv.group(1) if _cv else '3.2.5'      # 修订号（三位，用于字段与断言）
+PKG = '.'.join(REV.split('.')[:2])          # 包版本（两位，用于展示位）
+
 # 评审 / 审计 / 验收 / 需求书等过程文档不属交付物，统计时应一并排除。
 DEV_ONLY_DOCS = {
     'validation-report.md', 'acceptance-v2.md',
@@ -208,8 +216,8 @@ def run_round(r):
             if k not in head:
                 bad(f, 'frontmatter 缺 %s' % k)
         vm = re.search(r'version:\s*([\d.]+)', head)
-        if vm and vm.group(1) != '3.2.4':
-            bad(f, '版本号 %s（期望 3.2.4）' % vm.group(1))
+        if vm and vm.group(1) != REV:
+            bad(f, '版本号 %s（期望 %s）' % (vm.group(1), REV))
         if '/skills/local/' in f:
             for h in NEED:
                 if h not in t:
@@ -339,13 +347,13 @@ def run_round(r):
         m = re.search(r'^version:\s*([\d.]+)', fm.group(1), re.M)
         if m:
             vers.add(m.group(1))
-    if vers - {'3.2.4'}:
+    if vers - {REV}:
         bad('（frontmatter）', '版本号不唯一: %s' % sorted(vers))
     # 插件清单（JSON 风格，易与 YAML 风格一起被漏改）
     try:
         pv = json.loads(rd('.codebuddy-plugin/plugin.json')).get('version')
-        if pv != '3.2.4':
-            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 3.2.4）' % pv)
+        if pv != REV:
+            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 %s）' % (pv, REV))
     except Exception:
         pass
     # 提交物的版本声明（易漂移点，显式点名）
@@ -353,9 +361,9 @@ def run_round(r):
     _vf = 'qihang-scenario-design.html'
     if os.path.exists(_vf):
         m = re.search(r'<title>[^<]*（v([\d.]+)）', rd(_vf))
-        if m and m.group(1) not in ('3.2', '3.2.4'):
-            bad(_vf, '版本声明 %s（期望包版本 3.2 或修订号 3.2.4）' % (m.group(1), '3.2', '3.2.4'))
-    # 版本号口径（v3.2 起统一）：包版本 = 两位（3.2）｜修订号 = 三位（3.2.4）
+        if m and m.group(1) not in (PKG, REV):
+            bad(_vf, '版本声明 %s（期望包版本 %s 或修订号 %s）' % (m.group(1), PKG, REV))
+    # 版本号口径（v3.2 起统一）：包版本 = 两位（前两位）｜修订号 = 三位（见 config.yaml）
     # 展示位写三位 = 口径漂移（正是「包版本与修订号不统一」的复发点），故在此硬断言。
     _rfm = re.match(r'^---\n(.*?)\n---', rd('SKILL.md'), re.S)
     _rev = None
@@ -391,8 +399,8 @@ def run_round(r):
     try:
         pj = json.loads(rd('.codebuddy-plugin/plugin.json'))
         v = json.dumps(pj)
-        if '3.2.4' not in v:
-            warn('.codebuddy-plugin/plugin.json', '未声明版本 3.2.4')
+        if REV not in v:
+            warn('.codebuddy-plugin/plugin.json', '未声明版本 %s' % REV)
     except Exception as e:
         bad('.codebuddy-plugin/plugin.json', 'JSON 无法解析: %s' % e)
 

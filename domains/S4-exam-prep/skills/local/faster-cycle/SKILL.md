@@ -1,7 +1,7 @@
 ---
 name: qihang-faster-cycle
 description: 「启航」S4 备考与记忆域库内 skill：FASTER 学习循环——F 忘 A 练 S 态 T 教 E 恒 R 复六步闭环 + 四种学习模式（均衡 / 应试 / 理论 / 实践），以「教学回讲」为核心留存手段。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

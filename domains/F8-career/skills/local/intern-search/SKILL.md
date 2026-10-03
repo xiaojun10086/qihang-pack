@@ -1,7 +1,7 @@
 ---
 name: qihang-intern-search
 description: 「启航」F8 求职与竞赛域库内 skill：梳理实习渠道与时间线，做岗位-能力匹配自查，不代投递。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

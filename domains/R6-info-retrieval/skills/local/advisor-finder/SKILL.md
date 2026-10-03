@@ -1,7 +1,7 @@
 ---
 name: qihang-advisor-finder
 description: 「启航」R6 信息搜集与输出域库内 skill：导师信息搜集——从 DUT 教师主页平台、研究生院与学院官网定位导师的方向、院系与联系方式，输出标注来源与核验状态的信息卡；只查公开信息，不编造。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

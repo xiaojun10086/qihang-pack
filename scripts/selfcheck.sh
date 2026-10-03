@@ -41,7 +41,7 @@ references/dlut-official-sites.md references/dlut-login-sites.md references/dlut
 references/dlut-url-verification.md references/dlut-site-profiles.md references/browser-matrix.md
 references/skill-compliance-audit.md
 references/platforms.md references/e2e-scenarios.md
-.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh scripts/aligncheck.py scripts/runcheck.py scripts/checkall.py scripts/negative_test.py"
+.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh scripts/aligncheck.py scripts/runcheck.py scripts/checkall.py scripts/negative_test.py scripts/metrics.py"
 miss=0; cnt=0
 for f in $REQ; do
   cnt=$((cnt+1))
@@ -209,6 +209,27 @@ done
   && ok "L3 关键词表覆盖 config 全部 $_l3cnt 项" \
   || bad "L3 关键词表漏覆盖 $_l3miss 项（config 共 $_l3cnt 项）"
 grep -q '最后 3 条是反例' library/domain-review-cases.md 2>/dev/null && bad "用例集反例表述过时" || ok "用例集反例表述正确"
+
+# ---------- 7c. 隔离 / L3 判级 / 指标埋点（v3.2.5 新增）----------
+# 依据：FM-1（隔离可被静默绕过）/ FM-2（L3 插入型变体失配）/ FM-3（零可观测）。
+# 这四条断言的作用是把「承诺」变成「可判 FAIL 的检查」，而不是装饰性描述。
+echo "[7c] 隔离 / L3 判级 / 指标埋点"
+_iso1=$(grep -c 'close --all >/dev/null 2>&1 || true' scripts/dlut-read.sh 2>/dev/null); _iso1=${_iso1:-0}
+[ "$_iso1" -ge 1 ] && ok "私密站读取前先关闭既有会话（隔离前置）" \
+  || bad "dlut-read.sh 缺隔离前置（--profile 可被 daemon 静默忽略）"
+_iso2=$(grep -cE 'profile\[\[:space:\]\]\+ignored' scripts/dlut-read.sh 2>/dev/null); _iso2=${_iso2:-0}
+_iso3=$(grep -c '^  exit 5$' scripts/dlut-read.sh 2>/dev/null); _iso3=${_iso3:-0}
+[ "$_iso2" -ge 1 ] && [ "$_iso3" -ge 1 ] \
+  && ok "隔离校验生效（扫描 ignored 警告 + rc=5 中止）" \
+  || bad "dlut-read.sh 缺隔离校验（警告扫描 $_iso2 / rc=5 $_iso3）"
+_l3b=$(grep -c '插入型变体' scripts/dlut-read.sh 2>/dev/null); _l3b=${_l3b:-0}
+[ "$_l3b" -ge 3 ] && ok "L3 类 B 共现规则齐备（$_l3b 条）" \
+  || bad "L3 类 B 共现规则不足（$_l3b 条，期望 ≥3）"
+_mt1=$(grep -c '"leak":' scripts/metrics.py 2>/dev/null); _mt1=${_mt1:-0}
+_mt2=$(grep -c 'QIHANG_TRACE' scripts/metrics.py 2>/dev/null); _mt2=${_mt2:-0}
+[ "$_mt1" -ge 1 ] && [ "$_mt2" -ge 1 ] \
+  && ok "指标脚本就位（机制字段埋点 + 可一键关闭）" \
+  || bad "指标脚本缺埋点字段或开关（$_mt1 / $_mt2）"
 
 # ---------- 8. 计数 ----------
 echo "[8] 计数一致性"

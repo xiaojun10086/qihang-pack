@@ -1,7 +1,7 @@
 ---
 name: qihang-paper-outline
 description: 「启航」S5 学术表达域库内 skill：给结构大纲 + 各节字数 + 论证链自查 + 3 条改进建议，再做一次「审稿人视角」预审。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

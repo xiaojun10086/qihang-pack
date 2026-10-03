@@ -67,7 +67,7 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 > **连小理就是 LearnBuddy**，不是两个平台 —— 本包在赛道二中的场景名即「连小理」。
 
-1. 场景设计书（五要素齐备）
+1. 场景设计书（五要素齐备）—— **随赛事材料单独提交，本包不附带该文件**
 2. 平台侧挂载：`domains/_registry.md`（域总表）+ `library/` 规则 + `references/dlut-*.md`（信息库）
 3. 场景与结构见 `README.md`
 

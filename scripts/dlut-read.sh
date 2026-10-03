@@ -6,6 +6,7 @@
 #
 # 铁律：① 只读 ② 不外传 ③ 不落盘  ④ 必须用独立 Profile
 # 授权分级：L1 直接读 | L2 需 --yes 确认 | L3 一律拒绝
+# 退出码：0 成功或 L1 | 1 用法错误或需区分 | 2 L2 未确认 | 3 L3 拒绝 | 4 未装 agent-browser | 5 隔离校验失败
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -36,6 +37,27 @@ L3_HIT=""
 for _k in $L3_KEYS; do
   case "$TARGET" in *"$_k"*) L3_HIT="$_k"; break ;; esac
 done
+# ---------- 类 B：宽松名词 × 明细语义（**共现**才判 L3，避免误伤公开信息）----------
+# 只「收紧」不「放松」：不删除既有词，也不改 rc 语义。
+# 反向保护：单说「心理咨询讲座」「成绩公布时间」等公开信息**不得**被拦。
+if [ -z "$L3_HIT" ]; then
+  case "$TARGET" in
+    *心理*)
+      case "$TARGET" in *记录*|*档案*|*测评结果*) L3_HIT="心理·插入型变体" ;; esac ;;
+  esac
+fi
+if [ -z "$L3_HIT" ]; then
+  case "$TARGET" in
+    *成绩*)
+      case "$TARGET" in *明细*|*单科*|*分数*|*绩点*) L3_HIT="成绩·插入型变体" ;; esac ;;
+  esac
+fi
+if [ -z "$L3_HIT" ]; then
+  case "$TARGET" in
+    *各科*)
+      case "$TARGET" in *分数*|*得分*|*成绩单*|*明细*) L3_HIT="各科·插入型变体" ;; esac ;;
+  esac
+fi
 if [ -n "$L3_HIT" ]; then
   cat <<EOF
 ❌ 拒绝执行：目标「$TARGET」属于 L3 禁止读取级别（命中关键词「$L3_HIT」）。
@@ -139,6 +161,7 @@ EOF
 
 if [ "$DRYRUN" -eq 1 ]; then
   echo "[dry-run] 将执行："
+  echo "  0) $AB close --all           # 先清既有会话，保证下一步 --profile 不被忽略"
   echo "  1) $AB open <入口> --headed --profile \"$PROFILE_DIR\""
   echo "  2) 若未登录 → 提示你本人登录（本工具不接触凭证）"
   echo "  3) $AB snapshot -c           # 只读读取当前页面"
@@ -157,8 +180,28 @@ fi
 
 mkdir -p "$PROFILE_DIR"
 
+# ---------- 隔离前置：先关掉既有 daemon 会话（否则 --profile 会被静默忽略） ----------
+$AB close --all >/dev/null 2>&1 || true
+
 echo "▶ 打开入口（若未登录，请在弹出的窗口里自行登录）..."
-$AB open "$URL" --headed --profile "$PROFILE_DIR" 2>&1 | head -5
+OPEN_OUT="$($AB open "$URL" --headed --profile "$PROFILE_DIR" 2>&1 | head -20)"
+echo "$OPEN_OUT"
+
+# ---------- 隔离校验：--profile 必须真的生效（失效即中止，不在未隔离窗口继续读）----------
+PROFILE_BASE="$(basename "$PROFILE_DIR")"
+if printf '%s' "$OPEN_OUT" | grep -qiE 'profile[[:space:]]+ignored|daemon already running'; then
+  cat >&2 <<EOF
+❌ 中止：本次会话未使用独立 Profile（检测到 profile 被忽略 / daemon 已在运行）。
+   隐私隔离已失效，不继续读取。请先执行：$AB close --all，再重跑本命令。
+EOF
+  exit 5
+fi
+if printf '%s' "$OPEN_OUT" | grep -qF "$PROFILE_BASE"; then
+  echo "隔离校验: ✅ 独立 Profile 已生效（$PROFILE_DIR）"
+else
+  echo "隔离校验: ⚠️ 浏览器未回显 Profile 路径，无法从输出直接确认；"
+  echo "          已通过「打开前 close --all」保证无既有会话可复用（凭据隔离成立）。"
+fi
 
 echo ""
 echo "▶ 等待页面就绪（加载完成后回车继续）..."

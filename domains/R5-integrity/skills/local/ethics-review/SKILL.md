@@ -1,7 +1,7 @@
 ---
 name: qihang-ethics-review
 description: 「启航」R5 学术规范与伦理域库内 skill：涉人研究的伦理审查自查：知情同意、数据合规、风险受益。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 

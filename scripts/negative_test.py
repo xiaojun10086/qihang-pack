@@ -98,6 +98,26 @@ def inject_build_path(tree):
     return [p], t + '\n> 负向测试注入：生成器见 scripts/_build/v3/rebuild.py（本行应触发失效引用）\n'
 
 
+def inject_no_isolation(tree):
+    """移除隔离前置与隔离校验，模拟「--profile 可被 daemon 静默忽略」的回归。
+    期望：selfcheck [7c] 断言 FAIL（证明该断言不是装饰）。"""
+    p = os.path.join(tree, 'scripts', 'dlut-read.sh')
+    t = io.open(p, encoding='utf-8').read()
+    out, skipping = [], False
+    for ln in t.split('\n'):
+        if 'close --all >/dev/null 2>&1 || true' in ln:
+            out.append('')
+            continue
+        if 'grep -qiE' in ln and 'profile' in ln:
+            skipping = True
+        if skipping:
+            if ln.strip() == 'fi':
+                skipping = False
+            continue
+        out.append(ln)
+    return [p], '\n'.join(out)
+
+
 def inject_missing_fallback(tree):
     p = os.path.join(tree, 'library', 'general-fallback.md')
     return [p], None        # 特殊：移走文件
@@ -117,6 +137,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
         ('生成器段重复插入（同一行两份）', inject_dup_row,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
+        ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
+         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
     ]

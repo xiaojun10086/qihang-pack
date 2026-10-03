@@ -1,7 +1,7 @@
 ---
 name: qihang
 description: 「启航」大连理工大学新生学习生活一体化学伴包（三级结构）。入口 skill，负责需求明确、域审查、输出规范与路由。当用户提出与大连理工大学校情、课程学习、备考、笔记、作业、科研、校园生活相关的模糊求助时使用。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 tags: [dlut, campus, learning, library, orchestrator]
 ---
@@ -54,6 +54,10 @@ references/     数据与文档（DUT 官网库 / 私密站库）
 > 跳过它 = 把「需求超出 skill 定位」当成「已覆盖」直接下发 ④ —— 越界与降级都会漏报。
 > 判据：`explain-stepwise` 这类 **单点** skill 不得直接承接**整门课 / 整本书**级需求。
 
+> **⑧ 之后、结束本次会话前**：按 `scripts/metrics.py` 的 trace 规范追加 **1 行**记录
+> （格式见该脚本头部注释）。**埋点失败不得影响交付** —— 记不到就跳过，**不得**因此中断、
+> 也**不得**向用户展示埋点内容。详见「硬规则 5」。
+
 ## 六份规则文件（1 级库的本体）
 
 | 文件 | 职责 |
@@ -72,6 +76,9 @@ references/     数据与文档（DUT 官网库 / 私密站库）
 | 自然语言 | 「我高数快挂了」「机械学院官网是啥」 |
 | 斜杠命令 | `/qihang` `/qihang-dlut` + 20 个域命令，见 `commands/` |
 | 一键脚本 | `bash scripts/qihang.sh {status\|platform\|domains\|registry\|new-term}` |
+| 指标与门禁 | `python scripts/metrics.py report`（读本机 trace → 成功率 / 追问率 / 降级率 / 红线拦截率 / P95 耗时）｜`python scripts/metrics.py check`（对发布门禁阈值做 PASS/FAIL 判定） |
+
+> trace 目录位于**用户运行环境**（`~/.qihang/trace/`），**不随包分发**；包内只有记录格式与解析器。
 
 
 ## 红线总览（优先级高于澄清门）
@@ -95,4 +102,9 @@ references/     数据与文档（DUT 官网库 / 私密站库）
 1. **库内唯一**：本包为纯 DUT 特化库，全部场景均由库内 skill 承接，**不安装、不引用任何库外 skill**；库内无法覆盖的细分场景走降级流程并记「缺口」。
 2. **DUT 强绑定**：命中大工关键词必须先查 `references/dlut-official-sites.md`；未收录固定回复「信息库未收录，建议访问 https://www.dlut.edu.cn/ 核实」；**禁止编造 URL / 电话 / 单位名**。
 3. **私密站只读**：涉及需登录站点时，只读、不外传、不写入文件（见 `references/dlut-login-sites.md`）。
+   - **独立 Profile 必须校验生效**：`scripts/dlut-read.sh` 在打开入口前**先关闭全部既有会话**，并在打开后校验输出中**未出现**「profile ignored / daemon already running」类警告；出现即**立即中止**（`rc=5`），**不得**在未隔离的窗口里继续读取。
 4. **F3 域红线**：不做心理诊断、不做危机干预；识别危机信号立即转介心理中心。
+5. **指标埋点（本机、最小、可关）**：每次会话结束追加 **1 行** trace（格式见 `scripts/metrics.py` 头部），只记**机制字段** —— 域 ID / 澄清判定档 / 是否降级 / 是否命中红线 / 各阶段耗时 / 是否被用户纠正。
+   - **禁止**记录：用户原话、产出正文、任何敏感域（F3 / F5）内容、第三方隐私、任何 URL 与凭证。
+   - 埋点在**用户运行环境**（`~/.qihang/trace/`，**不随包分发**）；用户可用 `QIHANG_TRACE=0` 关闭。
+   - **埋点失败不得影响交付**：写不进去就跳过，**不得**因埋点报错而中断或降级输出。

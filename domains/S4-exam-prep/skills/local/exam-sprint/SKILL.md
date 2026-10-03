@@ -1,7 +1,7 @@
 ---
 name: qihang-exam-sprint
 description: 「启航」S4 备考与记忆域库内 skill：先要三件事（科目章节 / 剩余天数 / 要计划还是卡组），再出 3 步突击或 7 步系统两档方案，结束真出题判分。
-version: 3.2.4
+version: 3.2.5
 license: MIT
 ---
 
