@@ -1,7 +1,7 @@
 ---
 name: qihang-lit-fetch
 description: 「启航」R1 文献检索与管理域库内 skill：合法文献获取——从检索式到全文的一条龙：分层检索、质量筛查、合法全文路线（开放获取优先，绝不绕付费墙）、去重与中文交付清单。
-version: 3.3.1
+version: 3.3.2
 license: MIT
 ---
 

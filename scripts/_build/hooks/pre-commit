@@ -1,0 +1,40 @@
+#!/bin/sh
+# ---------------------------------------------------------------------------
+# 「启航」提交护栏 —— 禁止把「不随包分发」的路径提交进仓库（尤其 release 分支）。
+#
+# 为什么必须有它（不是靠自觉）：
+#   2026-10-03 一天之内发生 **两次** 同类事故 —— 有人用 `git add -f` 绕过 .gitignore，
+#   把 `.learnbuddy/memory/`（含本机路径，共 2200+ 行）、`.idea/` 与 8 份内部过程文档
+#   强加进 `release` 交付分支**并推送**。release 是公开分支，且 README 的「下载交付包」
+#   直链就是它的 zip → 等于公网泄露。第二次发生在第一次修好之后 15 分钟内。
+#   → 结论：**只靠流程约束不可靠，必须在提交动作上设闸**。
+#
+# 规则（分支感知）：
+#   · 任何分支：`.learnbuddy/`、`.idea/`、`.vscode/`、8 份内部过程文档 一律禁止提交；
+#   · `release` 分支：**额外**禁止 `scripts/_build/` 与 `.gitignore`（交付树不含开发物与元数据）。
+#
+# 用法：本文件由 `scripts/_build/hooks/install.sh` 安装到 `.git/hooks/pre-commit`。
+#       确需绕过时用 `git commit --no-verify`，并请在提交信息里写明理由。
+# ---------------------------------------------------------------------------
+BLOCKED_ANY='^(\.learnbuddy/|\.idea/|\.vscode/|references/(validation-report|acceptance-v2|review-report-v2\.2|review-report-v2\.3|review-report-v2\.4|stress-test-v3|alignment-audit-v3|需求确认书-v2三级结构)\.md$)'
+BLOCKED_REL='^(\.learnbuddy/|\.idea/|\.vscode/|scripts/_build/|\.gitignore$|references/(validation-report|acceptance-v2|review-report-v2\.2|review-report-v2\.3|review-report-v2\.4|stress-test-v3|alignment-audit-v3|需求确认书-v2三级结构)\.md$)'
+
+branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || echo '')
+case "$branch" in
+  release) pattern="$BLOCKED_REL" ;;
+  *)       pattern="$BLOCKED_ANY" ;;
+esac
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || true)
+[ -z "$staged" ] && exit 0
+bad=$(printf '%s\n' "$staged" | grep -E "$pattern" || true)
+
+if [ -n "$bad" ]; then
+  echo "✖ 提交被拦下（分支：${branch:-detached}）" >&2
+  echo "  下列路径属「不随包分发」，禁止提交：" >&2
+  printf '    %s\n' $bad >&2
+  echo "  依据：scripts/_build/README.md「发布方式」段；交付分支刷新只走 release_branch.py。" >&2
+  echo "  确需绕过：git commit --no-verify（并在提交信息里写明理由）。" >&2
+  exit 1
+fi
+exit 0

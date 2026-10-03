@@ -112,6 +112,20 @@ bash scripts/selfcheck.sh && bash scripts/audit.sh   # 跑完必自检
 
 ---
 
+## 提交护栏（v3.3.2 新增 · 事故驱动）
+
+`scripts/_build/hooks/pre-commit` 是一道**提交时拦截**的闸：暂存区出现「不随包」路径即拒绝提交。
+**为什么必须有它**：2026-10-03 一天内发生 **两次** `git add -f` 绕过 `.gitignore`、
+把 `.learnbuddy/memory/`（含本机路径）与 `.idea/` 强加进 **公开的 `release` 分支并推送** 的事故
+（第二次距第一次修好不到 15 分钟）。**只靠流程约束不可靠，必须设在提交动作上。**
+
+```bash
+bash scripts/_build/hooks/install.sh        # 安装到 .git/hooks/pre-commit（幂等）
+```
+
+配套：`scripts/selfcheck.sh` 的 `[11]` 段断言「`release` 树 == `main` 交付集」，
+于是任何一次 `checkall` 都能发现交付分支被污染。
+
 ## v2.11 链末结构层（`build_phase19.py`）
 
 `phase19` 是 v2.11 新增的**链末层**，跑在 `phase18` 之后。上面的循环行只到 `18`
