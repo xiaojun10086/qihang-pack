@@ -20,6 +20,10 @@
    ```bash
    python -c "import os;d1='../qihang-pack/.learnbuddy/memory';d2='.learnbuddy/memory';print([f for f in os.listdir(d1) if open(os.path.join(d1,f),'rb').read()!=open(os.path.join(d2,f),'rb').read()])"
    ```
+6. **`.gitattributes` / `.gitignore` 也在终检口径内**（2026-10-03 修）：`verify.py` 的判定**覆盖**这两个文件，
+   所以 `sync_release.py` 必须一并管理。原脚本用 `EXF = {'.gitattributes', '.gitignore'}` 把它们排除在同步之外
+   → 造成「终检永久报漂移（`内容不一致 1 ['.gitattributes']`）、而 `--apply` 只复核不修复」的死结。
+   已改 `EXF = set()`。**改这两个文件后照常 `--apply` 即可，不要再手工拷贝**。
 
 ---
 

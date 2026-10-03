@@ -18,7 +18,12 @@ _ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 DEV = os.path.abspath(_ARG[0] if _ARG else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..'))
 REL = os.path.abspath(_ARG[1] if len(_ARG) > 1 else DEV + '-release')
 EX = {'.git', '_build', '.learnbuddy', '__pycache__', '.codebuddy-plugin', '.idea'}
-EXF = {'.gitattributes', '.gitignore'}
+# 2026-10-03：原先 EXF = {'.gitattributes', '.gitignore'} 把这两个文件排除在同步之外，
+# 但 verify.py 的终检口径是「两树除 8 份过程文档外逐字节一致」——纳入终检却不由同步管理，
+# 会形成「终检永久报漂移、--apply 又修不动」的死结（实测：改 .gitattributes 后
+# verify 报「内容不一致 1 ['.gitattributes']」，而 --apply 只复核不修复）。
+# 故改为一并管理；过程文档仍由下方 .gitignore 派生排除。
+EXF = set()
 APPLY = '--apply' in sys.argv
 
 # .gitignore 明列「未随包分发」的过程文档（评审/审计/验收/需求书）不得进入交付副本
