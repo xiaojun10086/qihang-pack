@@ -13,17 +13,46 @@
 2. **两处记忆必须同源**：`.learnbuddy/memory/` 下的 `MEMORY.md` 与 `YYYY-MM-DD.md` 在两个仓库里
    **必须逐字节一致**。原因是：副本不含 `.learnbuddy/`（导出时 `NOISE_DIRS` 排除），
    所以**记忆不会随下发自动同步**，必须**手动镜像** —— 否则只打开一个文件夹就会丢掉另一半上下文。
-3. **写记忆的动作固定为两步**：先写副本 → `shutil.copy2()` 镜像回源仓库（或反之），
-   并断言两处 `open(...,'rb').read()` 相等。**禁止只写一处。**
+3. **写记忆的动作固定为两步**：**先写源仓库** → `shutil.copy2()` 镜像到交付副本，
+   并断言两处 `open(...,'rb').read()` 相等。方向与 §0.1「改动落源仓库」保持一致（2026-10-03 统一），
+   **禁止只写一处**。（此前两侧措辞不一：「先写副本→回源（或反之）」／「副本先写→回源」／跨项目记忆的「先写一侧」，
+   两个会话各按一侧写就会再次分叉。）
 4. **每日日志 append-only**：新的 `YYYY-MM-DD.md` 在**两处同时创建**（同名同内容），此后只追加、不回改。
-5. **一键自检**（在副本目录下执行；输出 `[]` 即两处同源）：
+5. **一键自检**（在**副本目录**下执行；输出 `OK 两处同源` 即一致，否则列出差异文件名）：
    ```bash
-   python -c "import os;d1='../qihang-pack/.learnbuddy/memory';d2='.learnbuddy/memory';print([f for f in os.listdir(d1) if open(os.path.join(d1,f),'rb').read()!=open(os.path.join(d2,f),'rb').read()])"
+   python -c "import os;a='../qihang-pack/.learnbuddy/memory';b='.learnbuddy/memory';ra=set(os.listdir(a));rb=set(os.listdir(b));bad=sorted(ra^rb)+[f for f in sorted(ra&rb) if open(a+'/'+f,'rb').read()!=open(b+'/'+f,'rb').read()];print(bad if bad else 'OK 两处同源')"
    ```
+   ⚠️ **旧命令已废弃，勿再用**（2026-10-03 实测 3 场景：两侧相同→`[]` ✓；**仅源侧多一个文件→`FileNotFoundError` 崩溃**；
+   **仅副本侧多一个文件→静默漏报、仍返回 `[]`**）。旧命令只遍历源侧文件名，既不判存在性也不看副本独有文件。
+   新命令按**双向对称差（`^`）+ 逐字节**判定，四场景实测 4/4 报出（同源 / 仅源多 / 仅副本多 / 同名内容不同）。
 6. **`.gitattributes` / `.gitignore` 也在终检口径内**（2026-10-03 修）：`verify.py` 的判定**覆盖**这两个文件，
    所以 `sync_release.py` 必须一并管理。原脚本用 `EXF = {'.gitattributes', '.gitignore'}` 把它们排除在同步之外
    → 造成「终检永久报漂移（`内容不一致 1 ['.gitattributes']`）、而 `--apply` 只复核不修复」的死结。
    已改 `EXF = set()`。**改这两个文件后照常 `--apply` 即可，不要再手工拷贝**。
+
+---
+
+## 当前状态（实测快照 · 每轮覆盖更新，2026-10-03 12:2x）
+
+> 新会话**先读本节**，不要凭历史段落推断现状；历史段里的数字都是当时的快照。
+
+| 项 | 实测值 |
+|---|---|
+| 源仓库 HEAD | **`ddff4e8`**（`fix(release): sync_release 一并管理 .gitattributes/.gitignore`） |
+| 推送状态 | **`main == origin/main`，领先 0 —— 已推送，无待 push**（此前「领先 10 个提交」的待办**已闭环**） |
+| 工作区 | **0 项未提交**（clean） |
+| 两树一致性 | 源**170** ⟷ 副本**170**，仅源有 0 / 仅副本有 0 / 内容不一致 **0** |
+| 记忆 | `.learnbuddy/memory/` 三文件两处**逐字节一致**（§0.5 自检输出 `OK 两处同源`） |
+| 交付副本 | **不含 `MANIFEST.md`、不含 zip**（现行 v3.0.0 线不产，见 §二之九） |
+
+**遗留（产品级，本轮未处理，需用户决策）**
+1. **「场景设计书」缺席**：`INSTALL.md:70` §四第 1 项指向的《智能体场景设计书》**不在包内**（v3.0.0 提交 `e31f959` 删除）。
+   可取回旧版：`git show e31f959^:qihang-scenario-design.html`（16 134 B / 中文 1617 字），
+   但其口径是 v2.11（19 域/38 skill/库内优先·库外兜底），**与 v3.0.0（20 域/92 skill/库内唯一）冲突，须重写后再放回**。
+   赛道二「作品 10-25 前提交」—— 这是当前唯一的赛事交付缺口。
+2. **记忆含本机路径**：文件内有 `C:\Users\xiaojun\Desktop\...`、`C:\Users\xiaojun\AppData\Local\Google\Chrome\User Data`，
+   且已随 `173a173`/`ddff4e8` 推送到 origin。日志是 append-only，**本轮未做历史擦洗**；
+   若仓库将转为公开，需先授权擦洗（把路径归一为 `%USERPROFILE%` / `%LOCALAPPDATA%`，事实不变）。
 
 ---
 
@@ -220,7 +249,7 @@
 
 - **唯一目标平台 = LearnBuddy / WorkBuddy**；Claude Code 适配已全移除，其他 agent 可装但不作承诺。
   唯一真相源：`references/platforms.md`。
-- `commands/`（21）= **LearnBuddy 域入口卡**（库 + 校情 + 19 域），**非斜杠命令**；用仓库根相对路径，
+- `commands/`（**v2.8 时 = 21**；**v3.0.0 现行 = 22**）= **LearnBuddy 域入口卡**（库 + 校情 + 域卡），**非斜杠命令**；用仓库根相对路径，
   不含 `$ARGUMENTS` / `argument-hint` / `~/.claude/...`。
 - 库外通道：首选 `find-skills`；通用 CLI `npx skills add`；手动复制到 `~/.learnbuddy/skills/`。
 
@@ -309,7 +338,23 @@ for p in v2 v2_extras 1..17; do python scripts/_build/build_$p.py . ; done
 - 收尾必须 `agent-browser close --all`；核验 `session list` 返回 `No active sessions`。
 
 
-## 二之九、发布交付（v2.11 起收进仓库）
+### 编号注记（2026-10-03 补）
+
+> 本节序列沿用原 Part B 编号，**「二之八」不存在**（合并当时两侧都没有该节，不是丢失）；看到跳号勿误判内容缺失。
+
+## 二之九、发布交付（**两条线，勿混用**）
+
+| 线 | 工具 | 产物 |
+|---|---|---|
+| v2.11（历史） | `scripts/_build/make_release.py` | 另导出目录 + **`MANIFEST.md`** + `.zip` |
+| **v3.0.0（现行）** | `scripts/_build/v3/release/{sync_release,verify}.py` | **原地归并两树**，不产 `MANIFEST.md`、不打包 zip |
+
+→ 现行交付副本**不含** `MANIFEST.md`／zip（2026-10-03 实测：顶层只有 6 个 md + `config.yaml` + `.gitattributes`/`.gitignore`）。
+→ 本段下文里的 `含 MANIFEST.md` / `135 文件` / `36/0/0` 是 **v2.11 历史快照**，**勿当现行验收值**；现行验收值见「当前状态」节。
+→ **历史产物路径均已失效**（2026-10-03 实测不存在，仅作史实保留）：`Desktop\新建文件夹\…`、`Desktop\qihang-pack-release`、
+  `Desktop\qihang-release-tools\make_release.py`、`Desktop\qihang-pack-v2.10.0.zip`、
+  以及 `Desktop\qihang-agent-test\行为验证报告-v1.md` —— **最后者是第 5 条透镜（137 次执行）的唯一证据文件**，
+  已随工作区迁移离开原路径 → 若仍需引用其数据，须先找回该报告。
 
 - **工具**：`scripts/_build/make_release.py`（**已收进仓库**，与生成器同目录、同样**不交付**）。
   用法：`python scripts/_build/make_release.py [目标目录]`（默认 `<仓库同级>/qihang-pack-release`）。
