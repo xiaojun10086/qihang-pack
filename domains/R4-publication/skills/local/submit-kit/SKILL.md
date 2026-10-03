@@ -1,7 +1,7 @@
 ---
 name: qihang-submit-kit
 description: 「启航」R4 学术产出与投稿域库内 skill：先跑投稿前自检（结构/引用/数据），再给期刊匹配与审稿意见逐条回复表。
-version: 3.3.3
+version: 3.3.4
 license: MIT
 ---
 

@@ -118,6 +118,14 @@ def inject_no_isolation(tree):
     return [p], '\n'.join(out)
 
 
+def inject_no_gate(tree):
+    """把 SKILL.md 的触发门整段删掉 → selfcheck [8d] 应 FAIL（防触发门被静默移除）。"""
+    p = os.path.join(tree, 'SKILL.md')
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('## 触发门与接管边界', '## （已移除）', 1)
+    return [p], t
+
+
 def inject_identity_drift(tree):
     """把 INSTALL.md 的身份串改一个字 → selfcheck [8c] 应 FAIL（防身份口径静默漂移）。"""
     p = os.path.join(tree, 'INSTALL.md')
@@ -180,6 +188,8 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 平台登记断言'),
         ('身份串漂移（INSTALL.md 与 config.yaml 不一致）', inject_identity_drift,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份串一致性'),
+        ('触发门被移除（SKILL.md 少了触发门小节）', inject_no_gate,
+         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8d] 触发门'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,
