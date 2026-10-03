@@ -37,4 +37,22 @@ if [ -n "$bad" ]; then
   echo "  确需绕过：git commit --no-verify（并在提交信息里写明理由）。" >&2
   exit 1
 fi
+
+# ── 删除闸（同日第二次事故驱动）─────────────────────────────────────────────
+# 实测：分支切换 + 交付分支刷新交错操作后，`scripts/regress.sh` 与 `scripts/runcheck.py`
+#   从工作区消失，随后被 `git status` 列出并被**当删除提交**（与项目记忆里
+#   「git commit -a 把工作区缺失的已跟踪文件当删除提交」是同一类，只是这次用显式路径也没挡住）。
+# → 产品文件的删除必须**显式授权**：QIHANG_ALLOW_DELETE=1 git commit ...
+deleted=$(git diff --cached --name-only --diff-filter=D 2>/dev/null || true)
+if [ -n "$deleted" ] && [ "${QIHANG_ALLOW_DELETE:-0}" != "1" ]; then
+  protect=$(printf '%s\n' "$deleted" \
+            | grep -E '^(scripts/|library/|domains/|references/|commands/|SKILL\.md$|config\.yaml$|LICENSE$)' || true)
+  if [ -n "$protect" ]; then
+    echo "✖ 提交被拦下：以下**产品文件**被删除。" >&2
+    printf '    %s\n' $protect >&2
+    echo "  删除必须是有意的 —— 先确认工作区文件是否意外缺失（git checkout <好提交> -- <路径> 可还原）。" >&2
+    echo "  确为有意删除：QIHANG_ALLOW_DELETE=1 git commit ..." >&2
+    exit 1
+  fi
+fi
 exit 0
