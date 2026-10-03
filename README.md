@@ -7,6 +7,21 @@
 
 ---
 
+## 0. 下载与快速开始
+
+| 方式 | 一步到位 |
+|---|---|
+| **下载交付包（推荐）** | [`release` 分支 ZIP](https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/release.zip) |
+| 在线浏览 | [github.com/xiaojun10086/qihang-pack/tree/release](https://github.com/xiaojun10086/qihang-pack/tree/release) |
+| 命令行安装 | `git clone -b release https://github.com/xiaojun10086/qihang-pack.git` |
+
+> **`release` 分支 = 纯净交付树**（173 个文件）：只含运行所需内容 —— 无构建脚本、无内部过程文档、无本机路径。
+> 下载后把目录放到 `~/.learnbuddy/skills/qihang`（用户级）或当前工作区 `.learnbuddy/skills/qihang`（项目级）即可使用，
+> **无需安装任何依赖**（私密站只读为可选功能，见 `INSTALL.md` §六）。
+> 开发树（含生成器链与过程文档）在 [`main` 分支](https://github.com/xiaojun10086/qihang-pack)。
+
+---
+
 ## 1. 三级结构
 
 ```

@@ -1,7 +1,7 @@
 ---
 name: qihang-interview-drill
 description: 「启航」F8 求职与竞赛域库内 skill：用 STAR 拆经历成故事卡，做模拟问答与追问压力测试。
-version: 3.2.6
+version: 3.2.7
 license: MIT
 ---
 

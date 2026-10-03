@@ -1,7 +1,7 @@
 ---
 name: qihang-pronounce-drill
 description: 「启航」S6 语言能力域库内 skill：跟读与发音纠错训练，含中式发音偏误对照表与每日脚本。
-version: 3.2.6
+version: 3.2.7
 license: MIT
 agent_created: true
 ---

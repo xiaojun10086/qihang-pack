@@ -45,6 +45,7 @@ LAYERS = [
     ('step55_realrun_fixes.py',      '真实问题 5×5 轮归因修复（示例自洽/未核验事实/触发词/站点口径）+ 修订号 3.2.3→3.2.4'),
     ('step56_v325_release.py',       'v3.2.5 工程化迭代（隔离断言 + L3 共现规则 + 指标埋点 + 版本派生）+ 修订号 3.2.4→3.2.5'),
     ('step57_risk_fixes.py',         '风险自检修复（记忆不跟踪 · INSTALL 前置澄清 · .gitattributes 注释纠错）+ 修订号 3.2.5→3.2.6'),
+    ('step58_readme_download.py',    'README 下载区（release 分支 ZIP / clone 指引）+ 修订号 3.2.6→3.2.7'),
 ]
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)
