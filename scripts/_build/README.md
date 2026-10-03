@@ -14,6 +14,39 @@
 >
 > 本文件以下内容均为**历史链（v2.x）**的记录，保留原样以便追溯。
 
+---
+
+## 发布方式（**v3.2.5 起：单仓库双分支**）
+
+> 此前是「源仓库目录 + 交付副本目录」两棵树（`qihang-pack` / `qihang-pack-release`），靠
+> `v3/release/sync_release.py` 单向下发、`verify.py` 逐字节终检。**该线已退役**（脚本保留为历史）。
+> **v3.2.5 起改为一个仓库两条分支** —— 交付物由 git 跟踪状态保证纯净，不再手工维护排除表。
+
+| 分支 | 角色 | 内容 |
+|---|---|---|
+| `main` | **开发树**（唯一真相源） | 全部内容：含生成器 `scripts/_build/`、记忆 `.learnbuddy/`、过程文档 |
+| `release` | **纯净交付树（直接分发给用户）** | `main` 的跟踪树 − `scripts/_build/**` − `.learnbuddy/**` = **174 文件** |
+
+```bash
+python scripts/_build/v3/release/release_branch.py            # 只比对（默认，零副作用）
+python scripts/_build/v3/release/release_branch.py --apply    # 刷新 release 分支
+git push origin main release                                  # 发布
+```
+
+**纯净性由 git 跟踪状态保证**（比手工排除表可靠）：`references/` 下 8 份过程文档、
+`__pycache__`、`.idea`、`.vscode`、`*.pyc` **均未被 git 跟踪** → 天然不进 `release` 分支。
+`release_branch.py` **从不触碰工作树与真实索引**（`GIT_INDEX_FILE` 指向临时索引：
+`read-tree(main) → rm --cached(排除项) → write-tree → commit-tree → update-ref`），
+因此可随时重跑、零数据丢失风险。
+
+- ⚠️ **不要用 `git merge main`**：`.learnbuddy` 每轮都在改而 release 上无此路径 → modify/delete 冲突；
+  且 main 新增的 `_build` 文件会被并进 release，破坏纯净性。
+- ⚠️ **不要在日常工作树里 `git checkout release`**：`.learnbuddy/` 与 `scripts/_build/` 在 main 上被跟踪，
+  检出 release 时会被从磁盘移除（切回 `main` 即恢复）。查看 / 分发包请用
+  `git archive release | tar -x -C <目录>` 或 `git clone -b release <url>`。
+
+---
+
 > **修改 19 个域时用这里，不用于日常运行。**
 
 | 脚本 | 作用 | 何时跑 |

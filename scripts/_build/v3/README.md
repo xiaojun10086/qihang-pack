@@ -6,6 +6,14 @@
 > 与上一级 `scripts/_build/`（`build_qihang_v2.py` + `build_phase1.py` … `build_phase19.py`）
 > 的关系：**那套是 v2.x 历史层**（模型停在 19 域 / 38 skill / v2.11），**只读保留、勿直接重跑**；
 > 本目录才是 v3.0.0 的现行链。详见上一级 `scripts/_build/README.md` 的「历史层」段。
+>
+> **发布分支（v3.2.5 起）**：本目录 `release/` 下 —— `release_branch.py` 是**现行**
+> （单仓库双分支：`main` 开发 → `release` 纯净交付；`git archive release` / `clone -b release` 分发）；
+> `sync_release.py` / `verify.py` 是**历史**（两目录线的下发与终检，已退役）；`finish.py` 更早（一次性收尾）。
+> 判据与命令见上一级 README 的「发布方式」段。
+>
+> **双目录线退役的连带简化**：此前「两处记忆必须逐字节同源」（副本不含 `.learnbuddy/`，须手动镜像）
+> 这条铁律**随之消失** —— `main` 成为记忆的**唯一落点**，`release` 分支天然不含 `.learnbuddy/`。
 
 ---
 
