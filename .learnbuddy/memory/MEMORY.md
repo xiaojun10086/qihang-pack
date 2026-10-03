@@ -5,7 +5,39 @@
 > **Part A** = 交付与合规线（结构 / 选型 / 输出标准 / 校验脚本）；**Part B** = 构建与生成器线（链 / 铁律 / 环境 / DUT 数据）。
 > Part A 的「环境坑」与 Part B 的「四、环境约束」是**同一主题的两侧视角**，互为补充，勿当重复删。
 
-## 0 · 记忆同源铁律（2026-10-03 起，最高优先级）
+## 0 · 工作流铁律（**2026-10-03 v3.2.5 起：单仓库双分支**）
+
+> **本节取代下方 §0′**。两目录线（源仓库目录 + 交付副本目录）**已退役** ——
+> 排除表漏项会静默放行（实测踩过两次：`EX` 含 `.codebuddy-plugin` → 副本静默停在旧版本、
+> 而终检仍报「完全一致」；`EXF` 含 `.gitattributes` → 终检**永久**报漂移且 `--apply` 修不动）。
+> 改为**由 git 跟踪状态保证纯净** —— 未跟踪的东西（8 份过程文档 / `__pycache__` / `.idea`…）
+> 天然进不了交付分支，不再需要任何手工排除表。
+
+| 分支 | 角色 | 内容 |
+|---|---|---|
+| `main` | **开发树**（唯一真相源） | 全部：生成器 `scripts/_build/`、记忆 `.learnbuddy/`、过程文档 |
+| `release` | **纯净交付树（直接分发给用户）** | `main` 跟踪树 − `scripts/_build/**` − `.learnbuddy/**` = **174 文件** |
+
+1. **改动落 `main`**：实质性改动都在 `main` 做（生成器与记忆都在这里）。
+2. **刷新交付分支**：`python scripts/_build/v3/release/release_branch.py`（默认只比对 → 输出新增/修改/删除清单）
+   → `--apply` 才刷新。判据**只认「树一致 / 差异项 = 0」**。
+   工具用 `GIT_INDEX_FILE` 指向**临时索引**构造树（`read-tree → rm --cached → write-tree → commit-tree → update-ref`），
+   **从不触碰工作树与真实索引** → 可随时重跑、零数据丢失风险。
+3. **记忆只在 `main` 写**：`release` 分支不含 `.learnbuddy/` → **「两处逐字节同源」这条铁律随之消失**，
+   不再需要 `shutil.copy2` 镜像、不再需要双向对称差自检。**这是本轮最大的净简化。**
+4. **禁用 `git merge main`**：`.learnbuddy` 每轮都在改而 release 上无此路径 → modify/delete 冲突；
+   且 main 新增的 `_build` 文件会被并进 release，破坏纯净性。
+5. **不要在日常工作树里 `git checkout release`**：`.learnbuddy/` 与 `scripts/_build/` 在 main 上被跟踪，
+   检出 release 时会被从磁盘移除（切回 `main` 即恢复）。查看 / 分发请用
+   `git archive release | tar -x -C <目录>` 或 `git clone -b release <url>`。
+6. **发布**：`git push origin main release`。
+7. **纯净性自检（两条，可直接跑）**：
+   `git ls-tree -r release --name-only | grep -c '^\(scripts/_build/\|\.learnbuddy/\)'` → **0**；
+   `git ls-tree -r release --name-only | wc -l` → **174**。
+
+---
+
+## 0′ · 记忆同源铁律（两目录线时代 · **已退役**，保留追溯）
 
 1. **改动落源仓库**：任何实质性改动默认在 `../qihang-pack`（有 `.git`、有 `scripts/_build/`）里做；
    改完用 `python scripts/_build/v3/release/sync_release.py --apply` **单向下发**副本，
@@ -42,7 +74,7 @@
 | 源仓库 HEAD | **以 `git log -1` 为准**（本节点修订时 = `560856e`，其后另有本轮 v3.2 提交） |
 | 推送状态 | **以 `git rev-list --count origin/main..main` 为准**（`ddff4e8` 及之前**已推送**；其后提交待在能联网处 `git push origin main`） |
 | 工作区 | 以 `git status --porcelain` 为准（每轮收尾应为 **0 项**） |
-| 两树一致性 | 源 **174** ⟷ 副本 **174**，仅源有 0 / 仅副本有 0 / 内容不一致 **0**（`.gitattributes` / `.gitignore` / `.codebuddy-plugin` 均已纳入同步与终检）<br>⚠️ **计数纠错（2026-10-03 v3.2.5 轮实测）**：此前记载的 **171 是错的** —— v3.2.4 收尾时实为 **173**，本轮新增 `scripts/metrics.py` → **174**。171 是 v3.2 轮调 `EX` 过程中的中间值。**凡计数类结论一律以当场实测为准** |
+| 交付分支 | **`release` = `main` 跟踪树 − `scripts/_build/**` − `.learnbuddy/**` = 174 文件**；`release_branch.py` 判「差异项 = 0」。<br>（旧口径「源 174 ⟷ 副本 174」已随两目录线退役）<br>⚠️ **计数纠错（2026-10-03 v3.2.5 轮实测）**：此前记载的 **171 是错的** —— v3.2.4 收尾时实为 **173**，本轮新增 `scripts/metrics.py` → **174**。171 是 v3.2 轮调 `EX` 过程中的中间值。**凡计数类结论一律以当场实测为准** |
 | 记忆 | `.learnbuddy/memory/` 三文件两处**逐字节一致**（§0.5 自检输出 `OK 两处同源`） |
 | 交付副本 | **不含 `MANIFEST.md`、不含 zip**（现行 v3.x 线不产，见 §二之九） |
 
@@ -58,9 +90,9 @@
    **悬空引用已消除**，文档与实物一致。旧版可取回（`git show e31f959^:qihang-scenario-design.html`，16 134 B），
    但口径是 v2.11（19 域/38 skill/库内优先·库外兜底），**与现行 v3.x 冲突，不可直接提交**；
    赛事物仍以「随赛事材料单独提交」为准。**本项已闭环**。
-2. **记忆含本机路径**：文件内有 `C:\Users\xiaojun\Desktop\...`、`C:\Users\xiaojun\AppData\Local\Google\Chrome\User Data`，
-   且已随 `173a173`/`ddff4e8` 推送到 origin。日志是 append-only，**本轮未做历史擦洗**；
-   若仓库将转为公开，需先授权擦洗（把路径归一为 `%USERPROFILE%` / `%LOCALAPPDATA%`，事实不变）。
+2. ~~**记忆含本机路径**~~ → **分发风险已收敛**（2026-10-03 分支化）：`release` 分支**不含** `.learnbuddy/`，
+   因此**分发给用户的包里不会再出现本机路径**。⚠️ 但 `main` 的**历史提交**里仍有（且已推送到 origin）——
+   若把 `main` 也转为公开仓库，仍需先授权擦洗（路径归一为 `%USERPROFILE%` / `%LOCALAPPDATA%`，事实不变）。
 
 ---
 

@@ -43,6 +43,47 @@ APPLY = '--apply' in sys.argv
 MSG = None
 if '--msg' in sys.argv:
     MSG = sys.argv[sys.argv.index('--msg') + 1]
+VDIR = None
+if '--verify-dir' in sys.argv:
+    VDIR = sys.argv[sys.argv.index('--verify-dir') + 1]
+
+
+def norm(b):
+    return b.replace(b'\r\n', b'\n')
+
+
+def verify_dir(d):
+    """把 release 分支的树与某个磁盘目录**逐字节**比对（迁移一次性证明 / 事后审计）。"""
+    d = os.path.abspath(d)
+    ref = DST if ref_exists(DST) else SRC
+    tree_files = sorted(x for x in git('ls-tree', '-r', '--name-only', ref).splitlines() if x)
+    disk = set()
+    for dp, dns, fns in os.walk(d):
+        dns[:] = [x for x in dns if x not in ('.git', '__pycache__', '.idea') + tuple(
+            os.path.basename(e) for e in EXCL)]
+        for f in fns:
+            disk.add(os.path.relpath(os.path.join(dp, f), d).replace(os.sep, '/'))
+    only_branch = sorted(set(tree_files) - disk)
+    only_disk = sorted(disk - set(tree_files))
+    diff = []
+    for p in sorted(set(tree_files) & disk):
+        blob = subprocess.run(['git', 'cat-file', 'blob', '%s:%s' % (ref, p)],
+                              cwd=ROOT, stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL).stdout
+        try:
+            with open(os.path.join(d, p), 'rb') as fh:
+                cur = fh.read()
+        except OSError:
+            diff.append(p); continue
+        if norm(blob) != norm(cur):
+            diff.append(p)
+    print('分支 %s：%d 文件 ｜ 目录 %s：%d 文件' % (ref, len(tree_files), d, len(disk)))
+    print('仅分支有 %d ｜ 仅目录有 %d ｜ 内容不一致 %d' % (len(only_branch), len(only_disk), len(diff)))
+    for p in (only_branch + only_disk + diff)[:20]:
+        print('   ! %s' % p)
+    ok = not (only_branch or only_disk or diff)
+    print('判定：%s' % ('✅ 分支产物与目录逐字节一致' if ok else '❌ 存在差异'))
+    return 0 if ok else 1
 
 
 def git(*args, check=True, env=None, text=True):
@@ -62,6 +103,8 @@ def ref_exists(ref):
 
 
 def main():
+    if VDIR:
+        return verify_dir(VDIR)
     if not ref_exists(SRC):
         print('!! 找不到分支 %s' % SRC); return 1
     src_tree = git('rev-parse', '%s^{tree}' % SRC)
