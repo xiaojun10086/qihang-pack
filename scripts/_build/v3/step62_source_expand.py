@@ -775,4 +775,16 @@ edit('references/external-sources.md', [
      '真机演练记录（亲测'),
 ])
 
+# =============================================================== M) 交付树实测查出的「假绿」缺陷
+# 源树全绿、**交付树 aligncheck FAIL**：本节的演练记录里写了
+# `scripts/_build/v3/tests/bridge_probe.py` —— 该路径**不随包分发**，
+# 于是交付树里成了「失效引用」。源树里它存在 → 一切正常 → **典型的假绿**。
+# 教训（已固化在项目记忆里）：**交付口径的改动必须在交付树里实跑校验器**。
+print('== M) 修「引用不随包路径」⇒ 交付树失效引用 ==')
+edit('references/external-sources.md', [
+    ('> 工具：`scripts/_build/v3/tests/bridge_probe.py --live`（build 侧，不随包分发）。',
+     '> 工具：`bridge_probe.py --live`（位于 **build 侧 `_build/` 内，不随包分发**，故此处不写其完整路径）。',
+     '位于 **build 侧 `_build/` 内，不随包分发**'),
+])
+
 print('done')
