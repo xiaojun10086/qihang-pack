@@ -1,7 +1,7 @@
 ---
 name: qihang-mock-paper
 description: 「启航」S4 备考与记忆域库内 skill：按真题结构自组模拟卷，错题归因后变式再练。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -91,8 +91,8 @@ license: MIT
 
 ## DUT 绑定点
 
-- 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/（考试安排）
-- 图书馆 https://lib.dlut.edu.cn/（自习）
+- 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/ （考试安排）
+- 图书馆 https://lib.dlut.edu.cn/ （自习）
 
 需登录（方案 A · 只读 · 须隔离 profile）：
 - 综合教务系统考试安排

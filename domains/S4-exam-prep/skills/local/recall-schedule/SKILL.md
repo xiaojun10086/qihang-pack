@@ -1,7 +1,7 @@
 ---
 name: qihang-recall-schedule
 description: 「启航」S4 备考与记忆域库内 skill：生成卡组与间隔重复排程（1/3/7/14 天），控制每日复习量。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---
@@ -94,8 +94,8 @@ agent_created: true
 ## DUT 绑定点
 
 **公开站（无需登录）**
-- 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/（考试安排）
-- 图书馆 https://lib.dlut.edu.cn/（自习）
+- 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/ （考试安排）
+- 图书馆 https://lib.dlut.edu.cn/ （自习）
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 综合教务系统考试安排

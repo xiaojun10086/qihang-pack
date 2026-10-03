@@ -1,7 +1,7 @@
 ---
 name: qihang-plagiarism-guard
 description: 「启航」R5 学术规范与伦理域库内 skill：提交查重前的相似来源识别与规范引用自查，不代改降重。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 

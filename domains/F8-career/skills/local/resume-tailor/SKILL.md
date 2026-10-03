@@ -1,7 +1,7 @@
 ---
 name: qihang-resume-tailor
 description: 「启航」F8 求职与竞赛域库内 skill：简历岗位定制——在完全真实的前提下，按目标岗位重排经历、对齐关键词、重写概要；核心原则是「点亮已有，绝不虚构」。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 

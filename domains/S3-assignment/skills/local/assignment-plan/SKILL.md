@@ -1,7 +1,7 @@
 ---
 name: qihang-assignment-plan
 description: 「启航」S3 作业与考核域库内 skill：把大作业/课程设计拆成里程碑与工作量排期，标注风险项。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---
@@ -98,7 +98,7 @@ agent_created: true
 - 教务处 https://teach.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
-- 综合教务系统 http://jxgl.dlut.edu.cn/（作业与成绩）
+- 综合教务系统 http://jxgl.dlut.edu.cn/ （作业与成绩）
 
 ## 失败与降级
 

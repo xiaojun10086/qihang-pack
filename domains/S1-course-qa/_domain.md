@@ -35,7 +35,7 @@
 - 数学科学学院 https://math.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
-- 综合教务系统 http://jxgl.dlut.edu.cn/（考试安排、培养方案）
+- 综合教务系统 http://jxgl.dlut.edu.cn/ （考试安排、培养方案）
 
 ## 执行顺序
 

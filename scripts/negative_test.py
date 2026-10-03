@@ -118,6 +118,14 @@ def inject_no_isolation(tree):
     return [p], '\n'.join(out)
 
 
+def inject_url_boundary(tree):
+    """把一条 URL 与紧随其后的中文说明贴在一起（模拟「依据里的链接被渲染器吞掉」）。
+    期望：aligncheck 的 URL 边界断言 FAIL。"""
+    p = os.path.join(tree, 'domains', 'F4-money-safety', '_domain.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t + '\n- 负向测试注入：https://www.dlut.edu.cn/（URL 紧贴中文，应触发 URL 边界断言）\n'
+
+
 def inject_missing_fallback(tree):
     p = os.path.join(tree, 'library', 'general-fallback.md')
     return [p], None        # 特殊：移走文件
@@ -137,6 +145,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
         ('生成器段重复插入（同一行两份）', inject_dup_row,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
+        ('URL 紧贴中文（依据里的链接会被渲染器吞掉）', inject_url_boundary,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck F2'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,

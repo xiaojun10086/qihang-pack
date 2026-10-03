@@ -1,7 +1,7 @@
 ---
 name: qihang-team-project
 description: 「启航」S3 作业与考核域库内 skill：把小组作业拆成可认领任务块与里程碑，生成分工表与进度看板。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -95,7 +95,7 @@ license: MIT
 - 教务处 https://teach.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 综合教务系统 http://jxgl.dlut.edu.cn/（作业与成绩）
+- 综合教务系统 http://jxgl.dlut.edu.cn/ （作业与成绩）
 
 ## 失败与降级
 

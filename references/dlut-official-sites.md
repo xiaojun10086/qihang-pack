@@ -18,9 +18,23 @@
 |---|---|---|---|
 | 1 | 统一身份认证 SSO | https://sso.dlut.edu.cn/ | ✅ 全校业务系统唯一登录入口 |
 | 2 | 校园门户 | https://portal.dlut.edu.cn/ | ✅ 办事大厅、业务系统总入口 |
-| 3 | 综合教学管理系统 | http://jxgl.dlut.edu.cn/student/home | ✅ **登录后实测可达**（含 学生信息 / 常用服务 / 所有服务） |
+| 3 | 综合教学管理系统 | http://jxgl.dlut.edu.cn/student/home | ✅ 可达（需登录）· **仅 HTTP**（https 实测连接被拒，勿手动改 https）；含 学生信息 / 常用服务 / 所有服务 |
 | 备用 | WebVPN（校外访问） | https://webvpn.dlut.edu.cn/ | ✅ 校外访问校内资源 |
 | 备用 | i大工 APP | 应用商店搜「i大工」 | ✅ 场馆/心理/浴室预约等**仅 APP** |
+
+## 0.1 链接打不开怎么办（四步，2026-10-03 实测新增）
+
+> 依据里的链接点不开是**已复现的真实缺陷**，按下面四步排查，**禁止臆造替代链接**：
+
+1. **确认链接边界**：复制时不要把后面的中文说明一起带走（本表已保证 URL 与说明之间有空格；
+   若你手抄过，务必只取到域名与路径为止）。
+2. **若浏览器把 `http://` 自动升级成 `https://` 而打不开**：本站 `jxgl` / `lx` / `map` **只支持 http**
+   （实测 `https://` 连接被拒）。请手动改回 `http://`，或从 `portal.dlut.edu.cn` 办事大厅进入。
+3. **提示登录 / 只看到登录页**：先走统一身份认证 `https://sso.dlut.edu.cn/`，再从小事大厅进入对应业务。
+4. **校外打不开（仅校园网）**：走 `https://webvpn.dlut.edu.cn/`；
+   仍不可用则按固定话术回复「信息库未收录 / 该入口受限，建议访问 `https://www.dlut.edu.cn/` 核实」。
+
+---
 
 ---
 
@@ -38,7 +52,7 @@
 | 急用电话 | https://office.dlut.edu.cn/info/1032/1500.htm | ✅ |
 | 组织机构总览 | https://www.dlut.edu.cn/xxgk/zzjg.htm | ✅ |
 | **学部学院导航** | https://www.dlut.edu.cn/xbxy.htm | ✅ 三校区分栏 |
-| 校园地图系统 | http://map.dlut.edu.cn/ | ✅ 可按楼宇查单位 |
+| 校园地图系统 | http://map.dlut.edu.cn/ | ✅ 可按楼宇查单位；**仅 HTTP**（https 实测超时，勿手动改 https） |
 | 档案馆 / 校史馆 | https://dangan.dlut.edu.cn/ | ✅ |
 
 ## 2. 校区
@@ -73,7 +87,7 @@
 | 校园邮箱 | http://mail.dlut.edu.cn/ | ✅ |
 | 一卡通 / 玉兰卡 | https://ecard.dlut.edu.cn/ | ✅ |
 | 校园统一支付平台 | http://pay.dlut.edu.cn/ | ✅ 需登录（302 → 统一身份认证） |
-| 离校系统 | http://lx.dlut.edu.cn/ | ✅ |
+| 离校系统 | http://lx.dlut.edu.cn/ | ✅ 可达（需登录）· **仅 HTTP**（https 实测连接被拒，勿手动改 https） |
 | 教师主页平台 | https://faculty.dlut.edu.cn/ | ✅ |
 | 迎新网 | https://yx.dlut.edu.cn/ | ✅ |
 

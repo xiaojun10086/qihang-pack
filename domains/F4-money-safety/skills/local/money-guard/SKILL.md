@@ -1,7 +1,7 @@
 ---
 name: qihang-money-guard
 description: 「启航」F4 财务与安全域库内 skill：先算月度收支缺口，再给节流方案；遇到可疑信息一律先按诈骗流程核验。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -57,7 +57,7 @@ license: MIT
 【结论】先把剩下的钱锁定日均额度，再砍非必要支出。
 【结果】① 算缺口：剩余金额 ÷ 10 = 日均上限（含餐费）
        ② 本周只做 1 条节流：先砍外卖，改食堂
-       ③ 应急资源：学生资助（学生处 https://xsc.dlut.edu.cn/）
+       ③ 应急资源：学生资助（学生处 https://xsc.dlut.edu.cn/ ）
        ④ 警惕：**不碰任何"校园贷/兼职刷单"**
 【网址】财务处 http://cw.dlut.edu.cn/ ｜ 资助办 84708317
 【状态】✅ 已核验
@@ -100,7 +100,7 @@ license: MIT
 - 保卫处 https://gach.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 一卡通 https://ecard.dlut.edu.cn/（余额/流水）
+- 一卡通 https://ecard.dlut.edu.cn/ （余额/流水）
 - 统一支付 http://pay.dlut.edu.cn/
 
 ## 失败与降级

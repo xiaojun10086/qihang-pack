@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-search
 description: 「启航」R6 信息搜集与输出域库内 skill：校内公开信息检索——从 DUT 官方站点体系（信息公开网 / 部门联系表 / 新闻网 / 组织机构 / 校园地图）检索公开信息，输出带来源的要点；未收录即明说，不编造。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -65,8 +65,8 @@ license: MIT
 
 ```
 【结论】教务处联系方式有总表与科室页两个官方入口，科室电话按科室分列。
-【依据】全校部门联系方式总表 https://office.dlut.edu.cn/info/1032/1492.htm（✅ 实抓核验）；
-       教务处机构设置 / 科室电话 https://teach.dlut.edu.cn/bmjs/jgsz.htm（✅ 实抓核验）
+【依据】全校部门联系方式总表 https://office.dlut.edu.cn/info/1032/1492.htm （✅ 实抓核验）；
+       教务处机构设置 / 科室电话 https://teach.dlut.edu.cn/bmjs/jgsz.htm （✅ 实抓核验）
 【结果】① 科室定位：缓考属「学籍与成绩管理」类科室，先看科室页
        ② 拨打前核对：办公时间以页面实时内容为准（核验基准日 2026-10-01）
        ③ 缓考流程：相关制度文件在信息公开网 https://info.dlut.edu.cn/ 检索「缓考」
@@ -106,10 +106,10 @@ license: MIT
 
 ## DUT 绑定点
 
-- 信息公开网 https://info.dlut.edu.cn/（✅）
-- 全校部门联系方式总表 https://office.dlut.edu.cn/info/1032/1492.htm（✅）
-- 组织机构总览 https://www.dlut.edu.cn/xxgk/zzjg.htm（✅）
-- 校园地图系统 http://map.dlut.edu.cn/（✅）
+- 信息公开网 https://info.dlut.edu.cn/ （✅）
+- 全校部门联系方式总表 https://office.dlut.edu.cn/info/1032/1492.htm （✅）
+- 组织机构总览 https://www.dlut.edu.cn/xxgk/zzjg.htm （✅）
+- 校园地图系统 http://map.dlut.edu.cn/ （✅）
 
 ## 失败与降级
 

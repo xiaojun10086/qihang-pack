@@ -1,7 +1,7 @@
 ---
 name: qihang-lit-map
 description: 「启航」R1 文献检索与管理域库内 skill：先出检索式与纳排标准，再按「主题—方法—结论」矩阵整理；每条引文给可核验锚点。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -56,7 +56,7 @@ license: MIT
 
 ```
 【结论】先定检索式与纳排标准，再做矩阵，别一上来就读全文。
-【依据】图书馆 https://lib.dlut.edu.cn/（含校外访问）
+【依据】图书馆 https://lib.dlut.edu.cn/ （含校外访问）
 【结果】① 拆概念：LLM / hallucination / detection|mitigation
        ② 检索式中英各一版（已给）
        ③ 纳排标准：2022 年后、有实验、同行评议

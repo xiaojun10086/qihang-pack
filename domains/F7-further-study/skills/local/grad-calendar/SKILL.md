@@ -1,7 +1,7 @@
 ---
 name: qihang-grad-calendar
 description: 「启航」F7 升学深造域库内 skill：保研/考研/留学月份级时间轴与材料倒排，文书只给结构。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: qihang-ai-disclosure
 description: 「启航」R5 学术规范与伦理域库内 skill：生成合规 AI 使用声明（工具/环节/核验范围）。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---

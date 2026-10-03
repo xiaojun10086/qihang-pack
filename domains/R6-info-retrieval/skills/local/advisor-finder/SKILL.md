@@ -1,7 +1,7 @@
 ---
 name: qihang-advisor-finder
 description: 「启航」R6 信息搜集与输出域库内 skill：导师信息搜集——从 DUT 教师主页平台、研究生院与学院官网定位导师的方向、院系与联系方式，输出标注来源与核验状态的信息卡；只查公开信息，不编造。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -63,8 +63,8 @@ license: MIT
 
 ```
 【结论】教师主页平台 + 计算机学院师资页双路检索，输出核对过的教师清单与信息卡。
-【依据】DUT 公开信息源：教师主页平台 https://faculty.dlut.edu.cn/（✅ 已核验）；
-       学院导航 https://www.dlut.edu.cn/xbxy.htm（✅）→ 计算机科学与技术学院官网
+【依据】DUT 公开信息源：教师主页平台 https://faculty.dlut.edu.cn/ （✅ 已核验）；
+       学院导航 https://www.dlut.edu.cn/xbxy.htm （✅）→ 计算机科学与技术学院官网
 【结果】① 学院师资页：按「计算机视觉 / 图像 / 模式识别」关键词筛方向
        ② 教师主页平台：逐位核对其自建主页（成果与联系方式以主页为准）
        ③ 信息卡：姓名｜院系｜职称｜方向｜主页｜公开联系方式｜来源
@@ -105,9 +105,9 @@ license: MIT
 
 ## DUT 绑定点
 
-- 教师主页平台 https://faculty.dlut.edu.cn/（✅）
-- 研究生院 https://gs.dlut.edu.cn/（✅）
-- 学部学院导航 https://www.dlut.edu.cn/xbxy.htm（✅）
+- 教师主页平台 https://faculty.dlut.edu.cn/ （✅）
+- 研究生院 https://gs.dlut.edu.cn/ （✅）
+- 学部学院导航 https://www.dlut.edu.cn/xbxy.htm （✅）
 
 ## 失败与降级
 

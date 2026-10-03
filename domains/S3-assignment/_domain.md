@@ -34,7 +34,7 @@
 - 教务处 https://teach.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
-- 综合教务系统 http://jxgl.dlut.edu.cn/（作业与成绩）
+- 综合教务系统 http://jxgl.dlut.edu.cn/ （作业与成绩）
 
 ## 执行顺序
 
