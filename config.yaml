@@ -2,7 +2,7 @@
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 # version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；
 # 包版本为两位形态（见 README 标题）。改版本时两处同改。
-version: 3.3.4
+version: 3.3.5
 
 # ============ 输出身份锁定（强制 · **单一真相源**） ============
 # 本段是身份口径的唯一真相源：`SKILL.md` 与 `INSTALL.md` 里的身份串必须与 self_intro **逐字一致**

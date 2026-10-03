@@ -1,7 +1,7 @@
 ---
 name: qihang-recall-schedule
 description: 「启航」S4 备考与记忆域库内 skill：生成卡组与间隔重复排程（1/3/7/14 天），控制每日复习量。
-version: 3.3.4
+version: 3.3.5
 license: MIT
 agent_created: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: qihang-notice-track
 description: 「启航」R6 信息搜集与输出域库内 skill：把报名 / 考试 / 评奖节点整理成带来源与截止时间的追踪清单。
-version: 3.3.4
+version: 3.3.5
 license: MIT
 ---
 

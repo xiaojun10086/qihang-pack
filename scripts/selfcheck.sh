@@ -383,6 +383,35 @@ if grep -qF '检索 12 平台' commands/qihang.md 2>/dev/null; then
   bad "入口卡仍写「检索 12 平台」（v3.3.1 起已改为按域指定 2–3 个）"
 else ok "入口卡平台口径已更新"; fi
 
+# ---------- 8e. 域锁定：两级匹配接线 + 触发词覆盖度（v3.3.5） ----------
+# 事故驱动：规则干跑实测「图书馆 / 教务 / 课表 / 成绩 / 降重 / 不想活」全部 **0 域命中**，
+#   因为它们只出现在各域 `_domain.md` 的**细筛词表**里，而路由当时**只查 `_registry.md` 的示意层**。
+#   本段把「细筛层必须接线」和「高频校情词必须可达」都钉成断言。
+echo "[8e] 域锁定两级匹配与覆盖度"
+if grep -q '两级匹配' library/domain-review.md 2>/dev/null; then
+  ok "domain-review 已声明「两级匹配」"
+else bad "domain-review 未声明两级匹配（只查 _registry 会漏锁）"; fi
+if grep -q '_domain.md' library/domain-review.md 2>/dev/null; then
+  ok "domain-review 已指向 _domain.md 细筛层"
+else bad "domain-review 未指向 _domain.md 细筛层"; fi
+if grep -q '示意层' domains/_registry.md 2>/dev/null; then
+  ok "_registry.md 已标明触发词列是示意层"
+else bad "_registry.md 未标明示意层（易被当成权威表）"; fi
+_alltrig=$(cat domains/*/_domain.md 2>/dev/null)
+_thin=0
+for _d in domains/*/; do
+  _t=$(sed -n '/^## *触发词/,/^## /p' "$_d/_domain.md" 2>/dev/null | grep -o '`[^`]*`' | wc -l | tr -d ' ')
+  if [ "${_t:-0}" -lt 8 ]; then _thin=$((_thin+1)); bad "$(basename "$_d") 细筛触发词仅 ${_t} 个（要求 ≥8）"; fi
+done
+[ "${_thin:-0}" -eq 0 ] && ok "20 域细筛触发词均 ≥8 个"
+for _w in 图书馆 教务 课表 成绩 一卡通 宿舍 选课 报修; do
+  if printf '%s' "$_alltrig" | grep -q "$_w"; then ok "高频校情词可达：$_w"
+  else bad "高频校情词不可达：$_w（会掉进无域兜底）"; fi
+done
+if sed -n '/^## *触发词/,/^## /p' domains/F3-wellbeing/_domain.md 2>/dev/null | grep -qE '不想活|轻生|自杀'; then
+  ok "F3 细筛含危机词（危机路径可达）"
+else bad "F3 细筛缺危机词（危机信号可能落进无域兜底）"; fi
+
 # ---------- 9. 库内唯一通道（纯 DUT 特化库） ----------
 echo "[9] 库内唯一通道"
 # 纯本地化后，唯一的「通道」就是库内 skill；不得存在任何库外通道残留。
