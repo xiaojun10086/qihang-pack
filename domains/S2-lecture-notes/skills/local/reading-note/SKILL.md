@@ -1,7 +1,7 @@
 ---
 name: qihang-reading-note
 description: 「启航」S2 课堂与笔记域库内 skill：对论文 / 专著做「主张—证据—疑点」三色标记的段落级精读笔记。
-version: 3.3.2
+version: 3.3.3
 license: MIT
 ---
 

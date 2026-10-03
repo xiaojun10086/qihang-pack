@@ -1,0 +1,14 @@
+#!/bin/sh
+# 「启航」分支警示 —— 切到 release（交付分支）时大声提醒，避免在交付树上继续写东西。
+# git 传入 $3 = 1 表示分支切换（0 表示同分支内文件检出）。
+[ "${3:-1}" = "1" ] || exit 0
+branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || echo '')
+if [ "$branch" = "release" ]; then
+  echo "" >&2
+  echo "Warning: now on **release** (delivery branch)." >&2
+  echo "  - This branch holds ONLY delivery files: do not edit here, do not run the build chain." >&2
+  echo "  - Editing here risks committing dev artifacts into a PUBLIC branch." >&2
+  echo "  - Correct flow: git checkout main -> edit -> run scripts/_build/v3/release/release_branch.py" >&2
+  echo "" >&2
+fi
+exit 0

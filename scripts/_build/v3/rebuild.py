@@ -51,7 +51,25 @@ LAYERS = [
     ('step61_external_bridge.py',    '**外部 skill 桥接（大改）**：降级链两档→三档 · 12 平台入口表 · 五步自检器 extskill.py · 20 域「外部承接」· 92 skill 降级段改写 · 包版本 3.2→3.3 / 修订号 3.2.9→3.3.0'),
     ('step62_source_expand.py',      '来源扩展 + 命中规则收紧：平台 12→20 · 每域只查指定的 2–3 个平台（未命中即按「无 skill 流程」回落）· §4 第 4 项扩为「脚本与指令风险」· extskill 补 3 组断言 · 负向注入第 9 类 · 修订号 3.3.0→3.3.1'),
     ('step63_release_guard.py',      '**交付分支护栏**：git pre-commit 钩子（提交时拦截不随包路径，分支感知）+ selfcheck [11]（断言 release 树 == main 交付集）+ 安装脚本 · 修订号 3.3.1→3.3.2'),
+    ('step64_identity_lock.py',      '**输出身份锁定（连小理）自检与修复**：config.yaml 立 identity 段为唯一真相源 + SKILL/INSTALL 口径对齐 + output-spec §8 输出身份 + 入口卡身份步骤 + selfcheck [8c] / regress [10] / 负向第 10 类 · 修订号 3.3.2→3.3.3'),
 ]
+
+# ── 分支守卫（2026-10-03 事故驱动）──────────────────────────────────────────────
+# 实测踩到：仓库被（并发会话）切到 `release` 分支后，生成链**照常在 release 的工作树上跑**，
+#   把本应只属于 main 的生成器文件写进了交付树。release 不含 scripts/_build，
+#   一旦在它上面跑链 / 提交，污染会直接进公开交付分支。
+# → **生成链只允许在 main（或非 release 分支）上跑**；确需在别的分支跑时用 QIHANG_ALLOW_BRANCH=1。
+if os.path.isdir(os.path.join(ROOT, '.git')):
+    import subprocess as _sp
+    _br = _sp.run(['git', 'symbolic-ref', '--quiet', '--short', 'HEAD'], cwd=ROOT,
+                  stdout=_sp.PIPE, stderr=_sp.DEVNULL).stdout.decode('utf-8', 'replace').strip()
+    if _br == 'release' and os.environ.get('QIHANG_ALLOW_BRANCH') != '1':
+        print('✖ 拒绝执行：当前分支是 `release`（交付分支）。')
+        print('  生成链只能在 `main` 上跑 —— 在 release 上跑会把开发物写进交付树。')
+        print('  先 `git checkout main`；确需如此请设 QIHANG_ALLOW_BRANCH=1。')
+        raise SystemExit(2)
+    if _br:
+        print('分支：%s（生成链要求非 release）' % _br)
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)
 print('（各层幂等；在已达 v3.0.0 的树上重跑应零变更）')

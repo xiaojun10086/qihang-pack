@@ -145,19 +145,41 @@ exit 0
 write('scripts/_build/hooks/pre-commit', HOOK, mode=0o755)
 
 INSTALL = '''#!/bin/sh
-# 安装「启航」提交护栏到 .git/hooks/pre-commit（幂等）。
+# 安装「启航」仓库护栏到 .git/hooks/（幂等）。
 # 用法：bash scripts/_build/hooks/install.sh [仓库根]
 set -eu
 ROOT="${1:-$(cd "$(dirname "$0")/../../.." && pwd)}"
-SRC="$ROOT/scripts/_build/hooks/pre-commit"
-DST="$ROOT/.git/hooks/pre-commit"
 [ -d "$ROOT/.git" ] || { echo "跳过：$ROOT 不是 git 仓库"; exit 0; }
-cp "$SRC" "$DST"
-chmod +x "$DST"
-echo "已安装：$DST"
+for _h in pre-commit post-checkout; do
+  [ -f "$ROOT/scripts/_build/hooks/$_h" ] || continue
+  cp "$ROOT/scripts/_build/hooks/$_h" "$ROOT/.git/hooks/$_h"
+  chmod +x "$ROOT/.git/hooks/$_h"
+  echo "已安装：$ROOT/.git/hooks/$_h"
+done
 echo "自测：在 release 分支上 git add -f .learnbuddy/memory/MEMORY.md && git commit 应被拒绝。"
 '''
 write('scripts/_build/hooks/install.sh', INSTALL, mode=0o755)
+
+# 为什么还要 post-checkout（2026-10-03 事故驱动）：
+#   仓库被（并发会话）切到 `release` 后，后续写入**落在交付树里**；而 release 不含 scripts/_build
+#   → 生成链文件会在交付树上被创建，极易被误提交进公开分支（本轮实测踩到）。
+#   钩子挡不住切换，但能在切换瞬间**大声提醒**，把「静默停在错误分支」变成「立刻可见」。
+POSTCO = '''#!/bin/sh
+# 「启航」分支警示 —— 切到 release（交付分支）时大声提醒，避免在交付树上继续写东西。
+# git 传入 $3 = 1 表示分支切换（0 表示同分支内文件检出）。
+[ "${3:-1}" = "1" ] || exit 0
+branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || echo '')
+if [ "$branch" = "release" ]; then
+  echo "" >&2
+  echo "Warning: now on **release** (delivery branch)." >&2
+  echo "  - This branch holds ONLY delivery files: do not edit here, do not run the build chain." >&2
+  echo "  - Editing here risks committing dev artifacts into a PUBLIC branch." >&2
+  echo "  - Correct flow: git checkout main -> edit -> run scripts/_build/v3/release/release_branch.py" >&2
+  echo "" >&2
+fi
+exit 0
+'''
+write('scripts/_build/hooks/post-checkout', POSTCO, mode=0o755)
 
 hook_src = os.path.join(ROOT, 'scripts', '_build', 'hooks', 'pre-commit')
 hook_dst = os.path.join(ROOT, '.git', 'hooks', 'pre-commit')

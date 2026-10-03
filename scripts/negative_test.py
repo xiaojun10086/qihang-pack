@@ -118,6 +118,14 @@ def inject_no_isolation(tree):
     return [p], '\n'.join(out)
 
 
+def inject_identity_drift(tree):
+    """把 INSTALL.md 的身份串改一个字 → selfcheck [8c] 应 FAIL（防身份口径静默漂移）。"""
+    p = os.path.join(tree, 'INSTALL.md')
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('我是连小理智能学伴『启航』', '我是连小理智能助手『启航』', 1)
+    return [p], t
+
+
 def inject_fake_platform(tree):
     """把某域「指定检索平台」改成不存在的平台 → extskill 应 FAIL（防编造平台）。"""
     p = os.path.join(tree, 'domains', 'S1-course-qa', '_domain.md')
@@ -170,6 +178,8 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 三档断言'),
         ('指定检索平台被改成不存在的平台', inject_fake_platform,
          ['@py', 'scripts/extskill.py', '.'], 'extskill 平台登记断言'),
+        ('身份串漂移（INSTALL.md 与 config.yaml 不一致）', inject_identity_drift,
+         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份串一致性'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,
