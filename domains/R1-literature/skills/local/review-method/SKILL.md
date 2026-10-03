@@ -1,7 +1,7 @@
 ---
 name: qihang-review-method
 description: 「启航」R1 文献检索与管理域库内 skill：按 PRISMA 流程给系统 / 范围综述的检索式、筛选与偏倚评估框架。
-version: 3.3.0
+version: 3.3.1
 license: MIT
 ---
 

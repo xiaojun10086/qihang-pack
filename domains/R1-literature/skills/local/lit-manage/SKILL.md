@@ -1,7 +1,7 @@
 ---
 name: qihang-lit-manage
 description: 「启航」R1 文献检索与管理域库内 skill：给 Zotero 文献库的分类 / 标签 / 命名 / 去重规范。
-version: 3.3.0
+version: 3.3.1
 license: MIT
 ---
 

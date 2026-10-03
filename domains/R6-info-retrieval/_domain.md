@@ -49,6 +49,9 @@
 > **禁止编造**外部链接（硬规则 2）；候选仓库已逐个双通道核验（2026-10-03）。
 
 **检索词**：信息检索 / 通知追踪 / 机构查询
+**平台检索式（英文，≤3 词）**：`research advisor lookup`
+**适配词表（英文，候选 name+description 命中任一即算适配）**：`advisor` ｜ `faculty` ｜ `notice` ｜ `retrieval`
+**指定检索平台（只查这几个，不穷举）**：`skillselion.com` ｜ `officialskills.sh` ｜ `skillsmp.com`（共 3 个）
 
 **本域尚未完成外部候选复核**（2026-10-03 登记）：本域为 v3 期新增域，v2 期 19 域的候选比对表未覆盖它。
 

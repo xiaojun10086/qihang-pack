@@ -44,6 +44,9 @@
 > **禁止编造**外部链接（硬规则 2）；候选仓库已逐个双通道核验（2026-10-03）。
 
 **检索词**：预算 / 反诈 / 资助
+**平台检索式（英文，≤3 词）**：`budget scam guard`
+**适配词表（英文，候选 name+description 命中任一即算适配）**：`budget` ｜ `scam` ｜ `fraud` ｜ `scholarship`
+**指定检索平台（只查这几个，不穷举）**：`agensi.io` ｜ `officialskills.sh`（共 2 个）
 
 **本域无合规且适配 DUT 的外部候选**（2026-10-02 已复核）：检索 `finance|budget|scam` 命中的均为 **awesome-list 清单**或通用 AI 助手，非可执行 skill；且理财建议涉合规风险 → **不引入外部依赖**。
 

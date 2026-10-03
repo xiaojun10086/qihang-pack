@@ -204,6 +204,115 @@ if POOL:
     else:
         ok('2 级引用的候选仓库全部已在池中登记（零编造）')
 
+
+# ---------- 6. 指定检索平台：数量 2–3 且必须在 20 个平台之内 ----------
+PLATSET = set()
+if os.path.isfile('references/external-sources.md'):
+    for m in re.finditer(r'https?://([a-z0-9.-]+)', rd('references/external-sources.md')):
+        h = m.group(1).lower().replace('www.', '')
+        PLATSET.add(h)
+    PLATSET.discard('github.com')
+
+n_pl = {}
+for d in dom_dirs:
+    p = 'domains/%s/_domain.md' % d
+    if not os.path.isfile(p):
+        continue
+    t = rd(p)
+    m = re.search(r'^##\s*外部承接[^\n]*$', t, re.M)
+    if not m:
+        continue
+    nxt = re.search(r'^##\s', t[m.end():], re.M)
+    body = t[m.end():][:nxt.start() if nxt else len(t)]
+    mm = re.search(r'\*\*指定检索平台[^\n]*', body)
+    if not mm:
+        bad('%s 未指定检索平台（命中规则无法执行）' % p)
+        continue
+    pl = re.findall(r'`([a-z0-9.-]+)`', mm.group(0))
+    n_pl[d] = pl
+    if not (2 <= len(pl) <= 3):
+        bad('%s 指定平台 %d 个（要求 2–3）' % (p, len(pl)))
+    for x in pl:
+        if x.replace('www.', '') not in PLATSET:
+            bad('%s 指定了未登记的平台 `%s`（疑编造平台）' % (p, x))
+if n_pl:
+    ok('指定检索平台：%d 个域，均为 2–3 个且已在平台表登记' % len(n_pl))
+
+# ---------- 6b. 平台检索式必须在位（否则检索必 0 命中）----------
+for d in dom_dirs:
+    p = 'domains/%s/_domain.md' % d
+    if not os.path.isfile(p):
+        continue
+    t = rd(p)
+    m = re.search(r'^##\s*外部承接[^\n]*$', t, re.M)
+    if not m:
+        continue
+    nxt = re.search(r'^##\s', t[m.end():], re.M)
+    body = t[m.end():][:nxt.start() if nxt else len(t)]
+    if '**平台检索式' not in body:
+        bad('%s 未给「平台检索式」（中文长句拿去检索会 0 命中）' % p)
+ok('平台检索式检查完成')
+
+# ---------- 6c. 适配词表必须在位（否则自检第 5 项等于默认通过 → 假命中）----------
+for d in dom_dirs:
+    p = 'domains/%s/_domain.md' % d
+    if not os.path.isfile(p):
+        continue
+    t = rd(p)
+    m = re.search(r'^##\s*外部承接[^\n]*$', t, re.M)
+    if not m:
+        continue
+    nxt = re.search(r'^##\s', t[m.end():], re.M)
+    body = t[m.end():][:nxt.start() if nxt else len(t)]
+    if '**适配词表' not in body:
+        bad('%s 未给「适配词表」（自检第 5 项将退化为默认通过 → 假命中）' % p)
+        continue
+    mm = re.search(r'\*\*适配词表[^\n]*', body)
+    if '不适用' not in mm.group(0):
+        w = re.findall(r'`([a-z0-9 -]+)`', mm.group(0))
+        if len(w) < 3:
+            bad('%s 适配词表仅 %d 词（要求 ≥3）' % (p, len(w)))
+ok('适配词表检查完成')
+
+# ---------- 6d. 全局反向词表必须在位（否则正向词会偶然命中 → 假命中）----------
+if os.path.isfile('references/external-sources.md'):
+    _dec = rd('references/external-sources.md')
+    if '反向词表' not in _dec:
+        bad('external-sources.md 缺「全局反向词表」（假命中闸门缺失）')
+    else:
+        _m = re.search(r'^##\s*四、全局反向词表(.*?)(?=^##\s)', _dec, re.M | re.S)
+        _w = re.findall(r'`([a-z]+)`', _m.group(1)) if _m else []
+        if len(_w) < 8:
+            bad('全局反向词表仅 %d 词（要求 ≥8）' % len(_w))
+        else:
+            ok('全局反向词表 = %d 词' % len(_w))
+
+# ---------- 7. 敏感域必须声明禁外接 ----------
+for d in ('F3-wellbeing', 'F5-health'):
+    p = 'domains/%s/_domain.md' % d
+    if not os.path.isfile(p):
+        continue
+    t = rd(p)
+    if '禁外接' not in t and '不外接' not in t:
+        bad('%s 未声明「敏感域禁外接」（红线缺口）' % p)
+    else:
+        ok('%s 已声明禁外接' % d)
+
+# ---------- 8. 无许可候选必须标 ⛔ ----------
+for d in dom_dirs:
+    p = 'domains/%s/_domain.md' % d
+    if not os.path.isfile(p):
+        continue
+    t = rd(p)
+    m = re.search(r'^##\s*外部承接[^\n]*$', t, re.M)
+    if not m:
+        continue
+    nxt = re.search(r'^##\s', t[m.end():], re.M)
+    body = t[m.end():][:nxt.start() if nxt else len(t)]
+    if '未声明' in body and '⛔' not in body:
+        bad('%s 含「未声明」许可的候选但未标 ⛔ 不入围' % p)
+ok('许可标注检查完成')
+
 print('=' * 68)
 for m in OK:
     print('  OK   %s' % m)

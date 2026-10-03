@@ -188,7 +188,7 @@ SOURCES = '''# 外部 skill 来源清单（12 平台）· 复核 2026-10-03
 | 38 | `somenssarkar/gurukul-ai` | 未声明 | 0 | ⛔ 不入围 |
 '''
 
-new_file('references/external-sources.md', SOURCES, '外部 skill 来源清单（12 平台）')
+new_file('references/external-sources.md', SOURCES, '外部 skill 来源清单')
 
 # =============================================================== B) 1 级规则
 print('== B) library/external-bridge.md（第 11 份规则）==')

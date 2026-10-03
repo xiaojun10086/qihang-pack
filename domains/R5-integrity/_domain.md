@@ -42,6 +42,9 @@
 > **禁止编造**外部链接（硬规则 2）；候选仓库已逐个双通道核验（2026-10-03）。
 
 **检索词**：学术规范 / 查重 / 伦理 / AI 披露
+**平台检索式（英文，≤3 词）**：`academic integrity check`
+**适配词表（英文，候选 name+description 命中任一即算适配）**：`integrity` ｜ `plagiarism` ｜ `ethic` ｜ `disclosure`
+**指定检索平台（只查这几个，不穷举）**：`skillselion.com` ｜ `officialskills.sh` ｜ `skillsmp.com`（共 3 个）
 
 **已核验候选**（仓库数据 2026-10-02 抓取 ｜ 链接 2026-10-03 双通道核验）
 
