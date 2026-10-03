@@ -1,7 +1,7 @@
 ---
 name: qihang-cite-normalize
 description: 「启航」S5 学术表达域库内 skill：引文按 GB/T 7714 与目标期刊格式规范化 + 逐条自查表。
-version: 3.3.4
+version: 3.3.5
 license: MIT
 agent_created: true
 ---

@@ -1,7 +1,7 @@
 ---
 name: qihang-code-assignment
 description: 「启航」S3 作业与考核域库内 skill：编程作业提交前的正确性 / 边界 / 复杂度 / 规范逐项自查清单，不代写代码。
-version: 3.3.4
+version: 3.3.5
 license: MIT
 ---
 

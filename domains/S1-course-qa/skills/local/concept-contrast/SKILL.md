@@ -1,7 +1,7 @@
 ---
 name: qihang-concept-contrast
 description: 「启航」S1 课程答疑域库内 skill：把一组易混概念放进多维对照表，逐项辨析差异与适用条件。
-version: 3.3.4
+version: 3.3.5
 license: MIT
 ---
 

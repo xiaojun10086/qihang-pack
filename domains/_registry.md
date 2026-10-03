@@ -6,13 +6,16 @@
 
 1. 1 级库先做**需求明确**（6 槽位 + 澄清门）
 2. 用下表**触发词**匹配锁定域；命中多个 → 走跨域串联
+   > ⚠️ **本列只是「示意层」**（每域 5–6 个词，带 `…`）。**权威词表在各域 `_domain.md` 的
+   > `## 触发词（命中任一即锁定本域）` 段**（每域 8–13 个词）—— **快筛未中必须细筛**，
+   > 见 `library/domain-review.md` §1①。只查本表就判「无域」会漏锁（实测过）。
 3. 无域可命中 → 走 `library/domain-review.md` 的兜底流程
 
 ## S · 学习类（6 域）
 
 *课程、课堂、作业、备考、表达、语言*
 
-| 域 ID | 名称 | 触发词 | 库内 skill |
+| 域 ID | 名称 | 触发词（**示意层**） | 库内 skill |
 |---|---|---|---|
 | `S1` | 课程答疑 | 讲一下、这题、为什么、推导、证明… | `concept-contrast` · `error-diagnose` · `explain-stepwise` · `prereq-bridge` · `socratic-qa` |
 | `S2` | 课堂与笔记 | 笔记、讲义、录音、整理、概念图… | `lecture-to-notes` · `link-notes` · `note-normalize` · `reading-note` |
@@ -27,9 +30,9 @@
 
 | 域 ID | 名称 | 触发词 | 库内 skill |
 |---|---|---|---|
-| `F1` | 校园事务 | 选课、学籍、证明、一卡通、报修… | `campus-desk` · `campus-proof-guide` · `course-select` · `dorm-life` |
+| `F1` | 校园事务 | 选课、学籍、证明、一卡通、报修、图书馆、教务系统… | `campus-desk` · `campus-proof-guide` · `course-select` · `dorm-life` |
 | `F2` | 作息与专注 | 拖延、作息、专注、番茄钟、时间管理… | `anti-procrastinate` · `deep-work` · `focus-block` · `sleep-reset` · `task-decompose` |
-| `F3` | 身心与社交 | 焦虑、压力、emo、室友、社团… | `adapt-guide` · `club-pick` · `peer-talk-script` · `roommate-mediate` · `wellbeing-checkin` |
+| `F3` | 身心与社交 | 焦虑、压力、emo、室友、社团、不想活… | `adapt-guide` · `club-pick` · `peer-talk-script` · `roommate-mediate` · `wellbeing-checkin` |
 | `F4` | 财务与安全 | 生活费、奖学金、助学金、兼职、诈骗… | `aid-apply` · `budget-plan` · `money-guard` · `part-time-guard` |
 | `F5` | 健康与运动 | 生病、就医、医保、锻炼、饮食… | `clinic-path` · `fitness-plan` · `health-guide` · `insurance-claim` |
 | `F6` | 军训与志愿 | 军训、国防、志愿、社会实践、志愿时长… | `military-prep` · `service-log` · `social-practice` · `volunteer-hours` |
@@ -46,8 +49,8 @@
 | `R2` | 实验与数据 | 实验、数据、统计、显著性、图表… | `data-lab` · `exp-design` · `stats-guard` · `stats-workflow` · `viz-spec` |
 | `R3` | 科研工具与代码 | Python、MATLAB、仿真、Git、环境… | `code-mentor` · `git-workflow` · `repro-env` · `sim-tool` · `tool-setup` |
 | `R4` | 学术产出与投稿 | 投稿、期刊、专利、会议、基金… | `defense-qa` · `grant-apply` · `patent-draft` · `rebuttal-structure` · `submit-kit` |
-| `R5` | 学术规范与伦理 | 查重、引用规范、学术诚信、AI 声明、数据合规… | `ai-disclosure` · `ethics-review` · `integrity-check` · `plagiarism-guard` |
-| `R6` | 信息搜集与输出 | 导师信息、教师主页、联系方式、通知、公告、信息公开… | `advisor-finder` · `campus-search` · `notice-track` · `org-lookup` |
+| `R5` | 学术规范与伦理 | 查重、降重、引用规范、学术诚信、AI 声明、数据合规… | `ai-disclosure` · `ethics-review` · `integrity-check` · `plagiarism-guard` |
+| `R6` | 信息搜集与输出 | 导师信息、教师主页、联系方式、课表、成绩、通知、公告… | `advisor-finder` · `campus-search` · `notice-track` · `org-lookup` |
 
 ## 方向自查（覆盖度）
 
