@@ -36,6 +36,25 @@
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 图书馆电子资源（外文数据库）
 
+## 外部承接（库内与同域降级都接不住时才启用）
+
+> **第三档入口**：先读 `library/external-bridge.md`（触发条件 + 五步自检 + 许可门禁），
+> 再按 `references/external-sources.md` §1 的顺序检索 **12 个平台**。
+> **库内优先不变**：本域仍先用库内 skill；外部桥接只在**同域降级也接不住**时启用。
+> **禁止编造**外部链接（硬规则 2）；候选仓库已逐个双通道核验（2026-10-03）。
+
+**检索词**：语言训练 / 雅思托福 / 口语
+
+**已核验候选**（仓库数据 2026-10-02 抓取 ｜ 链接 2026-10-03 双通道核验）
+
+| 候选仓库 | 许可 | ★ | 综合分 | 可用性判定 |
+|---|---|---|---|---|
+| `YANZHANLIN/ielts-claude-skills` | MIT | 307 | 4.55 | ✅ 最优解 |
+| `tianmind-studio/english-coach` | MIT | 17 | 3.95 | 备选 |
+| `flysheep-ai/education-skills` | MIT | 106 | 3.35 | 备选 |
+
+**本域结论**：可用首选：`YANZHANLIN/ielts-claude-skills`（MIT）。
+
 ## 执行顺序
 
 0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
@@ -44,6 +63,7 @@
 3. 用**库内 skill**（库内 5 个：`lang-drill` · `pronounce-drill` · `ielts-coach` · `academic-english` · `listening-drill`；按需求择一）执行
 4. 按 `library/output-spec.md` 输出，并写入学习档案
 5. 按 `library/skill-evolution.md` 记录本域习惯，并**只在可改段内**做非结构性自迭代（不改红线 / 输出契约 / 任何事实；不满足触发条件则不迭代）
+6. **外部桥接（最后的兜底）**：库内与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**。
 
 ## ⚠️ 红线（不得绕过）
 

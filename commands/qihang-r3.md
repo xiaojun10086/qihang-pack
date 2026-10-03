@@ -21,3 +21,4 @@ description: R3 科研工具与代码（科研类）域入口卡：Python、MATL
    路径：`domains/R3-research-tools/skills/local/code-mentor/SKILL.md`、`domains/R3-research-tools/skills/local/git-workflow/SKILL.md`、`domains/R3-research-tools/skills/local/repro-env/SKILL.md`、`domains/R3-research-tools/skills/local/sim-tool/SKILL.md`、`domains/R3-research-tools/skills/local/tool-setup/SKILL.md`
 4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
 5. **DUT 绑定点**：见 `domains/R3-research-tools/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（只读 / 不外传 / 不落盘）。
+6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。

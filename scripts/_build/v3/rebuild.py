@@ -48,6 +48,7 @@ LAYERS = [
     ('step58_readme_download.py',    'README 下载区（release 分支 ZIP / clone 指引）+ 修订号 3.2.6→3.2.7'),
     ('step59_link_integrity.py',     '链接可用性修复（URL 边界归一 + 仅HTTP标注 + 排查话术 + 断言与负向注入）+ 修订号 3.2.7→3.2.8'),
     ('step60_url_audit.py',          '外链核验订正（教务裸根 404 改可用入口 + 信息库 5 处事实订正 + §十一 三通道复核）+ 修订号 3.2.8→3.2.9'),
+    ('step61_external_bridge.py',    '**外部 skill 桥接（大改）**：降级链两档→三档 · 12 平台入口表 · 五步自检器 extskill.py · 20 域「外部承接」· 92 skill 降级段改写 · 包版本 3.2→3.3 / 修订号 3.2.9→3.3.0'),
 ]
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)

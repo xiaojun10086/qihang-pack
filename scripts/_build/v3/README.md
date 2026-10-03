@@ -63,6 +63,10 @@ python scripts/_build/v3/rebuild.py --dry      # 只列层，不执行
 | 14 | `scripts/_build/v3/step51_version_bump.py` | **版本号与计数级联**：包版本 → `3.2`（两位 · 展示位）／修订号 → `3.2.0`（三位 · 字段与断言）；`library` 文件数 9 → 10 | 新增层 |
 | 15 | `scripts/_build/v3/step52_requirement_confirm.py` | **需求确定门**：`library/clarity.md` §3.1（理解准确率 `C = 1 − U`，三档 0.95 / 0.70）+ `config.yaml` 阈值 + `regress [9]`；修订号 → `3.2.1` | 新增层 |
 | 16 | `scripts/_build/v3/step53_checkup_flow.py` | **自检查流程加固**：新增 `scripts/checkall.py`（单入口 · 逐项计时 · 模拟跑摘要）与 `scripts/negative_test.py`（负向自测 · 断言非空转）+ 需求确定门算例（例 D/E）+ `aligncheck` 口径断言；修订号 → `3.2.2` | 新增层 |
+| 17 | `step54_blindrun_fixes.py` · `step55_realrun_fixes.py` · `step56_v325_release.py` | 盲跑 / 真实问题归因修复 + v3.2.5 工程化迭代（隔离断言 · L3 共现规则 · 指标埋点）；修订号 `3.2.2 → 3.2.5` | 新增层 |
+| 18 | `step57_risk_fixes.py` · `step58_readme_download.py` | 风险自检修复（记忆不跟踪 · 交付剔除 `.gitignore`）+ README 下载区；修订号 `3.2.5 → 3.2.7` | 新增层 |
+| 19 | `step59_link_integrity.py` · `step60_url_audit.py` | 链接可用性修复（URL 边界归一 · 仅 HTTP 标注 · 排查话术）+ 外链核验订正（教务裸根 404 · 信息库 5 处事实订正 · 三通道复核）；修订号 `3.2.7 → 3.2.9` | 新增层 |
+| 20 | `step61_external_bridge.py` | **外部 skill 桥接（大改）**：降级链**两档 → 三档**（同域库内 → 外部桥接 → 纯提示词）· 12 平台入口表 `references/external-sources.md` · 1 级规则 `library/external-bridge.md` · 第 6 个校验器 `scripts/extskill.py` · 20 域 `## 外部承接` · 92 个 skill 降级段改写 · `library` 规则数 10→11；**包版本 `3.2 → 3.3` / 修订号 → `3.3.0`** | 新增层 |
 
 **版本号口径（v3.2 起统一）**：**包版本 = `3.2`**（两位，用于 README 标题 / 包根 `SKILL.md` 标题 / `qihang.sh` 状态行 / `config.yaml` 首行注释）
 ｜**修订号 = `3.2.2`**（三位，用于 92 个库内 `SKILL.md` frontmatter、包根 `SKILL.md` frontmatter、`.codebuddy-plugin/plugin.json`、`config.yaml` 的 `version:`、`aligncheck.py` 期望值）。

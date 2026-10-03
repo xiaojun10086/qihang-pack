@@ -66,6 +66,7 @@ CHECKS = [
     ('audit', ['@bash', 'scripts/audit.sh'], r'结果:\s*✅\s*(\d+)\s*通过\s*｜\s*⚠️?\s*(\d+)\s*警告\s*｜\s*❌\s*(\d+)\s*失败', '安全 / 合规 / 门禁', 2),
     ('aligncheck', ['@py', 'scripts/aligncheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '全量文件级对齐', 0),
     ('runcheck', ['@py', 'scripts/runcheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '端到端运行性（三级链）', 0),
+    ('extskill', ['@py', 'scripts/extskill.py', '.'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '外部 skill 桥接（接线 + 登记 + 许可）', 2),
     ('regress', ['@bash', 'scripts/regress.sh', ROUNDS], r'累计 FAIL\s*=\s*(\d+)', '行为回归（澄清门 / 门禁 / 输出标准）', 0),
 ]
 

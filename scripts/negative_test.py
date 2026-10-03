@@ -118,6 +118,15 @@ def inject_no_isolation(tree):
     return [p], '\n'.join(out)
 
 
+def inject_bridge_broken(tree):
+    """把某个 3 级 skill 的降级段改回「两档」（去掉外部桥接）→ extskill 应 FAIL。"""
+    import glob as _g
+    p = sorted(_g.glob(os.path.join(tree, 'domains/*/skills/local/*/SKILL.md')))[0]
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('按 `library/external-bridge.md` 走**外部桥接**', '走外部')
+    return [p], t
+
+
 def inject_url_boundary(tree):
     """把一条 URL 与紧随其后的中文说明贴在一起（模拟「依据里的链接被渲染器吞掉」）。
     期望：aligncheck 的 URL 边界断言 FAIL。"""
@@ -147,6 +156,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
         ('URL 紧贴中文（依据里的链接会被渲染器吞掉）', inject_url_boundary,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck F2'),
+        ('外部桥接接线被破坏（降级段退回两档）', inject_bridge_broken,
+         ['@py', 'scripts/extskill.py', '.'], 'extskill 三档断言'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 v3.2 · 三级结构管理脚本
+# 「启航」学伴包 v3.3 · 三级结构管理脚本
 # 用法: bash qihang.sh {status|platform|domains|registry|records|new-term}
 # 定位：纯 DUT 特化库 —— 库内 skill 唯一通道，无任何库外安装通道。
 set -uo pipefail
@@ -41,7 +41,7 @@ cmd_domains() {
 }
 
 cmd_status() {
-  echo "「启航」学伴包 v3.2 · 状态"
+  echo "「启航」学伴包 v3.3 · 状态"
   echo "----------------------------------------"
   echo "[1级] skill 库"
   for f in library/README.md library/clarity.md library/domain-review.md library/output-spec.md \
@@ -52,10 +52,10 @@ cmd_status() {
   echo "[2级] 域（库内唯一通道）"
   nd=$(find "$DOMAINS_DIR" -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')
   ns=$(find "$DOMAINS_DIR" -path '*/skills/local/*/SKILL.md' | wc -l | tr -d ' ')
-  printf '  ✓ %s 个域 / %s 个库内 skill（开箱即用，零外部依赖）\n' "$nd" "$ns"
+  printf '  ✓ %s 个域 / %s 个库内 skill（开箱即用，离线零依赖）\n' "$nd" "$ns"
   _ext=$(find "$DOMAINS_DIR" -path '*/skills/external.md' 2>/dev/null | wc -l | tr -d ' ')
   if [ "$_ext" -eq 0 ]; then
-    printf '  ✓ 无库外通道（纯 DUT 特化库）\n'
+    printf '  ✓ 无 per-skill 外部文件（库内优先；外部桥接为可选）\n'
   else
     printf '  ✗ 检出 %s 个库外通道 external.md（应为 0）\n' "$_ext"
   fi
@@ -153,7 +153,7 @@ cmd_platform() {
   _nd=$(find "$DOMAINS_DIR" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
   _ns=$(find "$DOMAINS_DIR" -path '*/skills/local/*/SKILL.md' 2>/dev/null | wc -l | tr -d ' ')
   if [ "$_nd" -gt 0 ] && [ "$_ns" -gt 0 ]; then
-    printf '  ✓ 可离线直接用：%s 个域 / %s 个库内 skill（零外部依赖）\n' "$_nd" "$_ns"
+    printf '  ✓ 可离线直接用：%s 个域 / %s 个库内 skill（离线零依赖；外接为可选）\n' "$_nd" "$_ns"
   else
     printf '  ✗ 包结构不完整，请重新解压后再试\n'
   fi

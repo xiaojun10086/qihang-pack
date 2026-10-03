@@ -21,3 +21,4 @@ description: R6 信息搜集与输出（科研类）域入口卡：导师信息�
    路径：`domains/R6-info-retrieval/skills/local/advisor-finder/SKILL.md`、`domains/R6-info-retrieval/skills/local/campus-search/SKILL.md`、`domains/R6-info-retrieval/skills/local/notice-track/SKILL.md`、`domains/R6-info-retrieval/skills/local/org-lookup/SKILL.md`
 4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点（每条标来源与核验状态），并按 `library/memory.md` 归档。
 5. **DUT 绑定点**：见 `domains/R6-info-retrieval/_domain.md`；本域只处理公开站，不涉及登录档位。
+6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。

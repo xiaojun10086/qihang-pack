@@ -1,7 +1,7 @@
 ---
 name: qihang-stats-workflow
 description: 「启航」R2 实验与数据域库内 skill：统计分析流程——先框定问题再碰数据、看原始数据再选检验、前提检查必须报告、效应量与 p 值并重；面向实验课与课设数据的规范分析流程。
-version: 3.2.9
+version: 3.3.0
 license: MIT
 ---
 
@@ -117,7 +117,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `data-lab` 降级承接（输出首行标 `[已降级] 由「统计分析」改为「数据实验」`）；`data-lab` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `data-lab` 降级承接（输出首行标 `[已降级] 由「统计分析」改为「数据实验」`）；`data-lab` 仍不满足 → 按 `library/external-bridge.md` 走**外部桥接**（12 平台检索 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；外部桥接未命中 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 
