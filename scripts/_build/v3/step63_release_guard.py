@@ -165,16 +165,41 @@ write('scripts/_build/hooks/install.sh', INSTALL, mode=0o755)
 #   → 生成链文件会在交付树上被创建，极易被误提交进公开分支（本轮实测踩到）。
 #   钩子挡不住切换，但能在切换瞬间**大声提醒**，把「静默停在错误分支」变成「立刻可见」。
 POSTCO = '''#!/bin/sh
-# 「启航」分支警示 —— 切到 release（交付分支）时大声提醒，避免在交付树上继续写东西。
+# 「启航」检出后护栏 —— ① 切到 release 时警示；② **自动补齐被沙箱吞掉的已跟踪文件**。
+#
+# ② 的原因（2026-10-03 受控实验复现）：本机沙箱的 safe-delete 拦截器会让
+#    `main <-> release` 这类**整分支切换**中的批量删除静默失败 → scripts/ 下 11 个
+#    `*.py|*.sh` 被吞掉（`git checkout <branch> -- <路径>` 这种 pathspec 检出则正常）。
+#    后果：文件缺失会被 `git status` 当成删除，一旦提交就是 3258 行误删（本项目已实际发生一次）。
+#    → 检出后立刻核对 **HEAD 树**里每个文件是否在磁盘；缺失的从 HEAD 补回并大声报告。
 # git 传入 $3 = 1 表示分支切换（0 表示同分支内文件检出）。
-[ "${3:-1}" = "1" ] || exit 0
 branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || echo '')
-if [ "$branch" = "release" ]; then
+if [ "${3:-1}" = "1" ] && [ "$branch" = "release" ]; then
   echo "" >&2
-  echo "Warning: now on **release** (delivery branch)." >&2
+  echo "WARNING: now on **release** (delivery branch)." >&2
   echo "  - This branch holds ONLY delivery files: do not edit here, do not run the build chain." >&2
   echo "  - Editing here risks committing dev artifacts into a PUBLIC branch." >&2
   echo "  - Correct flow: git checkout main -> edit -> run scripts/_build/v3/release/release_branch.py" >&2
+  echo "" >&2
+fi
+
+missing=$(git ls-tree -r HEAD --name-only 2>/dev/null | while IFS= read -r f; do
+            [ -e "$f" ] || echo "$f"
+          done)
+if [ -n "$missing" ]; then
+  _n=$(printf '%s\\n' "$missing" | grep -c . )
+  echo "" >&2
+  echo "WARNING: checkout left $_n tracked file(s) missing (sandbox delete interception)." >&2
+  echo "         Restoring them from HEAD ..." >&2
+  printf '%s\\n' "$missing" | while IFS= read -r f; do git checkout HEAD -- "$f" 2>/dev/null; done
+  _left=$(git ls-tree -r HEAD --name-only 2>/dev/null | while IFS= read -r f; do
+            [ -e "$f" ] || echo "$f"
+          done | grep -c . )
+  if [ "${_left:-0}" -eq 0 ]; then
+    echo "         OK: all tracked files restored." >&2
+  else
+    echo "         STILL MISSING $_left file(s) - run: git checkout HEAD -- <path>" >&2
+  fi
   echo "" >&2
 fi
 exit 0
