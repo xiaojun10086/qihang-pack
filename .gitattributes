@@ -19,3 +19,6 @@
 *.txt   text eol=lf
 .gitattributes  text eol=lf
 LICENSE         text eol=lf
+# 无扩展名的可执行脚本（git 钩子等）：不匹配上面的 *.xx 规则，
+# 若不显式锁定，checkout 时会被写成 CRLF → 钩子在 sh 下不可执行（实测踩到）。
+scripts/_build/hooks/*   text eol=lf

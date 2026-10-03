@@ -154,8 +154,22 @@ if os.path.isdir(os.path.join(ROOT, '.git')):
 else:
     print('  [SKIP] 无 .git（交付树）：钩子不适用')
 
-# =============================================================== B) selfcheck [11]
-print('== B) selfcheck.sh 新增 [11] 交付分支一致性 ==')
+# =============================================================== B) .gitattributes 锁 LF
+# 实测踩到：`scripts/_build/hooks/pre-commit` **没有扩展名**，不匹配任何 `*.xx` 规则
+# → `* text=auto` + 本机 `core.autocrlf=true` 会在 checkout 时写成 **CRLF**
+# → 钩子带 \r 在 sh 下报 `$'\r': command not found`，**护栏本身就是坏的**。
+print('== B) .gitattributes：为无扩展名的钩子锁 LF ==')
+edit('.gitattributes', [
+    ('LICENSE         text eol=lf',
+     'LICENSE         text eol=lf\n'
+     '# 无扩展名的可执行脚本（git 钩子等）：不匹配上面的 *.xx 规则，\n'
+     '# 若不显式锁定，checkout 时会被写成 CRLF → 钩子在 sh 下不可执行（实测踩到）。\n'
+     'scripts/_build/hooks/*   text eol=lf',
+     'scripts/_build/hooks/*'),
+])
+
+# =============================================================== C) selfcheck [11]
+print('== C) selfcheck.sh 新增 [11] 交付分支一致性 ==')
 S11 = '''# ---------- 11. 交付分支一致性（有 .git 时才查；交付树无 .git → 跳过） ----------
 # 事故驱动（2026-10-03 两次）：release 分支被 git add -f 塞进 .learnbuddy/.idea/过程文档。
 # 判据：release 树里**每个**文件都必须存在于 main（排除项除外）——「只在 release 出现」即为污染。
