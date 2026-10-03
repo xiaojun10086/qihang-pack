@@ -1,7 +1,7 @@
 ---
 name: qihang-course-select
 description: 「启航」F1 校园事务域库内 skill：把培养方案与已修学分做成对照表，核对缺口与选课节点，不代抢课。
-version: 3.3.0
+version: 3.3.1
 license: MIT
 ---
 

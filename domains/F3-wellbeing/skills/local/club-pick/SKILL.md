@@ -1,7 +1,7 @@
 ---
 name: qihang-club-pick
 description: 「启航」F3 身心与社交域库内 skill：按兴趣 / 时间 / 成长 / 退出成本四维度给社团选择决策清单。
-version: 3.3.0
+version: 3.3.1
 license: MIT
 ---
 

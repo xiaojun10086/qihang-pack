@@ -1,7 +1,7 @@
 ---
 name: qihang-insurance-claim
 description: 「启航」F5 健康与运动域库内 skill：梳理门诊 / 住院 / 异地就医的报销流程、材料与办理入口。
-version: 3.3.0
+version: 3.3.1
 license: MIT
 ---
 

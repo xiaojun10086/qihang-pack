@@ -118,6 +118,16 @@ def inject_no_isolation(tree):
     return [p], '\n'.join(out)
 
 
+def inject_fake_platform(tree):
+    """把某域「指定检索平台」改成不存在的平台 → extskill 应 FAIL（防编造平台）。"""
+    p = os.path.join(tree, 'domains', 'S1-course-qa', '_domain.md')
+    t = io.open(p, encoding='utf-8').read()
+    t = re.sub(r'\*\*指定检索平台[^\n]*\n',
+               '**指定检索平台（只查这几个，不穷举）**：`no-such-platform.example` ｜ `also-fake.example`（共 2 个）\n',
+               t, count=1)
+    return [p], t
+
+
 def inject_bridge_broken(tree):
     """把某个 3 级 skill 的降级段改回「两档」（去掉外部桥接）→ extskill 应 FAIL。"""
     import glob as _g
@@ -158,6 +168,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck F2'),
         ('外部桥接接线被破坏（降级段退回两档）', inject_bridge_broken,
          ['@py', 'scripts/extskill.py', '.'], 'extskill 三档断言'),
+        ('指定检索平台被改成不存在的平台', inject_fake_platform,
+         ['@py', 'scripts/extskill.py', '.'], 'extskill 平台登记断言'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,

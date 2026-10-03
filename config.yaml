@@ -2,7 +2,7 @@
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 # version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；
 # 包版本为两位形态（见 README 标题）。改版本时两处同改。
-version: 3.3.0
+version: 3.3.1
 
 # ============ 学校绑定（强绑定） ============
 school:
