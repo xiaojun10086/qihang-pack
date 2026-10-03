@@ -272,6 +272,26 @@ def run_round(r):
         if not re.search(r'0\.\s*\*\*先判红线\*\*', t):
             bad(f, '执行顺序未前置「先判红线」')
 
+    # ---------- F2 URL 呈现边界（2026-10-03 实测缺陷）----------
+    # 触发原因：依据里的 URL 紧贴中文说明时，渲染器会把中文吞进 href → 点开 404。
+    # 判据：URL 之后**要么是空白/表格竖线/行尾，要么先补一个空格**；URL 末尾不得紧跟收尾标点。
+    _trail = ')]}>,.;:。，、；：）】》'
+    _badurl = 0
+    for _f in MD:
+        for _i, _ln in enumerate(rd(_f).split('\n'), 1):
+            for _m in re.finditer(r'https?://[^\s\u4e00-\u9fff\u3000-\u303f\uff00-\uffef`*<>"\']+', _ln):
+                _core = _m.group(0).rstrip(_trail)
+                if not _core:
+                    continue
+                _tp = _m.start() + len(_core)
+                _nx = _ln[_tp:_tp + 1]
+                if _tp < _m.end() or (_nx and re.match(r'[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]', _nx)):
+                    _badurl += 1
+                    if _badurl <= 6:
+                        bad(_f, 'URL 与后续中文/标点之间缺空白（第 %d 行）→ 渲染时会被吞进链接' % _i)
+    if _badurl:
+        bad('（URL 边界）', '共 %d 处 URL 紧贴中文/标点，须在 URL 后补空格' % _badurl)
+
     # ---------- G 交叉引用 ----------
     pat = re.compile(r'(?:\.\./)*(library|references|domains|scripts|commands)/[^ )），、；;"“”<>*`]+\.(?:md|sh|py|json)')
     seen = set()

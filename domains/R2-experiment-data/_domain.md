@@ -31,7 +31,7 @@
 ## DUT 绑定点
 
 **公开站（无需登录）**
-- 网络与信息化中心 https://its.dlut.edu.cn/（超算）
+- 网络与信息化中心 https://its.dlut.edu.cn/ （超算）
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 超算账号（its 申请）

@@ -1,7 +1,7 @@
 ---
 name: qihang-data-lab
 description: 「启航」R2 实验与数据域库内 skill：先确认数据与假设，再选检验方法，跑完给出「图 + 一句话结论 + 不能下的结论」。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -95,7 +95,7 @@ license: MIT
 
 ## DUT 绑定点
 
-- 网络与信息化中心 https://its.dlut.edu.cn/（超算）
+- 网络与信息化中心 https://its.dlut.edu.cn/ （超算）
 
 需登录（方案 A · 只读 · 须隔离 profile）：
 - 超算账号（its 申请）

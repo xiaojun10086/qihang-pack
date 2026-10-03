@@ -1,7 +1,7 @@
 ---
 name: qihang-adapt-guide
 description: 「启航」F3 身心与社交域库内 skill：面向大一适应问题（想家 / 落差 / 集体生活），给可执行动作与支持资源，不做诊断。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 

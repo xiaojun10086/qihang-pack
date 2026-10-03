@@ -1,7 +1,7 @@
 ---
 name: qihang-argument-slides
 description: 「启航」S5 学术表达域库内 skill：论证式演示——每页标题写结论（行动标题）、只读标题就能讲通全部论证（幽灵测试）、一页一论据；面向课堂汇报与学术答辩的内容结构设计。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 

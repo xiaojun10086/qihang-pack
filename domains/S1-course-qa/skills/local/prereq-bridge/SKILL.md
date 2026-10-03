@@ -1,7 +1,7 @@
 ---
 name: qihang-prereq-bridge
 description: 「启航」S1 课程答疑域库内 skill：卡点在前置知识断层时先定位断点、只补一节最小前置。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -93,7 +93,7 @@ license: MIT
 - 数学科学学院 https://math.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 综合教务系统 http://jxgl.dlut.edu.cn/（考试安排、培养方案）
+- 综合教务系统 http://jxgl.dlut.edu.cn/ （考试安排、培养方案）
 
 ## 失败与降级
 

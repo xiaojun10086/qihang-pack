@@ -1,7 +1,7 @@
 ---
 name: qihang-budget-plan
 description: 「启航」F4 财务与安全域库内 skill：月度生活费三分法预算 + 记账模板 + 超支刹车规则。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---
@@ -100,7 +100,7 @@ agent_created: true
 - 保卫处 https://gach.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
-- 一卡通 https://ecard.dlut.edu.cn/（余额/流水）
+- 一卡通 https://ecard.dlut.edu.cn/ （余额/流水）
 - 统一支付 http://pay.dlut.edu.cn/
 
 ## 失败与降级

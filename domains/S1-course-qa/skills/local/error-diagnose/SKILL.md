@@ -1,7 +1,7 @@
 ---
 name: qihang-error-diagnose
 description: 「启航」S1 课程答疑域库内 skill：把错题按概念/方法/计算/审题四类归因，输出错因清单与再练顺序。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---
@@ -95,7 +95,7 @@ agent_created: true
 - 数学科学学院 https://math.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
-- 综合教务系统 http://jxgl.dlut.edu.cn/（考试安排、培养方案）
+- 综合教务系统 http://jxgl.dlut.edu.cn/ （考试安排、培养方案）
 
 ## 失败与降级
 

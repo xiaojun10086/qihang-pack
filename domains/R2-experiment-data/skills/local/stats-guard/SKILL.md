@@ -1,7 +1,7 @@
 ---
 name: qihang-stats-guard
 description: 「启航」R2 实验与数据域库内 skill：统计方法选择、检验力评估、列「不能下的结论」。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 agent_created: true
 ---
@@ -95,7 +95,7 @@ agent_created: true
 ## DUT 绑定点
 
 **公开站（无需登录）**
-- 网络与信息化中心 https://its.dlut.edu.cn/（超算）
+- 网络与信息化中心 https://its.dlut.edu.cn/ （超算）
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 超算账号（its 申请）

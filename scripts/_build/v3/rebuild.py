@@ -46,6 +46,7 @@ LAYERS = [
     ('step56_v325_release.py',       'v3.2.5 工程化迭代（隔离断言 + L3 共现规则 + 指标埋点 + 版本派生）+ 修订号 3.2.4→3.2.5'),
     ('step57_risk_fixes.py',         '风险自检修复（记忆不跟踪 · INSTALL 前置澄清 · .gitattributes 注释纠错）+ 修订号 3.2.5→3.2.6'),
     ('step58_readme_download.py',    'README 下载区（release 分支 ZIP / clone 指引）+ 修订号 3.2.6→3.2.7'),
+    ('step59_link_integrity.py',     '链接可用性修复（URL 边界归一 + 仅HTTP标注 + 排查话术 + 断言与负向注入）+ 修订号 3.2.7→3.2.8'),
 ]
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)

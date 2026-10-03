@@ -1,7 +1,7 @@
 ---
 name: qihang-exam-sprint
 description: 「启航」S4 备考与记忆域库内 skill：先要三件事（科目章节 / 剩余天数 / 要计划还是卡组），再出 3 步突击或 7 步系统两档方案，结束真出题判分。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -93,8 +93,8 @@ license: MIT
 
 ## DUT 绑定点
 
-- 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/（考试安排）
-- 图书馆 https://lib.dlut.edu.cn/（自习）
+- 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/ （考试安排）
+- 图书馆 https://lib.dlut.edu.cn/ （自习）
 
 需登录（方案 A · 只读 · 须隔离 profile）：
 - 综合教务系统考试安排

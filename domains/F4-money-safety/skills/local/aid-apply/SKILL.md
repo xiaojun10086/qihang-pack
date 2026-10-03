@@ -1,7 +1,7 @@
 ---
 name: qihang-aid-apply
 description: 「启航」F4 财务与安全域库内 skill：梳理奖助勤工的条件、材料与时间线，做资格自评，不代提交。
-version: 3.2.7
+version: 3.2.8
 license: MIT
 ---
 
@@ -96,7 +96,7 @@ license: MIT
 - 保卫处 https://gach.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 一卡通 https://ecard.dlut.edu.cn/（余额/流水）
+- 一卡通 https://ecard.dlut.edu.cn/ （余额/流水）
 - 统一支付 http://pay.dlut.edu.cn/
 
 ## 失败与降级

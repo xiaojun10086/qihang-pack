@@ -33,7 +33,7 @@
 - 保卫处 https://gach.dlut.edu.cn/
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
-- 一卡通 https://ecard.dlut.edu.cn/（余额/流水）
+- 一卡通 https://ecard.dlut.edu.cn/ （余额/流水）
 - 统一支付 http://pay.dlut.edu.cn/
 
 ## 执行顺序
