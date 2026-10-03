@@ -22,6 +22,7 @@ import io
 import os
 import shutil
 import stat
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -172,14 +173,15 @@ edit('.gitattributes', [
 print('== C) selfcheck.sh 新增 [11] 交付分支一致性 ==')
 S11 = '''# ---------- 11. 交付分支一致性（有 .git 时才查；交付树无 .git → 跳过） ----------
 # 事故驱动（2026-10-03 两次）：release 分支被 git add -f 塞进 .learnbuddy/.idea/过程文档。
-# 判据：release 树里**每个**文件都必须存在于 main（排除项除外）——「只在 release 出现」即为污染。
+# 判据：release 树里**每个**文件都必须存在于 main（release ⊆ main 恒成立）——「只在 release 出现」即污染。
+# ⚠️ 首版曾把 `.learnbuddy/` 等**预先过滤掉**，而它恰恰是最常见的污染源 → 断言对真实事故完全无效；
+#    实测（故意污染 release 后 [11] 仍报 OK）发现后改为**不预先过滤**，
+#    这正是本项目「断言必须经负向自检，否则可能是空转」的又一实例。
 echo "[11] 交付分支一致性"
 if [ -d .git ] && git rev-parse --verify --quiet release >/dev/null 2>&1; then
-  _extra=$(git ls-tree -r release --name-only \\
-           | grep -vE '^(scripts/_build/|\\.learnbuddy/|\\.gitignore$)' \\
-           | while IFS= read -r _f; do
-               git cat-file -e "main:$_f" 2>/dev/null || echo "$_f"
-             done)
+  _extra=$(git ls-tree -r release --name-only | while IFS= read -r _f; do
+             git cat-file -e "main:$_f" 2>/dev/null || echo "$_f"
+           done)
   if [ -n "$_extra" ]; then
     _n=$(printf '%s\\n' "$_extra" | grep -c . )
     bad "release 分支含 $_n 个不随包文件（应为 0）"
@@ -196,11 +198,17 @@ fi
 t = read('scripts/selfcheck.sh')
 if t is None:
     print('  [SKIP] 无 scripts/selfcheck.sh')
-elif '[11] 交付分支一致性' in t:
-    print('  [SAME] [11] 段已存在')
 else:
+    # 旧版（含预先过滤 .learnbuddy 的 bug）必须被替换，不能只判「段是否存在」
+    _buggy = "grep -vE '^(scripts/_build/|\\.learnbuddy/|\\.gitignore$)'"
     A = '# ---------- 汇总 ----------'
-    if A in t:
+    m = re.search(r'# ---------- 11\. 交付分支一致性.*?(?=# ---------- 汇总 ----------)', t, re.S)
+    if m and _buggy not in t and S11.strip() == m.group(0).strip():
+        print('  [SAME] [11] 段已在位且为修正后版本')
+    elif m:
+        write('scripts/selfcheck.sh', t[:m.start()] + S11 + t[m.end():])
+        print('  [OK]   已替换 [11] 段（修正「预先过滤污染源」的 bug）')
+    elif A in t:
         write('scripts/selfcheck.sh', t.replace(A, S11 + A, 1))
         print('  [OK]   已插入 [11] 段')
     else:
