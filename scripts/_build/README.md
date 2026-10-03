@@ -33,6 +33,27 @@ python scripts/_build/v3/release/release_branch.py --apply    # 刷新 release �
 git push origin main release                                  # 发布
 ```
 
+### 改 `main` 之后，`release` **不会自动同步**（刻意如此）
+
+- **同步动作是显式的**：只有跑 `--apply` 才刷新。不跑 = release 停在旧内容，**且不会有任何提示**。
+- **判据是「内容」不是「提交」**：工具比对的是**交付文件集合**的树。只改 `.learnbuddy/`（记忆）或
+  `scripts/_build/`（生成器）时，**即使 main 领先 release 好几个提交，差异项仍是 0、无需刷新**；
+  反之只要动了交付文件（`domains/` `library/` `commands/` `scripts/`(非 _build) `SKILL.md` `config.yaml` …）就必须刷新。
+- ⚠️ **别用 `git diff release..main` 判断「要不要同步」**：它永远会列出 `.learnbuddy/**` 与 `scripts/_build/**`
+  （那正是排除项），看着像「积压一大堆」，其实与交付无关。**只看工具的「差异项 = 0 / N」。**
+- **`--apply` 的「防误删闸」**（2026-10-03 实测事故换来）：
+  · 交付文件数 < **150**（当前 174）→ 中止（几乎必然是 main 树被误删）
+  · 差异里出现任何 **D（删除）** → 中止，并提示如何在 main 上修回；确要删除须加 `--allow-delete`
+  · 只比对模式同样提示但不改动；`--apply` 被拦时返回 **rc=2**
+  · **为什么需要它**：worktree 里少了文件（如刚 `git checkout release` 过、或写入被中断）时，
+    一条 `git commit -a`（= `git add -u`）会把「缺失」当成**删除**提交进 main，本工具会**忠实照搬** →
+    交付包静默少核心文件。工具没错（garbage in, garbage out），但「照搬误删」必须在刷新前挡住。
+- **为什么不做成自动**（提交即刷 / post-commit hook）：① 会把**半成品**（WIP 提交）也推进交付分支；
+  ② 每轮都产生一个 release 提交，历史噪声大；③ 出问题时难定位「是哪个 main 提交导致的」。
+  **推荐节奏：一批改动收口 → 看差异 → `--apply` → `push`。**
+- 刷新只写**本地** release 分支的提交；**真正到用户手里还要 `git push origin release`**
+  （用户侧用 `git clone -b release` 或 `git archive release | tar -x` 拉取）。
+
 **纯净性由 git 跟踪状态保证**（比手工排除表可靠）：`references/` 下 8 份过程文档、
 `__pycache__`、`.idea`、`.vscode`、`*.pyc` **均未被 git 跟踪** → 天然不进 `release` 分支。
 `release_branch.py` **从不触碰工作树与真实索引**（`GIT_INDEX_FILE` 指向临时索引：
