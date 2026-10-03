@@ -1,7 +1,7 @@
 ---
 name: qihang-note-normalize
 description: 「启航」S2 课堂与笔记域库内 skill：把散乱笔记/讲义/录音转写归一成章节-概念-例题-待补结构。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 agent_created: true
 ---

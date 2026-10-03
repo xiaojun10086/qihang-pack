@@ -1,7 +1,7 @@
 ---
 name: qihang-lab-report
 description: 「启航」S3 作业与考核域库内 skill：按 IMRAD 给实验报告骨架，分配各节字数，并给出自查清单；正文由学生自己写。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 ---
 
@@ -99,7 +99,7 @@ license: MIT
 - 教务处 https://teach.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 综合教务系统 http://jxgl.dlut.edu.cn/ （作业与成绩）
+- 综合教务系统 http://jxgl.dlut.edu.cn/student/home （作业与成绩）
 
 ## 失败与降级
 

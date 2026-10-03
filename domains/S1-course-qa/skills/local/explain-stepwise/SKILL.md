@@ -1,7 +1,7 @@
 ---
 name: qihang-explain-stepwise
 description: 「启航」S1 课程答疑域库内 skill：先让学习者自己写一步，再按「定位卡点 → 给提示 → 给解法 → 出同类题」四步走，不直接抛答案。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 ---
 
@@ -95,7 +95,7 @@ license: MIT
 - 数学科学学院 https://math.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 综合教务系统 http://jxgl.dlut.edu.cn/ （考试安排、培养方案）
+- 综合教务系统 http://jxgl.dlut.edu.cn/student/home （考试安排、培养方案）
 
 ## 失败与降级
 

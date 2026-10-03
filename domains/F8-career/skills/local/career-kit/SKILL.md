@@ -1,7 +1,7 @@
 ---
 name: qihang-career-kit
 description: 「启航」F8 求职与竞赛域库内 skill：按目标岗位/竞赛倒推能力缺口，改简历只做「相关性重构」，面试按 STAR 打磨。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 ---
 

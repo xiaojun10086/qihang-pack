@@ -65,7 +65,7 @@ agent-browser open <url> --headed --profile "$HOME/.qihang/browser-profile"
 | 5 | 一卡通 / 玉兰卡 | https://ecard.dlut.edu.cn/ | 余额、消费流水 | F1 F4 | 方案 A（仅看余额流水） |
 | 6 | 学生工作系统 | https://xsc.dlut.edu.cn/ | 资助、评奖、请假、第二课堂 | F1 F3 F4 F6 | 方案 A（资助/评奖状态属 **L2 需确认**；**心理记录 L3 禁读**） |
 | 7 | 统一支付平台 | http://pay.dlut.edu.cn/ | 缴费状态 | F4 | 方案 C（涉金额，只看状态） |
-| 8 | 财务处 | http://cw.dlut.edu.cn/ | 缴费、报销进度 | F4 | 方案 C |
+| 8 | 财务处 | http://cw.dlut.edu.cn/ | 缴费、报销进度 | F4 | 方案 C（站点公开可达；个人数据需登录，只读状态） |
 | 9 | 就业信息网 | https://job.dlut.edu.cn/ | 招聘、宣讲会、投递记录 | F8 | 方案 A（投递记录属 **L2 需确认**） |
 | 10 | 研究生系统 | https://gs.dlut.edu.cn/ | 培养、导师、开题 | R4 R5 F7 | 方案 A（培养进度属 **L2 需确认**） |
 | 11 | 研究生招生报名 | https://yjszs.dlut.edu.cn/zsbm | 报名状态 | F7 | 方案 C |

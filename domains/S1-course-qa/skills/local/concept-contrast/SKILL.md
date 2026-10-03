@@ -1,7 +1,7 @@
 ---
 name: qihang-concept-contrast
 description: 「启航」S1 课程答疑域库内 skill：把一组易混概念放进多维对照表，逐项辨析差异与适用条件。
-version: 3.2.8
+version: 3.2.9
 license: MIT
 ---
 
@@ -92,7 +92,7 @@ license: MIT
 - 数学科学学院 https://math.dlut.edu.cn/
 
 需登录（方案 A · 只读 · 须隔离 profile）：
-- 综合教务系统 http://jxgl.dlut.edu.cn/ （考试安排、培养方案）
+- 综合教务系统 http://jxgl.dlut.edu.cn/student/home （考试安排、培养方案）
 
 ## 失败与降级
 
