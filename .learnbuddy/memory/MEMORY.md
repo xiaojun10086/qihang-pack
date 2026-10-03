@@ -38,8 +38,8 @@
 
 | 项 | 实测值 |
 |---|---|
-| 源仓库 HEAD | **`ddff4e8`**（`fix(release): sync_release 一并管理 .gitattributes/.gitignore`） |
-| 推送状态 | **`main == origin/main`，领先 0 —— 已推送，无待 push**（此前「领先 10 个提交」的待办**已闭环**） |
+| 源仓库 HEAD | **以 `git log -1` 为准**（本节签发时 = `560856e fix(memory): 修正过期待办 …`） |
+| 推送状态 | **以 `git rev-list --count origin/main..main` 为准**（签发时 = `0`，即 `ddff4e8` 已推送到 origin；此后新增的提交需用户 `git push origin main`） |
 | 工作区 | **0 项未提交**（clean） |
 | 两树一致性 | 源**170** ⟷ 副本**170**，仅源有 0 / 仅副本有 0 / 内容不一致 **0** |
 | 记忆 | `.learnbuddy/memory/` 三文件两处**逐字节一致**（§0.5 自检输出 `OK 两处同源`） |
