@@ -38,23 +38,26 @@
 
 | 项 | 实测值 |
 |---|---|
-| **包版本 / 修订号** | **`3.2` / `3.2.4`**（**包版本 = 修订号前两位**；同一包版本线内**修订号递增** —— 见「强约定 9」与「稳定规模」） |
+| **包版本 / 修订号** | **`3.2` / `3.2.5`**（**包版本 = 修订号前两位**；同一包版本线内**修订号递增** —— 见「强约定 9」与「稳定规模」） |
 | 源仓库 HEAD | **以 `git log -1` 为准**（本节点修订时 = `560856e`，其后另有本轮 v3.2 提交） |
 | 推送状态 | **以 `git rev-list --count origin/main..main` 为准**（`ddff4e8` 及之前**已推送**；其后提交待在能联网处 `git push origin main`） |
 | 工作区 | 以 `git status --porcelain` 为准（每轮收尾应为 **0 项**） |
-| 两树一致性 | 源 **171** ⟷ 副本 **171**，仅源有 0 / 仅副本有 0 / 内容不一致 **0**（`.gitattributes` / `.gitignore` / `.codebuddy-plugin` 均已纳入同步与终检） |
+| 两树一致性 | 源 **174** ⟷ 副本 **174**，仅源有 0 / 仅副本有 0 / 内容不一致 **0**（`.gitattributes` / `.gitignore` / `.codebuddy-plugin` 均已纳入同步与终检）<br>⚠️ **计数纠错（2026-10-03 v3.2.5 轮实测）**：此前记载的 **171 是错的** —— v3.2.4 收尾时实为 **173**，本轮新增 `scripts/metrics.py` → **174**。171 是 v3.2 轮调 `EX` 过程中的中间值。**凡计数类结论一律以当场实测为准** |
 | 记忆 | `.learnbuddy/memory/` 三文件两处**逐字节一致**（§0.5 自检输出 `OK 两处同源`） |
 | 交付副本 | **不含 `MANIFEST.md`、不含 zip**（现行 v3.x 线不产，见 §二之九） |
 
 **校验器期望（两树同值）**：`python scripts/checkall.py .` → **全部 PASS / rc 0**（单入口，跑齐下面 5 个）；
-内部各项：`selfcheck OK 37 / 0 / 0` · `audit` 源 **46** / 副本 **45** 通过 · `aligncheck FAIL 0 / WARN 1`（`clarity.md` 良性）·
-`runcheck FAIL 0 / WARN 0` · `regress` 累计 `FAIL 0`。加 `--negative` 时负向自测须 **捕获率 100%**（当前 5/5）。
+内部各项（v3.2.5 实测，源 / 副本同值）：`selfcheck OK 41 / 0 / 0`（37 → 41，新增 **[7c] 隔离 / L3 判级 / 指标埋点** 4 条）·
+`audit` 源 **46** / 副本 **45** 通过 · `aligncheck FAIL 0 / WARN 1`（`clarity.md` 良性）·
+`runcheck FAIL 0 / WARN 0` · `regress` 累计 `FAIL 0`（[2] 段 L3 矩阵 19 → **23** 条，新增 2 正 + 2 反共现用例）。
+加 `--negative` 时负向自测须 **捕获率 100%**（当前 **6/6**，`--with-regress` 时 **7/7**，新增第 6 类「隔离校验缺失」）。
 
 **遗留（产品级，本轮未处理，需用户决策）**
-1. **「场景设计书」缺席**：`INSTALL.md:70` §四第 1 项指向的《智能体场景设计书》**不在包内**（v3.0.0 提交 `e31f959` 删除）。
-   可取回旧版：`git show e31f959^:qihang-scenario-design.html`（16 134 B / 中文 1617 字），
-   但其口径是 v2.11（19 域/38 skill/库内优先·库外兜底），**与 v3.0.0（20 域/92 skill/库内唯一）冲突，须重写后再放回**。
-   赛道二「作品 10-25 前提交」—— 这是当前唯一的赛事交付缺口。
+1. ~~**「场景设计书」缺席**~~ → **2026-10-03 v3.2.5 轮已按「方案 A」处置（用户拍板）**：
+   `INSTALL.md:70` 改为「场景设计书（五要素齐备）—— **随赛事材料单独提交，本包不附带该文件**」，
+   **悬空引用已消除**，文档与实物一致。旧版可取回（`git show e31f959^:qihang-scenario-design.html`，16 134 B），
+   但口径是 v2.11（19 域/38 skill/库内优先·库外兜底），**与现行 v3.x 冲突，不可直接提交**；
+   赛事物仍以「随赛事材料单独提交」为准。**本项已闭环**。
 2. **记忆含本机路径**：文件内有 `C:\Users\xiaojun\Desktop\...`、`C:\Users\xiaojun\AppData\Local\Google\Chrome\User Data`，
    且已随 `173a173`/`ddff4e8` 推送到 origin。日志是 append-only，**本轮未做历史擦洗**；
    若仓库将转为公开，需先授权擦洗（把路径归一为 `%USERPROFILE%` / `%LOCALAPPDATA%`，事实不变）。
@@ -149,7 +152,7 @@
 | 库内 skill | **92**（自建 80 + 改造 12；**每域 4–5 个**） |
 | `skills/external.md` | **必须为 0**（外部通道已删除） |
 | commands | 22（库入口 1 + 校情 1 + 20 域，每张卡第 3 步列全该域 4–5 个 skill） |
-| library 文件 | **10**（8 份规则 + `README.md` + `skill-evolution.md`；`qihang.sh status` 逐行列出 **9** 份=不含 README）｜ references **18**（源仓库）/ 10（副本，已去 8 份过程文档）｜ scripts **9**（5 个校验器 + `qihang.sh` + `dlut-read.sh` + **`checkall.py`** + **`negative_test.py`**） |
+| library 文件 | **10**（8 份规则 + `README.md` + `skill-evolution.md`；`qihang.sh status` 逐行列出 **9** 份=不含 README）｜ references **18**（源仓库）/ 10（副本，已去 8 份过程文档）｜ scripts **10**（5 个校验器 + `qihang.sh` + `dlut-read.sh` + **`checkall.py`** + **`negative_test.py`** + **`metrics.py`**） |
 | DUT 公开站 | 表格行 **162** / 数据条目 **142**（2026-10-02 直连核验后更新；旧值 159/139 已废） |
 
 > 计数散落在：`README.md`、`INSTALL.md`、`THIRD_PARTY_NOTICES.md`、`domains/_registry.md`、`SKILL.md`、
@@ -196,13 +199,14 @@
 
 | 脚本 | 管什么 | 期望 |
 |---|---|---|
-| `scripts/selfcheck.sh` | 结构 / 计数 / 交叉引用 / 红线一致（**依赖 `.gitignore` 的排除表**） | `OK 37 ｜ WARN 0 ｜ FAIL 0` |
+| `scripts/selfcheck.sh` | 结构 / 计数 / 交叉引用 / 红线一致 + **[7c] 隔离 / L3 判级 / 指标埋点**（**依赖 `.gitignore` 的排除表**） | `OK 41 ｜ WARN 0 ｜ FAIL 0` |
 | `scripts/audit.sh` | 安全 / 凭证 / L3 门禁 / 来源合规 / 库内唯一通道 | **源仓库** `46 通过`／**副本** `45 通过`，0 警告 0 失败 |
 | `scripts/regress.sh N` | 行为回归（澄清门算例 / L1-L3 门禁矩阵 / 红线一致 / 结构不变量 / **[5] 零命中兜底链** / 脚本语法 / **[7] 输出标准固化** / **[8] 自迭代边界（16 条）** / **[9] 需求确定门（14 条）**） | 累计 `FAIL 0` |
 | `scripts/aligncheck.py . N` | 全量文件级对齐（**18 组 A–D、F–Q、S、T**） | `FAIL 0 ｜ WARN ≤1` |
 | `scripts/runcheck.py . N [域ID…]` | **端到端运行性**：每域跑完整三级链，逐级确认返回结果可解（含**输出形态硬契约**） | `FAIL 0 ｜ WARN 0` |
 | **`scripts/checkall.py`** | **自检单入口**：固定顺序跑齐上面 5 个 + **逐项计时** + 模拟跑摘要；`--quick`（只跑 selfcheck/aligncheck/runcheck）｜`--rounds N`｜`--negative`｜`--limit S` | `全部 PASS ｜ rc 0` |
-| **`scripts/negative_test.py`** | **负向自测**：在临时树（交付口径）注入 6 类缺陷 → 断言校验器**必须 FAIL** → 报捕获率 | **捕获率 100%** |
+| **`scripts/negative_test.py`** | **负向自测**：在临时树（交付口径）注入 6 类缺陷（`--with-regress` 7 类，含**隔离校验缺失**）→ 断言校验器**必须 FAIL** → 报捕获率 | **捕获率 100%（6/6 ｜ 7/7）** |
+| **`scripts/metrics.py`**（v3.2.5 新增） | **指标埋点与发布门禁**：`emit`（白名单字段，自由文本进不去）/ `report` / `check`（零容忍三项 + 绝对/相对门禁，缺基线判 N/A）/ `baseline` | `rc 0` 或 `1`（门禁 FAIL） |
 
 - **一律走单入口**（`python scripts/checkall.py .`）：此前手工跑 5 条命令，**顺序/轮数/cwd 都可能漏 —— 漏跑本身就是缺陷来源**。
 - **时间基线（本机实测 2026-10-03）**：selfcheck ~27s ｜ audit ~46s ｜ aligncheck ~0.6s ｜ runcheck ~0.3s ｜ regress ~44s ｜ negative ~3s；
