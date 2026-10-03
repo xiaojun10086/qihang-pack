@@ -1,7 +1,7 @@
 ---
 name: qihang-stats-guard
 description: 「启航」R2 实验与数据域库内 skill：统计方法选择、检验力评估、列「不能下的结论」。
-version: 3.2.5
+version: 3.2.6
 license: MIT
 agent_created: true
 ---

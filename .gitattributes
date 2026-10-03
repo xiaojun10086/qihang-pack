@@ -4,9 +4,10 @@
 # ── 强制 LF（2026-10-03 加固）─────────────────────────────────────────────
 # 本机 core.autocrlf=true：fresh clone / checkout 会把文本文件写成 CRLF，后果：
 #   1) `*.sh` 带 \r → bash 报 `$'\r': command not found`，五个校验脚本全废；
-#   2) `.learnbuddy/memory/*.md` 变 CRLF → 与交付副本（LF）**不再逐字节一致**，
-#      违反「两处记忆必须同源」铁律（副本不含 .learnbuddy，不会自动跟随）。
-# 故对代码与文档显式锁定 LF；`.gitattributes` 本身不随包分发。
+#   2) 文档与规则文件变 CRLF → 与仓库基线不再逐字节一致，比对与 diff 全乱。
+# 故对代码与文档显式锁定 LF。
+# ⚠️ **本文件随包分发**（交付树必需）：用户 clone 后同样要靠它保证 LF；
+#    实测把它移出交付树 → 交付包 160 个文件变 CRLF、`*.sh` 直接不可执行。
 *.sh    text eol=lf
 *.py    text eol=lf
 *.md    text eol=lf

@@ -37,6 +37,16 @@ DST = 'release'
 EXCL = [
     'scripts/_build',    # 生成器链：构建期工具，交付物不需要
     '.learnbuddy',       # 项目记忆：含本机路径与过程信息，绝不外发
+    # 2026-10-03（R-2 修复）：仅排除 `.gitignore` —— 它会把 8 份内部过程文档的**文件名**
+    #   （review-report / stress-test / acceptance / 需求确认书 …）带给用户，暴露内部评审流程。
+    #   移出后 `selfcheck.sh [8b]` 会走它的 **else 分支**（「发布副本：无 .gitignore」→ OK），
+    #   无需改动任何断言；`_EXDEV` 在交付树里本应为空（交付树不含过程文档）→ 语义更准。
+    # ⚠️ **`.gitattributes` 必须留在交付树里**（实测教训）：它锁 `*.sh/*.py/*.md = eol=lf`，
+    #   本机 `core.autocrlf=true` 时 `git archive` / fresh clone 会按它决定行尾；
+    #   把它移出后交付树**立刻有 160 个文件变 CRLF**（aligncheck `WARN 含 CRLF 行尾` ×160），
+    #   而 `*.sh` 带 `\r` 在 bash 下直接 `$'\r': command not found` → 交付包功能损坏。
+    #   → 结论：**信息面风险（低）不值得换功能风险（高）**，`.gitattributes` 保留分发。
+    '.gitignore',
 ]
 
 APPLY = '--apply' in sys.argv
@@ -47,7 +57,7 @@ VDIR = None
 if '--verify-dir' in sys.argv:
     VDIR = sys.argv[sys.argv.index('--verify-dir') + 1]
 ALLOW_DELETE = '--allow-delete' in sys.argv
-# 交付文件数下界（当前 174）。低于它几乎必然意味着 **main 树被误删过**，而不是「本版真的删了东西」。
+# 交付文件数下界（当前 173）。低于它几乎必然意味着 **main 树被误删过**，而不是「本版真的删了东西」。
 MIN_FILES = 150
 
 

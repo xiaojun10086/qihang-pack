@@ -1,7 +1,7 @@
 ---
 name: qihang-wellbeing-checkin
 description: 「启航」F3 身心与社交域库内 skill：先倾听再给方法；不评判、不诊断；识别危机信号并第一时间转介心理中心。
-version: 3.2.5
+version: 3.2.6
 license: MIT
 ---
 

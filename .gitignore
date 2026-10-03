@@ -21,3 +21,8 @@ references/review-report-v2.4.md
 references/stress-test-v3.md
 references/alignment-audit-v3.md
 references/需求确认书-v2三级结构.md
+
+# 项目记忆（含本机路径等信息）—— **不随包分发、永不入库**。
+# 2026-10-03：由「跟踪」改为「不跟踪」—— 此前它被跟踪并已推送到公开仓库，
+# 导致本机路径外泄（详见 巡检报告/风险自检-2026-10-03.md R-1）。
+.learnbuddy/

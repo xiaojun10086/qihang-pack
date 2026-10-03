@@ -1,7 +1,7 @@
 ---
 name: qihang-thesis-format
 description: 「启航」S5 学术表达域库内 skill：按学校学位论文格式规范逐项自检结构、编号、图表与参考文献体例。
-version: 3.2.5
+version: 3.2.6
 license: MIT
 ---
 
