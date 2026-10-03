@@ -21,3 +21,4 @@ description: F8 求职与竞赛（生活类）域入口卡：简历、面试、�
    路径：`domains/F8-career/skills/local/career-kit/SKILL.md`、`domains/F8-career/skills/local/competition-pick/SKILL.md`、`domains/F8-career/skills/local/intern-search/SKILL.md`、`domains/F8-career/skills/local/interview-drill/SKILL.md`、`domains/F8-career/skills/local/resume-tailor/SKILL.md`
 4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
 5. **DUT 绑定点**：见 `domains/F8-career/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（只读 / 不外传 / 不落盘）。
+6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。

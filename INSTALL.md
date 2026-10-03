@@ -2,7 +2,7 @@
 
 > 「启航」是 `SKILL.md` 标准件，**面向 LearnBuddy / WorkBuddy 单一目标平台**。
 > 平台差异详见 `references/platforms.md`；就绪度探测用 `bash scripts/qihang.sh platform`。
-> 本包为**纯 DUT 特化库**：库内 skill 开箱即用，**运行时零外部依赖**。
+> 本包为 **DUT 特化库（库内优先）**：库内 skill 开箱即用，**离线零依赖**；外部桥接为**可选增强**（见 `library/external-bridge.md`）。
 
 ---
 
@@ -54,9 +54,9 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 | 项 | 说明 |
 |---|---|
-| 通道 | **库内唯一** —— 不安装、不引用任何库外 skill |
+| 通道 | **库内优先** —— 日常不装任何外部 skill；缺口时可**可选外接**（12 平台 + 五步自检） |
 | 来源 | 自建 80 个 + 由 MIT/Apache 许可外部最优解「骨架提取 + 重写」12 个 |
-| 依赖 | **零外部依赖**，全程离线可用 |
+| 依赖 | **核心能力零外部依赖**，全程离线可用；外接为可选项 |
 | 缺口 | 库内无法覆盖的细分场景走**同域降级**并记「缺口」，不引入库外通道 |
 
 > 改造来源与许可归属见 `THIRD_PARTY_NOTICES.md`；来源合规自检见 `references/skill-compliance-audit.md`。
@@ -101,7 +101,7 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 
 | 项 | 说明 |
 |---|---|
-| 库内 skill | **开箱即用，无需安装任何东西**（92 个，零外部依赖） |
+| 库内 skill | **开箱即用，无需安装任何东西**（92 个，离线零依赖） |
 | 网络 | 库内 skill 全程离线可用（**核心能力不触网**） |
 | 私密站（需登录）· **可选功能** | **属可选增强：不装也不影响核心能力**。需 `agent-browser` 或同类浏览器自动化（`npm i -g agent-browser`）；**必须用独立 Profile**（见 `references/dlut-login-sites.md` §0.1） |
 | 校内站点协议 | 部分校内系统**仅提供 `http://`**（教务 / 财务 / 缴费 / 信息服务等，域名均为 `*.dlut.edu.cn`）→ **访问时注意网络环境**；本包**不改写**站点协议，只如实登记 |

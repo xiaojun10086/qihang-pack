@@ -1,7 +1,7 @@
 ---
 name: qihang-viz-spec
 description: 「启航」R2 实验与数据域库内 skill：按期刊 / 学位论文规范给图型选择、坐标轴、误差棒与分辨率清单。
-version: 3.2.9
+version: 3.3.0
 license: MIT
 ---
 
@@ -97,7 +97,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `stats-workflow` 降级承接（输出首行标 `[已降级] 由「图表规范」改为「统计分析」`）；`stats-workflow` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `stats-workflow` 降级承接（输出首行标 `[已降级] 由「图表规范」改为「统计分析」`）；`stats-workflow` 仍不满足 → 按 `library/external-bridge.md` 走**外部桥接**（12 平台检索 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；外部桥接未命中 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

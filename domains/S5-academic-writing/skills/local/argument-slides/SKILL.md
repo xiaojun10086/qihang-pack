@@ -1,7 +1,7 @@
 ---
 name: qihang-argument-slides
 description: 「启航」S5 学术表达域库内 skill：论证式演示——每页标题写结论（行动标题）、只读标题就能讲通全部论证（幽灵测试）、一页一论据；面向课堂汇报与学术答辩的内容结构设计。
-version: 3.2.9
+version: 3.3.0
 license: MIT
 ---
 
@@ -104,7 +104,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `paper-outline` 降级承接（输出首行标 `[已降级] 由「论证式演示」改为「论文骨架与预审」`）；`paper-outline` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `paper-outline` 降级承接（输出首行标 `[已降级] 由「论证式演示」改为「论文骨架与预审」`）；`paper-outline` 仍不满足 → 按 `library/external-bridge.md` 走**外部桥接**（12 平台检索 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；外部桥接未命中 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

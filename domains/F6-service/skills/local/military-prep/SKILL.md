@@ -1,7 +1,7 @@
 ---
 name: qihang-military-prep
 description: 「启航」F6 军训与志愿域库内 skill：军训前的身心与物资准备清单，含不适处置原则（先报告教官）。
-version: 3.2.9
+version: 3.3.0
 license: MIT
 ---
 
@@ -98,7 +98,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `service-log` 降级承接（输出首行标 `[已降级] 由「军训准备」改为「军训与志愿记录」`）；`service-log` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `service-log` 降级承接（输出首行标 `[已降级] 由「军训准备」改为「军训与志愿记录」`）；`service-log` 仍不满足 → 按 `library/external-bridge.md` 走**外部桥接**（12 平台检索 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；外部桥接未命中 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

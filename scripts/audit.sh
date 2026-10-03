@@ -138,7 +138,10 @@ if [ -f "$aud" ]; then
   grep -q "0 侵权" "$aud" && ok "合规自检记录：包内内容 0 侵权" || warn "未明确「0 侵权」"
   grep -q "GPL-3.0" "$aud" && ok "已识别并隔离 GPL-3.0 依赖（未吸收）" || warn "未识别 GPL 风险"
   grep -q "无 LICENSE" "$aud" && ok "已标注「无 LICENSE」仓库（未吸收）" || warn "未标注无证仓库"
-  grep -q "零外部依赖" "$aud" && ok "已声明运行期零外部依赖" || warn "未声明零外部依赖"
+  grep -qE "核心能力运行期零外部依赖|运行期零外部依赖" "$aud" \
+    && ok "已声明「核心能力运行期零外部依赖」" || warn "未声明零外部依赖口径"
+  grep -q "外部桥接" "$aud" && ok "已声明外部桥接为可选增强（v3.3.0）" \
+    || warn "未声明外部桥接口径（v3.3.0 起必需）"
 else
   bad "缺少 skill-compliance-audit.md"
 fi

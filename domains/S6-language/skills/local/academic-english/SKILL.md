@@ -1,7 +1,7 @@
 ---
 name: qihang-academic-english
 description: 「启航」S6 语言能力域库内 skill：面向论文写作的句式库、时态语态选择与中式表达改写方向，只标错不整段重写。
-version: 3.2.9
+version: 3.3.0
 license: MIT
 ---
 
@@ -100,7 +100,7 @@ license: MIT
 
 ## 失败与降级
 
-本 skill 不满足 → 用同域库内 `lang-drill` 降级承接（输出首行标 `[已降级] 由「学术英语」改为「语言训练」`）；`lang-drill` 仍不满足 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
+本 skill 不满足 → 用同域库内 `lang-drill` 降级承接（输出首行标 `[已降级] 由「学术英语」改为「语言训练」`）；`lang-drill` 仍不满足 → 按 `library/external-bridge.md` 走**外部桥接**（12 平台检索 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；外部桥接未命中 → 纯提示词模式并标注 `[已降级]`，并在学习档案记「缺口」（见 `library/memory.md`）。
 
 ## 与同域其他库内 skill 的分工
 

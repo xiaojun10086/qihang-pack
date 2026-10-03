@@ -16,3 +16,4 @@ description: 「启航」学伴包库入口卡（1 级库）：需求明确 → 
 3. **域审查**：读 `library/domain-review.md`，用该域「不覆盖」条目复核，越界则改锁。
 4. **锁定 skill**：读 `domains/<域>/_domain.md` → 用**库内 skill**（`skills/local/`）。
 5. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档（F3/F5 除外）。
+6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。

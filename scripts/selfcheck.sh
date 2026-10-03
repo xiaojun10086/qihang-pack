@@ -240,7 +240,7 @@ _pbad=$(find domains -path '*skills/local/*/SKILL.md' 2>/dev/null | awk -F/ '{pr
         | sort | uniq -c | awk '$1<4 || $1>5' | wc -l | tr -d ' ')
 [ "${_pbad:-0}" -eq 0 ] && ok "每域均为 4–5 个库内 skill" || bad "$_pbad 个域的库内 skill 数不在 4–5"
 libn=$(ls -1 library/*.md 2>/dev/null | wc -l | tr -d ' ')
-[ "${libn:-0}" -eq 10 ] && ok "library 文件数 = 10" || warn "library 文件数 = $libn（期望 10）"
+[ "${libn:-0}" -eq 11 ] && ok "library 文件数 = 11" || warn "library 文件数 = $libn（期望 11）"
 cmdn=$(ls -1 commands/*.md 2>/dev/null | wc -l | tr -d ' ')
 [ "${cmdn:-0}" -eq 22 ] && ok "commands = 22" || warn "commands = $cmdn（期望 22）"
 pub=$(grep -c '^|' references/dlut-official-sites.md 2>/dev/null); pub=${pub:-0}

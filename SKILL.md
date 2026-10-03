@@ -1,12 +1,12 @@
 ---
 name: qihang
 description: 「启航」大连理工大学新生学习生活一体化学伴包（三级结构）。入口 skill，负责需求明确、域审查、输出规范与路由。当用户提出与大连理工大学校情、课程学习、备考、笔记、作业、科研、校园生活相关的模糊求助时使用。
-version: 3.2.9
+version: 3.3.0
 license: MIT
 tags: [dlut, campus, learning, library, orchestrator]
 ---
 
-# 「启航」学伴包 · 入口（v3.2）
+# 「启航」学伴包 · 入口（v3.3）
 
 三级结构：**skill 库（本入口）→ 域 → skill**
 
@@ -99,7 +99,7 @@ references/     数据与文档（DUT 官网库 / 私密站库）
 
 ## 硬规则
 
-1. **库内唯一**：本包为纯 DUT 特化库，全部场景均由库内 skill 承接，**不安装、不引用任何库外 skill**；库内无法覆盖的细分场景走降级流程并记「缺口」。
+1. **库内优先**：日常场景由库内 skill 承接，**不安装任何外部 skill**；库内与同域降级都接不住时走**外部桥接**（可选，`library/external-bridge.md`）；外部未命中则回落**纯提示词模式**并记「缺口」。
 2. **DUT 强绑定**：命中大工关键词必须先查 `references/dlut-official-sites.md`；未收录固定回复「信息库未收录，建议访问 https://www.dlut.edu.cn/ 核实」；**禁止编造 URL / 电话 / 单位名**。
 3. **私密站只读**：涉及需登录站点时，只读、不外传、不写入文件（见 `references/dlut-login-sites.md`）。
    - **独立 Profile 必须校验生效**：`scripts/dlut-read.sh` 在打开入口前**先关闭全部既有会话**，并在打开后校验输出中**未出现**「profile ignored / daemon already running」类警告；出现即**立即中止**（`rc=5`），**不得**在未隔离的窗口里继续读取。
