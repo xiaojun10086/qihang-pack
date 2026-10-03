@@ -98,7 +98,12 @@ edit('.gitattributes', [
      '# 故对代码与文档显式锁定 LF。\n'
      '# ⚠️ **本文件随包分发**（交付树必需）：用户 clone 后同样要靠它保证 LF；\n'
      '#    实测把它移出交付树 → 交付包 160 个文件变 CRLF、`*.sh` 直接不可执行。'),
-], )
+    ('*.txt   text eol=lf',
+     '*.txt   text eol=lf\n'
+     '.gitattributes  text eol=lf\n'
+     'LICENSE         text eol=lf',
+     '.gitattributes  text eol=lf'),
+])
 
 # ---------------------------------------------------------------- 构建侧文档里的计数同步
 print('== 计数同步）_build/README.md 与 release_branch.py 的 174 → 173 ==')
