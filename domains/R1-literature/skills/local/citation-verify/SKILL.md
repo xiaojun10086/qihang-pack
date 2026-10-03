@@ -1,7 +1,7 @@
 ---
 name: qihang-citation-verify
 description: 「启航」R1 文献检索与管理域库内 skill：逐条核验引文字段并标回源状态，不生成不补全。
-version: 3.2.0
+version: 3.2.1
 license: MIT
 agent_created: true
 ---

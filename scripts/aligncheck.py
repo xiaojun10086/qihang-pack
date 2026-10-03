@@ -208,8 +208,8 @@ def run_round(r):
             if k not in head:
                 bad(f, 'frontmatter 缺 %s' % k)
         vm = re.search(r'version:\s*([\d.]+)', head)
-        if vm and vm.group(1) != '3.2.0':
-            bad(f, '版本号 %s（期望 3.2.0）' % vm.group(1))
+        if vm and vm.group(1) != '3.2.1':
+            bad(f, '版本号 %s（期望 3.2.1）' % vm.group(1))
         if '/skills/local/' in f:
             for h in NEED:
                 if h not in t:
@@ -339,13 +339,13 @@ def run_round(r):
         m = re.search(r'^version:\s*([\d.]+)', fm.group(1), re.M)
         if m:
             vers.add(m.group(1))
-    if vers - {'3.2.0'}:
+    if vers - {'3.2.1'}:
         bad('（frontmatter）', '版本号不唯一: %s' % sorted(vers))
     # 插件清单（JSON 风格，易与 YAML 风格一起被漏改）
     try:
         pv = json.loads(rd('.codebuddy-plugin/plugin.json')).get('version')
-        if pv != '3.2.0':
-            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 3.2.0）' % pv)
+        if pv != '3.2.1':
+            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 3.2.1）' % pv)
     except Exception:
         pass
     # 提交物的版本声明（易漂移点，显式点名）
@@ -353,9 +353,9 @@ def run_round(r):
     _vf = 'qihang-scenario-design.html'
     if os.path.exists(_vf):
         m = re.search(r'<title>[^<]*（v([\d.]+)）', rd(_vf))
-        if m and m.group(1) not in ('3.2', '3.2.0'):
-            bad(_vf, '版本声明 %s（期望包版本 3.2 或修订号 3.2.0）' % (m.group(1), '3.2', '3.2.0'))
-    # 版本号口径（v3.2 起统一）：包版本 = 两位（3.2）｜修订号 = 三位（3.2.0）
+        if m and m.group(1) not in ('3.2', '3.2.1'):
+            bad(_vf, '版本声明 %s（期望包版本 3.2 或修订号 3.2.1）' % (m.group(1), '3.2', '3.2.1'))
+    # 版本号口径（v3.2 起统一）：包版本 = 两位（3.2）｜修订号 = 三位（3.2.1）
     # 展示位写三位 = 口径漂移（正是「包版本与修订号不统一」的复发点），故在此硬断言。
     _rfm = re.match(r'^---\n(.*?)\n---', rd('SKILL.md'), re.S)
     _rev = None
@@ -390,8 +390,8 @@ def run_round(r):
     try:
         pj = json.loads(rd('.codebuddy-plugin/plugin.json'))
         v = json.dumps(pj)
-        if '3.2.0' not in v:
-            warn('.codebuddy-plugin/plugin.json', '未声明版本 3.2.0')
+        if '3.2.1' not in v:
+            warn('.codebuddy-plugin/plugin.json', '未声明版本 3.2.1')
     except Exception as e:
         bad('.codebuddy-plugin/plugin.json', 'JSON 无法解析: %s' % e)
 

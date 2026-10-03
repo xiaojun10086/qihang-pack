@@ -243,6 +243,27 @@ while [ "$r" -le "$ROUNDS" ]; do
   if grep -q 'scripts/_build' "$_ev" 2>/dev/null; then
     _fail "规则文件引用了不随包分发的生成器路径（scripts/_build）→ 交付副本会判失效引用"
   else _ok "规则文件未引用生成器路径（副本安全）"; fi
+  echo "[9] 需求确定门（理解准确率 ≥ 95% 才直接执行）"
+  _cl="library/clarity.md"
+  if grep -q '需求确定门' "$_cl" 2>/dev/null; then _ok "需求确定门已在位"; else _fail "clarity.md 缺需求确定门"; fi
+  if grep -qF 'C = 1 − U' "$_cl" 2>/dev/null; then _ok "已声明理解准确率口径 C = 1 − U"; else _fail "未声明 C = 1 − U"; fi
+  if grep -qF '0.95' "$_cl" 2>/dev/null; then _ok "已声明 95% 阈值"; else _fail "未声明 0.95 阈值"; fi
+  if grep -qF '0.70' "$_cl" 2>/dev/null; then _ok "已声明复述档下界 0.70"; else _fail "未声明 0.70 下界"; fi
+  for _t in 确定档 复述档 追问档; do
+    if grep -q "$_t" "$_cl" 2>/dev/null; then _ok "三档已定义：$_t"; else _fail "三档缺：$_t"; fi
+  done
+  # 复述档三条硬规格
+  for _t in '一句话' '不得新增' '【假设】'; do
+    if grep -qF "$_t" "$_cl" 2>/dev/null; then _ok "复述规格已声明：$_t"; else _fail "复述规格缺：$_t"; fi
+  done
+  # 红线优先于本门 + 例外 6 视为达标（防「为了确认而削弱合规」与「假复述」）
+  grep -qF '红线优先于本门' "$_cl" 2>/dev/null && _ok "红线优先于需求确定门" || _fail "未声明红线优先于本门"
+  grep -qF '视为 `C` 达标' "$_cl" 2>/dev/null && _ok "例外 6 视为 C 达标（免复述）" || _fail "未声明例外 6 免复述"
+  # 两个可复现自检问
+  grep -qF '可复现自检问' "$_cl" 2>/dev/null && _ok "已给出可复现自检问" || _fail "缺可复现自检问"
+  # 阈值单一真相源必须在 config.yaml（与 §3 的 U 阈值同源约定）
+  if grep -q 'confirm_threshold: 0.95' config.yaml 2>/dev/null; then _ok "config.yaml 声明 confirm_threshold: 0.95"
+  else _fail "config.yaml 缺 confirm_threshold: 0.95（阈值未落在单一真相源）"; fi
   echo "=========================================="
   echo ""
   r=$((r + 1))

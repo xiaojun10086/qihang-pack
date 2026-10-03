@@ -2,7 +2,7 @@
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 # version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；
 # 包版本为两位形态（见 README 标题）。改版本时两处同改。
-version: 3.2.0
+version: 3.2.1
 
 # ============ 学校绑定（强绑定） ============
 school:
@@ -42,6 +42,10 @@ library:
     max_questions_per_round: 3
     weights: {O: 1.5, T: 1.5, D: 1.5, W: 0.8, C: 0.6, B: 0.2}
     ask_priority: {W: 3.0, O: 2.5, D: 2.0, C: 1.5, B: 1.0, T: 0.5}
+    # 需求确定门（见 library/clarity.md §3.1）：C = 1 − U 为「理解准确率」
+    #   C >= 0.95 → 直接执行（免复述）｜0.70 <= C < 0.95 → 一句话复述并落【假设】｜C < 0.70 → 追问
+    confirm_threshold: 0.95        # 免复述阈值
+    restate_floor: 0.70            # 复述档下界（低于此值走追问，本门不改变追问判定）
     skip_when:                        # 与 library/clarity.md §5 六条例外一一对应；优先级 4 > 6 > 1 > 2 > 5 > 3
       - 命中校情横切且对象明确                        # 例外 1
       - O/T/D 三关键槽齐全且均 c_i >= 0.8            # 例外 2

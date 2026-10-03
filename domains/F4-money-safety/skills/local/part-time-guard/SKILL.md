@@ -1,7 +1,7 @@
 ---
 name: qihang-part-time-guard
 description: 「启航」F4 财务与安全域库内 skill：用「押金 / 合同 / 结算 / 安全」四条风险线核验兼职机会。
-version: 3.2.0
+version: 3.2.1
 license: MIT
 ---
 
