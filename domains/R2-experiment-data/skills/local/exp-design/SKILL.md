@@ -1,7 +1,7 @@
 ---
 name: qihang-exp-design
 description: 「启航」R2 实验与数据域库内 skill：实验设计要素检查：变量操作化、对照随机、样本量估算思路。
-version: 3.2.5
+version: 3.2.6
 license: MIT
 ---
 

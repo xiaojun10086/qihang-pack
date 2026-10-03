@@ -102,8 +102,9 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 | 项 | 说明 |
 |---|---|
 | 库内 skill | **开箱即用，无需安装任何东西**（92 个，零外部依赖） |
-| 网络 | 库内 skill 全程离线可用 |
-| 私密站（需登录） | 需 `agent-browser` 或同类浏览器自动化；**必须用独立 Profile**（见 `references/dlut-login-sites.md` §0.1） |
+| 网络 | 库内 skill 全程离线可用（**核心能力不触网**） |
+| 私密站（需登录）· **可选功能** | **属可选增强：不装也不影响核心能力**。需 `agent-browser` 或同类浏览器自动化（`npm i -g agent-browser`）；**必须用独立 Profile**（见 `references/dlut-login-sites.md` §0.1） |
+| 校内站点协议 | 部分校内系统**仅提供 `http://`**（教务 / 财务 / 缴费 / 信息服务等，域名均为 `*.dlut.edu.cn`）→ **访问时注意网络环境**；本包**不改写**站点协议，只如实登记 |
 
 ---
 
