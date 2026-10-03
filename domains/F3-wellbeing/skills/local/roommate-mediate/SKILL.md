@@ -1,7 +1,7 @@
 ---
 name: qihang-roommate-mediate
 description: 「启航」F3 身心与社交域库内 skill：把宿舍摩擦转成一次可执行的沟通：事实分离 + 我信息 + 协商方案。
-version: 3.2.1
+version: 3.2.2
 license: MIT
 ---
 

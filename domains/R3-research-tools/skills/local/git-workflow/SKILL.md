@@ -1,7 +1,7 @@
 ---
 name: qihang-git-workflow
 description: 「启航」R3 科研工具与代码域库内 skill：面向科研代码的 Git 分支模型、提交规范与冲突处理。
-version: 3.2.1
+version: 3.2.2
 license: MIT
 ---
 

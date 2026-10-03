@@ -38,7 +38,7 @@
 
 | 项 | 实测值 |
 |---|---|
-| **包版本 / 修订号** | **`3.2` / `3.2.1`**（**包版本 = 修订号前两位**；同一包版本线内**修订号递增** —— 见「强约定 9」与「稳定规模」） |
+| **包版本 / 修订号** | **`3.2` / `3.2.2`**（**包版本 = 修订号前两位**；同一包版本线内**修订号递增** —— 见「强约定 9」与「稳定规模」） |
 | 源仓库 HEAD | **以 `git log -1` 为准**（本节点修订时 = `560856e`，其后另有本轮 v3.2 提交） |
 | 推送状态 | **以 `git rev-list --count origin/main..main` 为准**（`ddff4e8` 及之前**已推送**；其后提交待在能联网处 `git push origin main`） |
 | 工作区 | 以 `git status --porcelain` 为准（每轮收尾应为 **0 项**） |
@@ -46,8 +46,9 @@
 | 记忆 | `.learnbuddy/memory/` 三文件两处**逐字节一致**（§0.5 自检输出 `OK 两处同源`） |
 | 交付副本 | **不含 `MANIFEST.md`、不含 zip**（现行 v3.x 线不产，见 §二之九） |
 
-**校验器期望（两树同值）**：`selfcheck OK 37 / 0 / 0` · `aligncheck FAIL 0 / WARN 1`（`clarity.md` 良性）·
-`runcheck FAIL 0 / WARN 0` · `regress` 累计 `FAIL 0` · `audit` 源 **46** / 副本 **45** 通过。
+**校验器期望（两树同值）**：`python scripts/checkall.py .` → **全部 PASS / rc 0**（单入口，跑齐下面 5 个）；
+内部各项：`selfcheck OK 37 / 0 / 0` · `audit` 源 **46** / 副本 **45** 通过 · `aligncheck FAIL 0 / WARN 1`（`clarity.md` 良性）·
+`runcheck FAIL 0 / WARN 0` · `regress` 累计 `FAIL 0`。加 `--negative` 时负向自测须 **捕获率 100%**（当前 5/5）。
 
 **遗留（产品级，本轮未处理，需用户决策）**
 1. **「场景设计书」缺席**：`INSTALL.md:70` §四第 1 项指向的《智能体场景设计书》**不在包内**（v3.0.0 提交 `e31f959` 删除）。
@@ -142,12 +143,12 @@
 
 | 项 | 值 |
 |---|---|
-| 版本号 | **包版本 = `3.2`**（两位 · **只用于展示位**：README 标题 / 根 SKILL.md 标题 / `qihang.sh` 状态行 / `config.yaml` 首行注释）｜**修订号 = `3.2.1`**（三位 · **用于字段与断言**：92 个库内 SKILL.md frontmatter + 根 SKILL.md frontmatter + `.codebuddy-plugin/plugin.json` + `config.yaml` 的 `version:` + `scripts/aligncheck.py` 期望值）。**包版本 = 修订号前两位**（`3.2` ↔ `3.2.x`）；同一包版本线内**修订号递增**（规则变更 +1）。`output-spec.md` **不再另设修订号**（原「输出标准修订 v3.1.0」已并入 3.2 线）。**展示位写三位 = 口径漂移**，`aligncheck` 有硬断言 |
+| 版本号 | **包版本 = `3.2`**（两位 · **只用于展示位**：README 标题 / 根 SKILL.md 标题 / `qihang.sh` 状态行 / `config.yaml` 首行注释）｜**修订号 = `3.2.2`**（三位 · **用于字段与断言**：92 个库内 SKILL.md frontmatter + 根 SKILL.md frontmatter + `.codebuddy-plugin/plugin.json` + `config.yaml` 的 `version:` + `scripts/aligncheck.py` 期望值）。**包版本 = 修订号前两位**（`3.2` ↔ `3.2.x`）；同一包版本线内**修订号递增**（规则/工具变更 +1）。`output-spec.md` **不再另设修订号**（原「输出标准修订 v3.1.0」已并入 3.2 线）。**展示位写三位 = 口径漂移**，`aligncheck` 有硬断言 |
 | 域数 | **20**（S1–S6 / F1–F8 / R1–R6） |
 | 库内 skill | **92**（自建 80 + 改造 12；**每域 4–5 个**） |
 | `skills/external.md` | **必须为 0**（外部通道已删除） |
 | commands | 22（库入口 1 + 校情 1 + 20 域，每张卡第 3 步列全该域 4–5 个 skill） |
-| library 文件 | **10**（8 份规则 + `README.md` + `skill-evolution.md`；`qihang.sh status` 逐行列出 **9** 份=不含 README）｜ references **18**（源仓库）/ 10（副本，已去 8 份过程文档）｜ scripts 7 |
+| library 文件 | **10**（8 份规则 + `README.md` + `skill-evolution.md`；`qihang.sh status` 逐行列出 **9** 份=不含 README）｜ references **18**（源仓库）/ 10（副本，已去 8 份过程文档）｜ scripts **9**（5 个校验器 + `qihang.sh` + `dlut-read.sh` + **`checkall.py`** + **`negative_test.py`**） |
 | DUT 公开站 | 表格行 **162** / 数据条目 **142**（2026-10-02 直连核验后更新；旧值 159/139 已废） |
 
 > 计数散落在：`README.md`、`INSTALL.md`、`THIRD_PARTY_NOTICES.md`、`domains/_registry.md`、`SKILL.md`、
@@ -190,7 +191,7 @@
 
 
 
-## 五个校验脚本（职责不重叠，期望值）
+## 校验体系（5 个校验器 + 1 个单入口 + 1 个负向自测，职责不重叠）
 
 | 脚本 | 管什么 | 期望 |
 |---|---|---|
@@ -199,17 +200,29 @@
 | `scripts/regress.sh N` | 行为回归（澄清门算例 / L1-L3 门禁矩阵 / 红线一致 / 结构不变量 / **[5] 零命中兜底链** / 脚本语法 / **[7] 输出标准固化** / **[8] 自迭代边界（16 条）** / **[9] 需求确定门（14 条）**） | 累计 `FAIL 0` |
 | `scripts/aligncheck.py . N` | 全量文件级对齐（**18 组 A–D、F–Q、S、T**） | `FAIL 0 ｜ WARN ≤1` |
 | `scripts/runcheck.py . N [域ID…]` | **端到端运行性**：每域跑完整三级链，逐级确认返回结果可解（含**输出形态硬契约**） | `FAIL 0 ｜ WARN 0` |
+| **`scripts/checkall.py`** | **自检单入口**：固定顺序跑齐上面 5 个 + **逐项计时** + 模拟跑摘要；`--quick`（只跑 selfcheck/aligncheck/runcheck）｜`--rounds N`｜`--negative`｜`--limit S` | `全部 PASS ｜ rc 0` |
+| **`scripts/negative_test.py`** | **负向自测**：在临时树（交付口径）注入 6 类缺陷 → 断言校验器**必须 FAIL** → 报捕获率 | **捕获率 100%** |
 
+- **一律走单入口**（`python scripts/checkall.py .`）：此前手工跑 5 条命令，**顺序/轮数/cwd 都可能漏 —— 漏跑本身就是缺陷来源**。
+- **时间基线（本机实测 2026-10-03）**：selfcheck ~27s ｜ audit ~46s ｜ aligncheck ~0.6s ｜ runcheck ~0.3s ｜ regress ~44s ｜ negative ~3s；
+  **`--quick` ~28s ／ full+negative ~121s**。超基线只记 **WARN**（不判 FAIL）—— 本机高负载下会偶发 `rc=127`。
 - `aligncheck.py` 唯一允许的 WARN：`library/clarity.md` 两个算例的 D 槽行巧合重复（良性交叉登记）。
 - 全部脚本设计为**零临时文件**（受限环境 `rm` 被拦截会让脚本静默失败）。
+- **在 Python 脚本里调 `bash` 必须显式找 Git Bash**（`checkall.py` / `negative_test.py` 内建 `bash_bin()`）：
+  直接 `subprocess.run(['bash', …])` 会落到 **WSL**（`System32\bash.exe`）→ 秒退、零输出、rc≠0（实测被 checkall 冒烟测试当场抓到）。
 - `runcheck.py` 的**关键解析约定**（改它时别踩回去）：
   ① 域触发词**只取列表行**，必须排除 `>` 注释行（注释里引用别的域 ID / 文件名）；
   ② `_registry.md` 触发词列是**缩写摘要**（`、` 分隔 + `…` 截断），断言只能 **registry ⊆ 域文件**；
   ③ 降级校验要同时看「`` `X` 降级承接 ``」的承接目标与降级标注里指向的 skill；**落盘输出**用能力级写法（不含 skill 名）。
-- 改校验器后必须做**负向测试**（往副本注入已知缺陷，确认被捕获），否则可能是空转断言。
+- 改校验器后必须做**负向测试** —— 现已固化为 `scripts/negative_test.py`（6 类注入，含 2026-10-03 实测揪出的
+  「红线漂移 / 伪降级目标 / 展示位三位 / 段重复插入 / 规则文件引用生成器路径 / 兜底框架缺失」）。
+- **解析输出时要按校验器各自的列序取 FAIL 计数**（`checkall.py` 的 `fgrp`）：
+  selfcheck/audit 的 FAIL 在**最后一列**，aligncheck/runcheck/regress 在**第一列** —— 第一版统一取末列，把 WARN 当成了 FAIL。
 - **`--dry-run` 必须排在「探测外部二进制」之前**（本项目 `dlut-read.sh` 曾把 dry-run 放在 `agent-browser` 探测之后
   → 本机未装浏览器时连「只打印计划」也 `exit 4` → regress 6 处 L1 项**假失败**；前置后归零）。
   外部依赖只在**真跑**时校验。
+- **给 shell 脚本插入成段内容后，必须跑一次语法检查**（`bash -n` 或 selfcheck 的「脚本语法」项）：
+  插入段自带收尾时若又拼一次收尾 → 语法错误（本层实测踩过，被 selfcheck 当场抓到）。
 
 
 ## 强约定

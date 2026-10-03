@@ -82,21 +82,27 @@ edit('.codebuddy-plugin/plugin.json', [('"version": "%s"' % OLD, '"version": "%s
 # config.yaml：头部注释块用**整体归一**（不用「插入型替换」）。
 # 教训：本层第一版用 `replace(锚点, 锚点+新块)` —— 新串包含旧串 → 每跑一次多插一份，
 # 实测把 `version:` 插成两个（YAML 重复键）。这正是本包铁律「追加型替换必须加完成判据」的复发。
-CFG_HEAD = ('# 「启航」学伴包 v%s · 唯一需要按学期 / 课程修改的文件\n'
-            '# 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。\n'
-            '# version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；\n'
-            '# 包版本为两位形态（见 README 标题）。改版本时两处同改。\n'
-            'version: %s\n\n' % (PKG, REV))
+CFG_HEAD_TMPL = ('# 「启航」学伴包 v%s · 唯一需要按学期 / 课程修改的文件\n'
+                 '# 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。\n'
+                 '# version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；\n'
+                 '# 包版本为两位形态（见 README 标题）。改版本时两处同改。\n'
+                 'version: %s\n\n')
 _cfg = read('config.yaml')
 if _cfg is None:
     print('  [SKIP] config.yaml（不存在）')
 else:
     _i = _cfg.find('# ============ 学校绑定')
+    # ⚠️ 必须**保留文件里既有的修订号**：本层是「头部整体归一」，若把版本硬写成自己的 `REV`，
+    # 后续层（step52/step53…）升过的更高修订号会被**改回去** → 链第 1 遍变更 1 个文件
+    # （实测：3.2.2 被改回 3.2.1）。归一的是**格式**，不是**版本值**。
+    _vm = re.search(r'^version:\s*([\d.]+)', _cfg, re.M)
+    _ver = _vm.group(1) if _vm else REV
+    _head = CFG_HEAD_TMPL % (PKG, _ver)
     if _i < 0:
         print('  [MISS] config.yaml :: 未找到「学校绑定」锚点')
-    elif _cfg[:_i] != CFG_HEAD:
-        write('config.yaml', CFG_HEAD + _cfg[_i:])
-        print('  [OK]   config.yaml :: 头部归一（单一个 version 键）')
+    elif _cfg[:_i] != _head:
+        write('config.yaml', _head + _cfg[_i:])
+        print('  [OK]   config.yaml :: 头部归一（单一个 version 键，保留修订号 %s）' % _ver)
     else:
         print('  [SAME] config.yaml :: 头部已归一')
 

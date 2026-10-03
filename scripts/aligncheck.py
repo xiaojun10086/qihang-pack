@@ -208,8 +208,8 @@ def run_round(r):
             if k not in head:
                 bad(f, 'frontmatter 缺 %s' % k)
         vm = re.search(r'version:\s*([\d.]+)', head)
-        if vm and vm.group(1) != '3.2.1':
-            bad(f, '版本号 %s（期望 3.2.1）' % vm.group(1))
+        if vm and vm.group(1) != '3.2.2':
+            bad(f, '版本号 %s（期望 3.2.2）' % vm.group(1))
         if '/skills/local/' in f:
             for h in NEED:
                 if h not in t:
@@ -339,13 +339,13 @@ def run_round(r):
         m = re.search(r'^version:\s*([\d.]+)', fm.group(1), re.M)
         if m:
             vers.add(m.group(1))
-    if vers - {'3.2.1'}:
+    if vers - {'3.2.2'}:
         bad('（frontmatter）', '版本号不唯一: %s' % sorted(vers))
     # 插件清单（JSON 风格，易与 YAML 风格一起被漏改）
     try:
         pv = json.loads(rd('.codebuddy-plugin/plugin.json')).get('version')
-        if pv != '3.2.1':
-            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 3.2.1）' % pv)
+        if pv != '3.2.2':
+            bad('.codebuddy-plugin/plugin.json', 'version = %s（期望 3.2.2）' % pv)
     except Exception:
         pass
     # 提交物的版本声明（易漂移点，显式点名）
@@ -353,9 +353,9 @@ def run_round(r):
     _vf = 'qihang-scenario-design.html'
     if os.path.exists(_vf):
         m = re.search(r'<title>[^<]*（v([\d.]+)）', rd(_vf))
-        if m and m.group(1) not in ('3.2', '3.2.1'):
-            bad(_vf, '版本声明 %s（期望包版本 3.2 或修订号 3.2.1）' % (m.group(1), '3.2', '3.2.1'))
-    # 版本号口径（v3.2 起统一）：包版本 = 两位（3.2）｜修订号 = 三位（3.2.1）
+        if m and m.group(1) not in ('3.2', '3.2.2'):
+            bad(_vf, '版本声明 %s（期望包版本 3.2 或修订号 3.2.2）' % (m.group(1), '3.2', '3.2.2'))
+    # 版本号口径（v3.2 起统一）：包版本 = 两位（3.2）｜修订号 = 三位（3.2.2）
     # 展示位写三位 = 口径漂移（正是「包版本与修订号不统一」的复发点），故在此硬断言。
     _rfm = re.match(r'^---\n(.*?)\n---', rd('SKILL.md'), re.S)
     _rev = None
@@ -376,6 +376,7 @@ def run_round(r):
                     % (_h.group(1), _pkg, _rev))
 
 
+
     # ---------- I commands ----------
     for f in sorted(glob.glob('commands/*.md')):
         f = f.replace('\\', '/')
@@ -390,8 +391,8 @@ def run_round(r):
     try:
         pj = json.loads(rd('.codebuddy-plugin/plugin.json'))
         v = json.dumps(pj)
-        if '3.2.1' not in v:
-            warn('.codebuddy-plugin/plugin.json', '未声明版本 3.2.1')
+        if '3.2.2' not in v:
+            warn('.codebuddy-plugin/plugin.json', '未声明版本 3.2.2')
     except Exception as e:
         bad('.codebuddy-plugin/plugin.json', 'JSON 无法解析: %s' % e)
 
@@ -417,6 +418,21 @@ def run_round(r):
     v0 = {'O': 1, 'T': 1, 'D': 0.8}
     if abs(U(v0) - 0.311) > 0.002:
         bad('library/clarity.md', '例 A 的 U=%.4f 与文档 0.311 不符' % U(v0))
+    # 需求确定门（`library/clarity.md` §3.1）：`C = 1 − U` 的算例与阈值必须与 `config.yaml` 同源
+    _cl = rd('library/clarity.md')
+    _C = 1 - U(v0)
+    if abs(_C - 0.689) > 0.002:
+        bad('library/clarity.md', '例 A 的 C = 1 − U = %.4f 与文档 0.689 不符（需求确定门算例）' % _C)
+    _ct = re.search(r'confirm_threshold:\s*([\d.]+)', rd('config.yaml'))
+    _rf = re.search(r'restate_floor:\s*([\d.]+)', rd('config.yaml'))
+    if _ct and _ct.group(1) not in _cl:
+        bad('library/clarity.md', 'confirm_threshold=%s 未在 §3.1 声明（阈值未同源）' % _ct.group(1))
+    if _rf and _rf.group(1) not in _cl:
+        bad('library/clarity.md', 'restate_floor=%s 未在 §3.1 声明（阈值未同源）' % _rf.group(1))
+    if '复述档' not in _cl or '确定档' not in _cl or '追问档' not in _cl:
+        bad('library/clarity.md', '§3.1 未声明三档（确定档 / 复述档 / 追问档）')
+    if '例 D' not in _cl or '0.816' not in _cl:
+        bad('library/clarity.md', '§3.1 缺需求确定门算例（例 D / 例 E）')
     for pat_ in [r'U\s*=\s*1\s*[−-]\s*([\d.]+)\s*/\s*6\.1\s*=\s*([\d.]+)']:
         for f in MD:
             for m in re.finditer(pat_, rd(f)):

@@ -1,7 +1,7 @@
 ---
 name: qihang-grant-apply
 description: 「启航」R4 学术产出与投稿域库内 skill：申报书结构骨架与评审维度自查（创新 / 可行 / 基础 / 预算）。
-version: 3.2.1
+version: 3.2.2
 license: MIT
 ---
 

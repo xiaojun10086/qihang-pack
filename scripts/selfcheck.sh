@@ -41,7 +41,7 @@ references/dlut-official-sites.md references/dlut-login-sites.md references/dlut
 references/dlut-url-verification.md references/dlut-site-profiles.md references/browser-matrix.md
 references/skill-compliance-audit.md
 references/platforms.md references/e2e-scenarios.md
-.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh scripts/aligncheck.py scripts/runcheck.py"
+.codebuddy-plugin/plugin.json scripts/qihang.sh scripts/dlut-read.sh scripts/selfcheck.sh scripts/audit.sh scripts/regress.sh scripts/aligncheck.py scripts/runcheck.py scripts/checkall.py scripts/negative_test.py"
 miss=0; cnt=0
 for f in $REQ; do
   cnt=$((cnt+1))

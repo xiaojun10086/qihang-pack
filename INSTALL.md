@@ -93,6 +93,7 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 | `bash scripts/regress.sh 3` | **行为对不对**（澄清门算例 / L3 门禁矩阵 / 红线一致性） | 全 OK ｜ `FAIL 0` |
 | `python scripts/aligncheck.py . 5` | **全量文件级对齐**（18 组断言） | `FAIL 0 ｜ 全部通过` |
 | `python scripts/runcheck.py . 3` | **跑得通不通**（每域跑完整三级链，逐级确认返回结果） | `FAIL 0 ｜ 运行链全部可解` |
+| `python scripts/checkall.py .` | **自检单入口**：跑齐 5 个校验器 + 逐项计时 + 模拟跑摘要（`--quick` 加速 ｜ `--negative` 断言非空转） | `全部 PASS ｜ rc 0` |
 
 ---
 

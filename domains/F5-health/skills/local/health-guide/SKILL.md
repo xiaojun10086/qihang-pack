@@ -1,7 +1,7 @@
 ---
 name: qihang-health-guide
 description: 「启航」F5 健康与运动域库内 skill：症状严重直接给就医路径（校医院 → 附属医院）；不诊断，只给流程与运动处方。
-version: 3.2.1
+version: 3.2.2
 license: MIT
 ---
 

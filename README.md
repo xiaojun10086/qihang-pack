@@ -90,6 +90,7 @@ bash scripts/audit.sh             # 安全审计 + L3 门禁实测
 bash scripts/regress.sh 3         # 行为回归（连跑 3 轮验证确定性）
 python scripts/aligncheck.py . 5  # 全量对齐审计（连跑 5 轮）
 python scripts/runcheck.py . 3    # 运行性检查（每域跑完整三级链，连跑 3 轮）
+python scripts/checkall.py .       # 自检单入口（跑齐 5 个校验器 + 计时 + 模拟跑摘要）
 bash scripts/qihang.sh status     # 三级结构完整度
 bash scripts/qihang.sh domains    # 20 域清单
 bash scripts/qihang.sh registry   # DUT 信息库统计

@@ -53,15 +53,20 @@ python scripts/_build/v3/rebuild.py --dry      # 只列层，不执行
 | 12 | `scripts/_build/v3/step44_checker_thresholds.py` | 校验器阈值同步（52→92） | `gen_counts.py` |
 | 13 | `scripts/_build/v3/step50_self_evolution.py` | **习惯自迭代机制**：新增 `library/skill-evolution.md`（1 级库第 6 份规则）+ 20 域执行顺序接线 + `regress.sh [8]` 边界段 + `runcheck` 接线断言 | 新增层 |
 | 14 | `scripts/_build/v3/step51_version_bump.py` | **版本号与计数级联**：包版本 → `3.2`（两位 · 展示位）／修订号 → `3.2.0`（三位 · 字段与断言）；`library` 文件数 9 → 10 | 新增层 |
+| 15 | `scripts/_build/v3/step52_requirement_confirm.py` | **需求确定门**：`library/clarity.md` §3.1（理解准确率 `C = 1 − U`，三档 0.95 / 0.70）+ `config.yaml` 阈值 + `regress [9]`；修订号 → `3.2.1` | 新增层 |
+| 16 | `scripts/_build/v3/step53_checkup_flow.py` | **自检查流程加固**：新增 `scripts/checkall.py`（单入口 · 逐项计时 · 模拟跑摘要）与 `scripts/negative_test.py`（负向自测 · 断言非空转）+ 需求确定门算例（例 D/E）+ `aligncheck` 口径断言；修订号 → `3.2.2` | 新增层 |
 
 **版本号口径（v3.2 起统一）**：**包版本 = `3.2`**（两位，用于 README 标题 / 包根 `SKILL.md` 标题 / `qihang.sh` 状态行 / `config.yaml` 首行注释）
-｜**修订号 = `3.2.0`**（三位，用于 92 个库内 `SKILL.md` frontmatter、包根 `SKILL.md` frontmatter、`.codebuddy-plugin/plugin.json`、`config.yaml` 的 `version:`、`aligncheck.py` 期望值）。
-两者**同一条线**（修订号 = 包版本 + `.0`），且由 `aligncheck.py` 硬断言「展示位必须是两位形态」。
+｜**修订号 = `3.2.2`**（三位，用于 92 个库内 `SKILL.md` frontmatter、包根 `SKILL.md` frontmatter、`.codebuddy-plugin/plugin.json`、`config.yaml` 的 `version:`、`aligncheck.py` 期望值）。
+**包版本 = 修订号前两位**，同一包版本线内**修订号递增**；由 `aligncheck.py` 硬断言「展示位必须是两位形态」。
 历史陈述（如 `自 v3.0.0 起…`）描述的是**当时的变更**，不追改。
 
+> ⚠️ **归一格式，不归一版本值**：任何「头部/整块归一」的层（如 step51 处理 `config.yaml`）必须**保留文件里既有的修订号**，
+> 否则会把更靠后层升过的版本**改回去**（实测：3.2.2 被改回 3.2.1 → 全链第 1 遍变更 1 个文件）。
+
 **判据**：本链在**已达 v3.2** 的树上重跑应**零变更**；全链连跑两遍，逐文件哈希一致；
-产物通过 `scripts/selfcheck.sh` · `scripts/audit.sh` · `scripts/regress.sh` ·
-`scripts/aligncheck.py` · `scripts/runcheck.py`。
+产物通过 `scripts/checkall.py .`（内部即跑齐 `selfcheck.sh` · `audit.sh` · `aligncheck.py` · `runcheck.py` · `regress.sh`），
+可用 `--negative` 追加负向自测。
 
 ---
 

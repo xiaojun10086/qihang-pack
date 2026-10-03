@@ -1,7 +1,7 @@
 ---
 name: qihang-code-mentor
 description: 「启航」R3 科研工具与代码域库内 skill：编程私教——使命驱动的长期教学：学习使命文档 + 最近发展区选题 + 检索练习，学一个技能给一次小胜，凭学习记录推下次教什么。
-version: 3.2.1
+version: 3.2.2
 license: MIT
 ---
 

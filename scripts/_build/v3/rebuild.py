@@ -40,6 +40,7 @@ LAYERS = [
     ('step50_self_evolution.py',     '习惯自迭代机制（library 规则文件 + 20 域接线 + [8] 段断言）'),
     ('step51_version_bump.py',       '版本号与计数级联（包版本 3.0.0→3.2.0 / library 9→10）'),
     ('step52_requirement_confirm.py', '需求确定门（clarity §3.1 · 理解准确率 ≥95%）+ 修订号 3.2.0→3.2.1'),
+    ('step53_checkup_flow.py',       '自检查流程加固（单入口 checkall + 负向自测）+ 需求确定门算例 + 修订号 3.2.1→3.2.2'),
 ]
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)
