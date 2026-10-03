@@ -1,7 +1,7 @@
 ---
 name: qihang-academic-english
 description: 「启航」S6 语言能力域库内 skill：面向论文写作的句式库、时态语态选择与中式表达改写方向，只标错不整段重写。
-version: 3.3.2
+version: 3.3.3
 license: MIT
 ---
 

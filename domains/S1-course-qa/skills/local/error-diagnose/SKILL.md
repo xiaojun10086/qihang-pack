@@ -1,7 +1,7 @@
 ---
 name: qihang-error-diagnose
 description: 「启航」S1 课程答疑域库内 skill：把错题按概念/方法/计算/审题四类归因，输出错因清单与再练顺序。
-version: 3.3.2
+version: 3.3.3
 license: MIT
 agent_created: true
 ---
