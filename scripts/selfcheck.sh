@@ -255,14 +255,15 @@ echo "[8b] 入口唯一性与声明"
 # ⚠️ 为什么编号是 8b 而不是 11（**锚点冲突，实测踩过**）：
 #   phase15 用 `rep('# ---------- 11. 交付分支一致性（有 .git 时才查；交付树无 .git → 跳过） ----------
 # 事故驱动（2026-10-03 两次）：release 分支被 git add -f 塞进 .learnbuddy/.idea/过程文档。
-# 判据：release 树里**每个**文件都必须存在于 main（排除项除外）——「只在 release 出现」即为污染。
+# 判据：release 树里**每个**文件都必须存在于 main（release ⊆ main 恒成立）——「只在 release 出现」即污染。
+# ⚠️ 首版曾把 `.learnbuddy/` 等**预先过滤掉**，而它恰恰是最常见的污染源 → 断言对真实事故完全无效；
+#    实测（故意污染 release 后 [11] 仍报 OK）发现后改为**不预先过滤**，
+#    这正是本项目「断言必须经负向自检，否则可能是空转」的又一实例。
 echo "[11] 交付分支一致性"
 if [ -d .git ] && git rev-parse --verify --quiet release >/dev/null 2>&1; then
-  _extra=$(git ls-tree -r release --name-only \
-           | grep -vE '^(scripts/_build/|\.learnbuddy/|\.gitignore$)' \
-           | while IFS= read -r _f; do
-               git cat-file -e "main:$_f" 2>/dev/null || echo "$_f"
-             done)
+  _extra=$(git ls-tree -r release --name-only | while IFS= read -r _f; do
+             git cat-file -e "main:$_f" 2>/dev/null || echo "$_f"
+           done)
   if [ -n "$_extra" ]; then
     _n=$(printf '%s\n' "$_extra" | grep -c . )
     bad "release 分支含 $_n 个不随包文件（应为 0）"
