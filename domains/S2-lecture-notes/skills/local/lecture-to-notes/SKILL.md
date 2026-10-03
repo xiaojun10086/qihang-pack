@@ -1,7 +1,7 @@
 ---
 name: qihang-lecture-to-notes
 description: 「启航」S2 课堂与笔记域库内 skill：把讲义/录音/PPT 压成「5–8 条核心 + 概念图 + 3 个自测题」，并标注未理解点供下次复考。
-version: 3.3.5
+version: 3.3.6
 license: MIT
 ---
 

@@ -32,13 +32,15 @@ SENSITIVE_NO_WRITE = ('F3-wellbeing', 'F5-health')
 SENSITIVE_PARTIAL = ('F4-money-safety', 'F6-service')
 
 # 红线判据（关键词 → 类别，逐条对应 SKILL.md「红线总览」的六类）
+# ⚠️ 这是**近似**：包里的红线是语义规则（由模型判），这里只做关键词初筛，
+#    因此漏判不等于包有错 —— 面板会把「疑似漏判」单列，供人工确认。
 REDLINES = [
     ('学术诚信', ['代写', '直接交', '给我答案', '直接给答案', '代考', '降重', '去重', '规避查重', '查不出来', '隐藏ai', '隐藏 AI']),
-    ('代操作',   ['帮我选课', '帮我缴费', '帮我交费', '帮我报名', '帮我提交', '帮我投稿', '时长登记']),
-    ('编造/代写文书', ['帮我写个人陈述', '帮我写文书', 'ps 帮我写', '编一段经历', '美化学历', '改一下获奖']),
-    ('安全兜底', ['不想活', '自杀', '轻生', '活不下去', '转账了', '被骗', '急诊', '急救']),
-    ('隐私',     ['我室友', '我同学', '我朋友的心理', '帮我分析一下他', '帮我分析下他']),
-    ('L3 禁读',  ['缴费金额', '银行卡号', '身份证号', '邮件正文', '成绩明细']),
+    ('代操作',   ['帮我选课', '帮我缴费', '帮我交费', '帮我报名', '帮我提交', '帮我投稿', '时长登记', '帮我登记']),
+    ('编造/代写文书', ['帮我写个人陈述', '帮我写文书', '编一段经历', '编一段实习', '编造经历', '美化学历', '改一下获奖', '伪造经历']),
+    ('安全兜底', ['不想活', '自杀', '轻生', '活不下去', '转账了', '被骗', '急诊', '急救', '晕倒', '昏迷', '骨折', '大出血']),
+    ('隐私',     ['我室友', '我同学', '我朋友的心理', '帮我分析一下他', '帮我分析下他', '他的成绩单', '他的病历', '他的银行卡']),
+    ('L3 禁读',  ['缴费金额', '银行卡号', '身份证号', '邮件正文', '成绩明细', '成绩单']),
 ]
 
 # 端到端样例：原话 + 预期（不填则只观察）
@@ -128,9 +130,13 @@ def get(url):
 
 # ---------------- 链路各步 ----------------
 def gate(text, cfg):
+    """返回 (命中条件列表, 是否被越界信号拦下)。越界信号优先级最高。"""
     dlut = yaml_list(cfg, 'dlut_markers')
     learn = yaml_list(cfg, 'learning_markers')
     intent = yaml_list(cfg, 'learning_intents')
+    oos = yaml_list(cfg, 'out_of_scope_markers')
+    if any(m in text for m in oos):
+        return [], True
     hit = []
     if any(m in text for m in dlut):
         hit.append('T1')
@@ -138,7 +144,7 @@ def gate(text, cfg):
         hit.append('T2')
     if re.search(r'(我是|我们学校|我们大工).{0,12}(大工|大连理工|DUT|凌水)', text):
         hit.append('T3')
-    return hit
+    return hit, False
 
 
 def redline(text):
@@ -160,23 +166,24 @@ def domain_words(dom):
 
 
 def lock_domains(text, reg):
-    """两级匹配：① _registry 快筛（示意层）→ ② 逐域 _domain.md 细筛（权威层）。"""
+    """两级匹配：① _registry 快筛（示意层）→ ② 逐域 _domain.md 细筛（权威层）。
+    命中多个时按**匹配词长度降序**排（越长的词越具体 = 越像需求主键 O，优先）。"""
     hits = []
     for d in reg:
         for w in d['words']:
             if w and w in text:
                 hits.append((d['id'], w, '快筛'))
                 break
-    if hits:
-        return hits
-    for dname in sorted(os.listdir(os.path.join(ROOT, 'domains'))):
-        if not os.path.isdir(os.path.join(ROOT, 'domains', dname)):
-            continue
-        for w in domain_words(dname):
-            if w and w in text:
-                hits.append((dname.split('-')[0], w, '细筛'))
-                break
-    return hits
+    if not hits:
+        for dname in sorted(os.listdir(os.path.join(ROOT, 'domains'))):
+            if not os.path.isdir(os.path.join(ROOT, 'domains', dname)):
+                continue
+            for w in domain_words(dname):
+                if w and w in text:
+                    hits.append((dname.split('-')[0], w, '细筛'))
+                    break
+    # 最长匹配优先（「引用规范」→ R5 胜过「引用」→ S5）
+    return sorted(hits, key=lambda h: -len(h[1]))
 
 
 # 红线处置（逐条对应 SKILL.md「红线总览」的六类）
@@ -252,7 +259,7 @@ def main():
     for text, expect in CASES:
         print('Q：%s' % text)
         cat, kw = redline(text)
-        hits = gate(text, cfg)
+        hits, oos = gate(text, cfg)
         triggered = bool(hits)
         if cat:
             stat['红线'] += 1

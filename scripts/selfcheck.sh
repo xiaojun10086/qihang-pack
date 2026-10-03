@@ -369,6 +369,18 @@ for _k in '触发门与接管边界' '不接管' '必须走三级结构' '未穷
   if grep -qF "$_k" SKILL.md 2>/dev/null; then ok "SKILL.md 触发门含「$_k」"
   else bad "SKILL.md 触发门缺「$_k」"; fi
 done
+# 词表同源（v3.3.6）：门词表必须是 20 域触发词的并集 —— 防「域能锁、门不放行」的 39 处矛盾复发
+_gatewords=$(sed -n '/^  learning_markers:/,/^  learning_intents:/p' config.yaml 2>/dev/null)
+_cov=0
+for _w in 概念图 卡组 引用规范 军训 作息 简历 投稿 专利 查重 讲义 emo 助学金; do
+  printf '%s' "$_gatewords" | grep -q "$_w" && _cov=$((_cov+1))
+done
+[ "${_cov:-0}" -ge 10 ] && ok "门词表与域表同源（12 个代表词命中 $_cov 个）" \
+  || bad "门词表与域表不同源（代表词仅命中 ${_cov:-0}/12）—— 会把能锁定的问题挡在门外"
+for _k in '^  out_of_scope_markers:' '^  boundary_note:'; do
+  grep -q "$_k" config.yaml 2>/dev/null && ok "config.yaml 含 $_k" || bad "config.yaml 缺 $_k"
+done
+grep -qF '越界信号' SKILL.md 2>/dev/null && ok "SKILL.md 已声明越界信号" || bad "SKILL.md 缺越界信号"
 for _t in 明确涉及大连理工大学 知识学习 自述为大连理工大学学生; do
   if grep -qF "$_t" SKILL.md 2>/dev/null; then ok "触发条件在位：$_t"
   else bad "触发条件缺：$_t"; fi
