@@ -1,7 +1,7 @@
 ---
 name: qihang-integrity-check
 description: 「启航」R5 学术规范与伦理域库内 skill：跑一份合规自查：引用、查重、署名、数据来源、AI 使用声明，逐项给可执行修正。
-version: 3.2.3
+version: 3.2.4
 license: MIT
 ---
 

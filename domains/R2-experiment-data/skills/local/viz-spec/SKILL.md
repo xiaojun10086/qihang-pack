@@ -1,7 +1,7 @@
 ---
 name: qihang-viz-spec
 description: 「启航」R2 实验与数据域库内 skill：按期刊 / 学位论文规范给图型选择、坐标轴、误差棒与分辨率清单。
-version: 3.2.3
+version: 3.2.4
 license: MIT
 ---
 

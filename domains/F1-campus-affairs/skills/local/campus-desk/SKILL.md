@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-desk
 description: 「启航」F1 校园事务域库内 skill：先查 DUT 信息库锁定入口与电话，再给「去哪办 / 带什么 / 多久」，查不到就明说未收录。
-version: 3.2.3
+version: 3.2.4
 license: MIT
 ---
 
@@ -27,7 +27,7 @@ license: MIT
 2. 判定线上线下（线上给门户链接，线下给楼宇与电话）
 3. 列出所需材料清单
 4. 给出办理时长与常见卡点
-5. 未收录则固定回复：信息库未收录，建议访问 www.dlut.edu.cn 核实
+5. 未收录则固定回复：信息库未收录，建议访问 https://www.dlut.edu.cn/ 核实
 6. 输出办理卡片
 
 ## 方法库 · 判定细则

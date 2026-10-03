@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-proof-guide
 description: 「启航」F1 校园事务域库内 skill：各类证明的开具部门、材料清单与办理周期，只给路径。
-version: 3.2.3
+version: 3.2.4
 license: MIT
 agent_created: true
 ---

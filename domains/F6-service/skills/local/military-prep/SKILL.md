@@ -1,7 +1,7 @@
 ---
 name: qihang-military-prep
 description: 「启航」F6 军训与志愿域库内 skill：军训前的身心与物资准备清单，含不适处置原则（先报告教官）。
-version: 3.2.3
+version: 3.2.4
 license: MIT
 ---
 
