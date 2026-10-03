@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 v3.0.0 · 三级结构管理脚本
+# 「启航」学伴包 v3.2 · 三级结构管理脚本
 # 用法: bash qihang.sh {status|platform|domains|registry|records|new-term}
 # 定位：纯 DUT 特化库 —— 库内 skill 唯一通道，无任何库外安装通道。
 set -uo pipefail
@@ -41,11 +41,12 @@ cmd_domains() {
 }
 
 cmd_status() {
-  echo "「启航」学伴包 v3.0.0 · 状态"
+  echo "「启航」学伴包 v3.2 · 状态"
   echo "----------------------------------------"
   echo "[1级] skill 库"
   for f in library/README.md library/clarity.md library/domain-review.md library/output-spec.md \
-           library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md; do
+           library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md \
+           library/skill-evolution.md; do
     [ -f "$ROOT/$f" ] && printf '  ✓ %s\n' "$f" || printf '  ✗ %s\n' "$f"
   done
   echo "[2级] 域（库内唯一通道）"

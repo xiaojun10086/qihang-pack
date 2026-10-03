@@ -1,7 +1,7 @@
 ---
 name: qihang-imrad-scaffold
 description: 「启航」S3 作业与考核域库内 skill：IMRAD 论文骨架——把课程论文 / 毕业设计拆成「引言-方法-结果-讨论」四节 + 项目目录管理，想法与数据必须由用户提供（人类主权双闸），AI 只做结构与自查。
-version: 3.0.0
+version: 3.2.0
 license: MIT
 ---
 

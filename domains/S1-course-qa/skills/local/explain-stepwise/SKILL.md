@@ -1,7 +1,7 @@
 ---
 name: qihang-explain-stepwise
 description: 「启航」S1 课程答疑域库内 skill：先让学习者自己写一步，再按「定位卡点 → 给提示 → 给解法 → 出同类题」四步走，不直接抛答案。
-version: 3.0.0
+version: 3.2.0
 license: MIT
 ---
 

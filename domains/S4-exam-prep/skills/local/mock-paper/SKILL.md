@@ -1,7 +1,7 @@
 ---
 name: qihang-mock-paper
 description: 「启航」S4 备考与记忆域库内 skill：按真题结构自组模拟卷，错题归因后变式再练。
-version: 3.0.0
+version: 3.2.0
 license: MIT
 ---
 

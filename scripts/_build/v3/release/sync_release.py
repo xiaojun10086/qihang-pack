@@ -17,7 +17,12 @@ import os, io, sys, shutil
 _ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 DEV = os.path.abspath(_ARG[0] if _ARG else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..'))
 REL = os.path.abspath(_ARG[1] if len(_ARG) > 1 else DEV + '-release')
-EX = {'.git', '_build', '.learnbuddy', '__pycache__', '.codebuddy-plugin', '.idea'}
+EX = {'.git', '_build', '.learnbuddy', '__pycache__', '.idea'}
+# 2026-10-03（第二轮）：原先 EX 还含 '.codebuddy-plugin' —— 那是**产品文件所在目录**
+# （`.codebuddy-plugin/plugin.json` 是 `selfcheck.sh [1]` 的必备文件，且是版本号落点）。
+# 把它同时排除在「同步」与「终检」之外 → 包版本升级后副本里的 plugin.json **静默停在旧版本**
+# （实测：源 3.2.0 / 副本 3.0.0，而 verify.py 报「两树完全一致」）。与 `.gitattributes` 死结同型，
+# 故一并移出排除集：纳入同步 + 纳入终检。
 # 2026-10-03：原先 EXF = {'.gitattributes', '.gitignore'} 把这两个文件排除在同步之外，
 # 但 verify.py 的终检口径是「两树除 8 份过程文档外逐字节一致」——纳入终检却不由同步管理，
 # 会形成「终检永久报漂移、--apply 又修不动」的死结（实测：改 .gitattributes 后

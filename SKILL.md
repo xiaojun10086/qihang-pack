@@ -1,12 +1,12 @@
 ---
 name: qihang
 description: 「启航」大连理工大学新生学习生活一体化学伴包（三级结构）。入口 skill，负责需求明确、域审查、输出规范与路由。当用户提出与大连理工大学校情、课程学习、备考、笔记、作业、科研、校园生活相关的模糊求助时使用。
-version: 3.0.0
+version: 3.2.0
 license: MIT
 tags: [dlut, campus, learning, library, orchestrator]
 ---
 
-# 「启航」学伴包 · 入口（v3.0.0）
+# 「启航」学伴包 · 入口（v3.2）
 
 三级结构：**skill 库（本入口）→ 域 → skill**
 
@@ -47,13 +47,14 @@ references/     数据与文档（DUT 官网库 / 私密站库）
   ↓ ⑤执行      domains/<域>/skills/local/   库内 skill 唯一通道，命中即调用，无需安装
   ↓ ⑥输出      library/output-spec.md        ≤6 条要点，过 output-checklist 校验
   ↓ ⑦归档      library/memory.md             写学习档案（F3/F5 敏感域除外）
+  ↓ ⑧自迭代    library/skill-evolution.md    按习惯只在可改段内迭代（不满足触发条件则不迭代）
 ```
 
 > **③ 必须先于 ④ 完成**：`domain-review.md` §1③ 的「有没有对口 skill」校验是**必经**步骤。
 > 跳过它 = 把「需求超出 skill 定位」当成「已覆盖」直接下发 ④ —— 越界与降级都会漏报。
 > 判据：`explain-stepwise` 这类 **单点** skill 不得直接承接**整门课 / 整本书**级需求。
 
-## 五份规则文件（1 级库的本体）
+## 六份规则文件（1 级库的本体）
 
 | 文件 | 职责 |
 |---|---|
@@ -62,6 +63,7 @@ references/     数据与文档（DUT 官网库 / 私密站库）
 | `library/output-spec.md` | 输出规范：统一模板 + 简略原则 + 交付前校验 |
 | `library/memory.md` | 学习档案：四类内容 + 分层落点 + 敏感域红线 |
 | `library/login-policy.md` | 登录选择原则：A/B/C 三档 + 标准话术 + 安全保障 |
+| `library/skill-evolution.md` | 习惯自迭代：**只改可改段**（执行步骤 / 判定细则 / 示例说明），不改红线 / 输出契约 / 任何事实 |
 
 ## 快捷调用
 

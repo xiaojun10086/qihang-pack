@@ -146,7 +146,7 @@ while [ "$r" -le "$ROUNDS" ]; do
   echo "[4] 结构与计数不变量"
   _chk "域数" "$(find domains -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')" 20
   _chk "库内 skill 总数" "$(find domains -path '*skills/local/*/SKILL.md' | wc -l | tr -d ' ')" 92
-  _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 9
+  _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 10
   _chk "commands 数" "$(ls -1 commands/*.md | wc -l | tr -d ' ')" 22
   _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 162
   # 数据条目 = 表格行 − 分隔行 − 表头行（表头 = 下一行是分隔行的那些行）
@@ -215,6 +215,34 @@ while [ "$r" -le "$ROUNDS" ]; do
   if grep -q '只讲结果与建议（零内部名）' library/output-checklist.md 2>/dev/null; then
     _ok "output-checklist 校验 4 已点名「零内部名」"
   else _fail "output-checklist 校验 4 未点名「零内部名」"; fi
+  echo "[8] 自迭代边界（习惯自迭代只可改「可改段」）"
+  _ev="library/skill-evolution.md"
+  if [ -f "$_ev" ]; then _ok "自迭代规则文件在位"; else _fail "缺 library/skill-evolution.md"; fi
+  # 三目标必须明文（否则机制退化成泛泛而谈）
+  for _g in '优化思考速度' '精准化信息获取' '减少 AI 幻觉'; do
+    if grep -q "$_g" "$_ev" 2>/dev/null; then _ok "已声明目标：$_g"
+    else _fail "未声明目标：$_g"; fi
+  done
+  # 可改段 / 禁改段两张清单必须在位
+  grep -q '§2.1 可改段' "$_ev" 2>/dev/null && _ok "可改段清单在位" || _fail "缺可改段清单"
+  grep -q '§2.2 禁改段' "$_ev" 2>/dev/null && _ok "禁改段清单在位" || _fail "缺禁改段清单"
+  # 禁改项必须逐条点名（红线 / 输出 / 失败与降级 / 分工 / frontmatter / 事实）
+  for _b in '## ⚠️ 红线' '## 输出' '## 失败与降级' '## 与同域其他库内 skill 的分工' 'frontmatter' '任何事实'; do
+    if grep -qF "$_b" "$_ev" 2>/dev/null; then _ok "禁改项已点名：$_b"
+    else _fail "禁改项未点名：$_b"; fi
+  done
+  # 习惯画像必须明确「不随包」，且包内不得出现习惯数据
+  grep -q '不随包' "$_ev" 2>/dev/null && _ok "习惯画像声明不随包分发" || _fail "未声明习惯画像不随包"
+  # 20 域执行顺序必须全部接上自迭代规则
+  _w=$(grep -rl 'library/skill-evolution.md' domains/*/_domain.md 2>/dev/null | wc -l | tr -d ' ')
+  _chk "已接线自迭代的域数" "$_w" 20
+  # 判定不可被习惯影响（合规优先于速度）
+  grep -q '不影响' "$_ev" 2>/dev/null && grep -q '红线优先' "$_ev" 2>/dev/null \
+    && _ok "已声明「习惯不影响判定 / 红线优先」" || _fail "未声明判定不受习惯影响"
+  # 规则文件不得引用**只在源仓库存在**的路径（生成器链不随包分发 → 副本会判失效引用）
+  if grep -q 'scripts/_build' "$_ev" 2>/dev/null; then
+    _fail "规则文件引用了不随包分发的生成器路径（scripts/_build）→ 交付副本会判失效引用"
+  else _ok "规则文件未引用生成器路径（副本安全）"; fi
   echo "=========================================="
   echo ""
   r=$((r + 1))

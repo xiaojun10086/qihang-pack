@@ -51,8 +51,15 @@ python scripts/_build/v3/rebuild.py --dry      # 只列层，不执行
 | 10 | `scripts/_build/v3/step42_cmd_cards.py` | 20 张域入口卡第 3 步升级为「全量库内择优」 | `gen_cmd_cards.py` |
 | 11 | `scripts/_build/v3/step43_slashfix.py` | 路径反斜杠归一（幂等兜底） | `_slashfix.py` |
 | 12 | `scripts/_build/v3/step44_checker_thresholds.py` | 校验器阈值同步（52→92） | `gen_counts.py` |
+| 13 | `scripts/_build/v3/step50_self_evolution.py` | **习惯自迭代机制**：新增 `library/skill-evolution.md`（1 级库第 6 份规则）+ 20 域执行顺序接线 + `regress.sh [8]` 边界段 + `runcheck` 接线断言 | 新增层 |
+| 14 | `scripts/_build/v3/step51_version_bump.py` | **版本号与计数级联**：包版本 → `3.2`（两位 · 展示位）／修订号 → `3.2.0`（三位 · 字段与断言）；`library` 文件数 9 → 10 | 新增层 |
 
-**判据**：本链在**已达 v3.0.0** 的树上重跑应**零变更**；全链连跑两遍，逐文件哈希一致；
+**版本号口径（v3.2 起统一）**：**包版本 = `3.2`**（两位，用于 README 标题 / 包根 `SKILL.md` 标题 / `qihang.sh` 状态行 / `config.yaml` 首行注释）
+｜**修订号 = `3.2.0`**（三位，用于 92 个库内 `SKILL.md` frontmatter、包根 `SKILL.md` frontmatter、`.codebuddy-plugin/plugin.json`、`config.yaml` 的 `version:`、`aligncheck.py` 期望值）。
+两者**同一条线**（修订号 = 包版本 + `.0`），且由 `aligncheck.py` 硬断言「展示位必须是两位形态」。
+历史陈述（如 `自 v3.0.0 起…`）描述的是**当时的变更**，不追改。
+
+**判据**：本链在**已达 v3.2** 的树上重跑应**零变更**；全链连跑两遍，逐文件哈希一致；
 产物通过 `scripts/selfcheck.sh` · `scripts/audit.sh` · `scripts/regress.sh` ·
 `scripts/aligncheck.py` · `scripts/runcheck.py`。
 

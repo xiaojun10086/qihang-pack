@@ -1,7 +1,7 @@
 ---
 name: qihang-org-lookup
 description: 「启航」R6 信息搜集与输出域库内 skill：查校内机构职能、办事地点与场馆开放的公开入口，标注来源与核验状态。
-version: 3.0.0
+version: 3.2.0
 license: MIT
 ---
 

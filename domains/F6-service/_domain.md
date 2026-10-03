@@ -40,6 +40,7 @@
 2. 1 级库完成**域审查**，确认命中 `F6`（`library/domain-review.md`）
 3. 用**库内 skill**（库内 4 个：`service-log` · `volunteer-hours` · `military-prep` · `social-practice`；按需求择一）执行
 4. 按 `library/output-spec.md` 输出，并按 `library/memory.md` §4 与 `library/output-spec.md` §5「禁止写入的域与内容」排除伤病记录后写入
+5. 按 `library/skill-evolution.md` 记录本域习惯，并**只在可改段内**做非结构性自迭代（不改红线 / 输出契约 / 任何事实；不满足触发条件则不迭代）
 
 ## ⚠️ 红线（不得绕过）
 

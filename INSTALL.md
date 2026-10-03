@@ -82,7 +82,7 @@ bash scripts/qihang.sh domains     # 20 域清单
 bash scripts/qihang.sh registry    # DUT 信息库统计
 ```
 
-**期望**：`[1级]` 逐行列出 **8 个** library 文件 · `[2级] 20 个域 / **92 个**库内 skill` · `[资源] DUT 公开站 162 行`
+**期望**：`[1级]` 逐行列出 **9 个** library 文件 · `[2级] 20 个域 / **92 个**库内 skill` · `[资源] DUT 公开站 162 行`
 
 **完整验收（5 个脚本，职责不重叠）**：
 

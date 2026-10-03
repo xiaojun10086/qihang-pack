@@ -12,7 +12,10 @@ import os, io, re, sys
 _ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 DEV = os.path.abspath(_ARG[0] if _ARG else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..'))
 REL = os.path.abspath(_ARG[1] if len(_ARG) > 1 else DEV + '-release')
-EX = {'.git', '_build', '.learnbuddy', '__pycache__', '.codebuddy-plugin', '.idea'}
+EX = {'.git', '_build', '.learnbuddy', '__pycache__', '.idea'}
+# 2026-10-03（第二轮）：原先 EX 还含 '.codebuddy-plugin' —— 那是产品文件所在目录
+# （`.codebuddy-plugin/plugin.json` 是必备文件，也是版本号落点）。终检若把它排除，
+# 「两树完全一致」就是**漏了 1 个文件的假一致**（实测：副本曾停在 3.0.0，而终检报「完全一致」）。
 
 ign = io.open(os.path.join(DEV, '.gitignore'), encoding='utf-8').read()
 proc = {l.strip() for l in ign.splitlines() if re.match(r'^references/.*\.md$', l.strip())}

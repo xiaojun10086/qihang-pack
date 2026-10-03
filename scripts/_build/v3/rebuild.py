@@ -37,6 +37,8 @@ LAYERS = [
     ('step42_cmd_cards.py',          '域入口卡第 3 步升级为「全量库内择优」'),
     ('step43_slashfix.py',           '入口卡路径反斜杠归一（幂等兜底）'),
     ('step44_checker_thresholds.py', '校验器阈值同步（52→92）'),
+    ('step50_self_evolution.py',     '习惯自迭代机制（library 规则文件 + 20 域接线 + [8] 段断言）'),
+    ('step51_version_bump.py',       '版本号与计数级联（包版本 3.0.0→3.2.0 / library 9→10）'),
 ]
 
 print('v3.0.0 生成链 · 目标树：%s' % ROOT)

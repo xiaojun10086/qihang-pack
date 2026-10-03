@@ -271,6 +271,8 @@ def run_round(r):
             bad(dmf, '执行顺序未接输出规范 library/output-spec.md')
         if '库外' in order or 'external.md' in order:
             bad(dmf, '执行顺序仍含库外通道（应为库内唯一）')
+        if 'library/skill-evolution.md' not in order:
+            bad(dmf, '执行顺序未接自迭代规则 library/skill-evolution.md')
 
         # ===== 级别 3：逐 skill 跑 =====
         d_red = red_lines(dmt) or []

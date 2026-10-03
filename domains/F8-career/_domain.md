@@ -44,6 +44,7 @@
 2. 1 级库完成**域审查**，确认命中 `F8`（`library/domain-review.md`）
 3. 用**库内 skill**（库内 5 个：`career-kit` · `competition-pick` · `resume-tailor` · `intern-search` · `interview-drill`；按需求择一）执行
 4. 按 `library/output-spec.md` 输出，并写入学习档案
+5. 按 `library/skill-evolution.md` 记录本域习惯，并**只在可改段内**做非结构性自迭代（不改红线 / 输出契约 / 任何事实；不满足触发条件则不迭代）
 
 ## ⚠️ 红线（不得绕过）
 
