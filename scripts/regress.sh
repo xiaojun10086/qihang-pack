@@ -253,7 +253,7 @@ while [ "$r" -le "$ROUNDS" ]; do
     if grep -q "$_t" "$_cl" 2>/dev/null; then _ok "三档已定义：$_t"; else _fail "三档缺：$_t"; fi
   done
   # 复述档三条硬规格
-  for _t in '一句话' '不得新增' '【假设】'; do
+  for _t in '一句话' '不得新增' '【结论】首行的前置短句'; do
     if grep -qF "$_t" "$_cl" 2>/dev/null; then _ok "复述规格已声明：$_t"; else _fail "复述规格缺：$_t"; fi
   done
   # 红线优先于本门 + 例外 6 视为达标（防「为了确认而削弱合规」与「假复述」）
@@ -261,6 +261,11 @@ while [ "$r" -le "$ROUNDS" ]; do
   grep -qF '视为 `C` 达标' "$_cl" 2>/dev/null && _ok "例外 6 视为 C 达标（免复述）" || _fail "未声明例外 6 免复述"
   # 两个可复现自检问
   grep -qF '可复现自检问' "$_cl" 2>/dev/null && _ok "已给出可复现自检问" || _fail "缺可复现自检问"
+  # 三条前置约定（红线短路 / 先问后述 / 例外 6 免复述）必须明文
+  for _p in '本门短路' '先问后述' '例外 6 视为达标'; do
+    if grep -qF "$_p" "$_cl" 2>/dev/null; then _ok "前置约定已声明：$_p"
+    else _fail "前置约定缺：$_p"; fi
+  done
   # 阈值单一真相源必须在 config.yaml（与 §3 的 U 阈值同源约定）
   if grep -q 'confirm_threshold: 0.95' config.yaml 2>/dev/null; then _ok "config.yaml 声明 confirm_threshold: 0.95"
   else _fail "config.yaml 缺 confirm_threshold: 0.95（阈值未落在单一真相源）"; fi

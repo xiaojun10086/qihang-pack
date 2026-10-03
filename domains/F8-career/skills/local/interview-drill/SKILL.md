@@ -1,7 +1,7 @@
 ---
 name: qihang-interview-drill
 description: 「启航」F8 求职与竞赛域库内 skill：用 STAR 拆经历成故事卡，做模拟问答与追问压力测试。
-version: 3.2.2
+version: 3.2.3
 license: MIT
 ---
 
@@ -21,6 +21,7 @@ license: MIT
 
 - 覆盖：面试问答演练、STAR 故事拆解、追问压力测试、自我介绍结构
 - 不覆盖：简历措辞（→`resume-tailor`）；编造经历（见红线）；升学面试（→`F7`）
+- **裸「面试」= 歧义**：须先 1 问区分升学 / 求职（消歧表见 `domains/_registry.md`），不得默认按求职直接演练
 
 ## 执行步骤
 
@@ -48,7 +49,7 @@ license: MIT
 
 **输入**
 
-> 下周有个面试，帮我练一下
+> 下周有个企业校招面试，帮我练一下
 
 **澄清判定**：关键槽 `O/T/D` 齐全且不歧义 → 依 `clarity.md` §5 例外 2 放行
 

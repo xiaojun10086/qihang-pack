@@ -1,6 +1,6 @@
 {
   "name": "qihang",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "「启航」大连理工大学新生学习·生活·科研一体化学伴包。三级结构（skill 库 → 域 → skill），20 个域覆盖学习/生活/科研，强绑定 DUT 公开站与需登录的私密站，含澄清门与输出规范。",
   "description_en": "Qihang: an integrated campus companion skill pack for DUT freshmen. Three-tier structure (library -> domains -> skills) covering study, campus life and research, with a clarification gate and output spec.",
   "author": {

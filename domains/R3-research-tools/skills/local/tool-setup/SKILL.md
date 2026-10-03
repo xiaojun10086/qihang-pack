@@ -1,7 +1,7 @@
 ---
 name: qihang-tool-setup
 description: 「启航」R3 科研工具与代码域库内 skill：先问清目标工具与系统，再给最小可用环境步骤；报错按「复现 → 最小化 → 假设 → 插桩验证 → 修复」处理。
-version: 3.2.2
+version: 3.2.3
 license: MIT
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: qihang-school-pick
 description: 「启航」F7 升学深造域库内 skill：按「冲 / 稳 / 保」梯度做选校与夏令营投递策略。
-version: 3.2.2
+version: 3.2.3
 license: MIT
 ---
 

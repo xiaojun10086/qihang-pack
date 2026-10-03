@@ -1,7 +1,7 @@
 ---
 name: qihang-material-kit
 description: 「启航」F7 升学深造域库内 skill：给个人陈述 / 研究计划 / 推荐信的骨架与真实完整性自查。
-version: 3.2.2
+version: 3.2.3
 license: MIT
 ---
 

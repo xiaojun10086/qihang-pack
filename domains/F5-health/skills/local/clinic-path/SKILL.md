@@ -1,7 +1,7 @@
 ---
 name: qihang-clinic-path
 description: 「启航」F5 健康与运动域库内 skill：紧急度分层 → 就诊层级 → 医保报销材料，不诊断不给药。
-version: 3.2.2
+version: 3.2.3
 license: MIT
 agent_created: true
 ---
