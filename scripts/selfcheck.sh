@@ -253,7 +253,29 @@ echo "[8b] 入口唯一性与声明"
 # 都写 `name: qihang` 且红线表已分叉，而四个校验器当时**全绿**（纯结构性盲区）。
 #
 # ⚠️ 为什么编号是 8b 而不是 11（**锚点冲突，实测踩过**）：
-#   phase15 用 `rep('# ---------- 汇总 ----------', '[9]+[10] + 汇总')` 插入第 9/10 节，
+#   phase15 用 `rep('# ---------- 11. 交付分支一致性（有 .git 时才查；交付树无 .git → 跳过） ----------
+# 事故驱动（2026-10-03 两次）：release 分支被 git add -f 塞进 .learnbuddy/.idea/过程文档。
+# 判据：release 树里**每个**文件都必须存在于 main（排除项除外）——「只在 release 出现」即为污染。
+echo "[11] 交付分支一致性"
+if [ -d .git ] && git rev-parse --verify --quiet release >/dev/null 2>&1; then
+  _extra=$(git ls-tree -r release --name-only \
+           | grep -vE '^(scripts/_build/|\.learnbuddy/|\.gitignore$)' \
+           | while IFS= read -r _f; do
+               git cat-file -e "main:$_f" 2>/dev/null || echo "$_f"
+             done)
+  if [ -n "$_extra" ]; then
+    _n=$(printf '%s\n' "$_extra" | grep -c . )
+    bad "release 分支含 $_n 个不随包文件（应为 0）"
+    printf '%s\n' "$_extra" | head -8 | while IFS= read -r _l; do echo "       + $_l"; done
+    echo "       → 修法：python scripts/_build/v3/release/release_branch.py --apply --allow-delete"
+  else
+    ok "release 树 == main 交付集（无多余文件）"
+  fi
+else
+  ok "无 .git 或无 release 分支 → 跳过（交付树正常路径）"
+fi
+
+# ---------- 汇总 ----------', '[9]+[10] + 汇总')` 插入第 9/10 节，
 #   其幂等护栏要求「[9]…[10]…汇总」**整块连续**。若本节插在 [10] 与「汇总」之间，
 #   该连续性被破坏 → phase15 每跑一轮就再追加一份 [9]/[10]；
 #   而本节自己的护栏（要求「[11] + 汇总」相邻）同样失效 → 两个区块**互相引爆**，
