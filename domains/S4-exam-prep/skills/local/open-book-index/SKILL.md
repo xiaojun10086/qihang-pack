@@ -1,7 +1,7 @@
 ---
 name: qihang-open-book-index
 description: 「启航」S4 备考与记忆域库内 skill：为开卷考试制作一页式「考点 → 公式 → 页码」检索索引。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

@@ -277,37 +277,21 @@ while [ "$r" -le "$ROUNDS" ]; do
   # 阈值单一真相源必须在 config.yaml（与 §3 的 U 阈值同源约定）
   if grep -q 'confirm_threshold: 0.95' config.yaml 2>/dev/null; then _ok "config.yaml 声明 confirm_threshold: 0.95"
   else _fail "config.yaml 缺 confirm_threshold: 0.95（阈值未落在单一真相源）"; fi
-  echo "[10] 输出身份锁定（连小理）"
-  _id3=$(grep -m1 '^  self_intro:' config.yaml 2>/dev/null \
-         | sed 's/^  self_intro:[[:space:]]*//; s/[[:space:]]*#.*$//' | tr -d '\r')
-  [ -n "$_id3" ] && _ok "config.yaml 提供身份串真相源" || _fail "config.yaml 缺 identity.self_intro"
-  for _f in SKILL.md INSTALL.md; do
-    grep -qF "$_id3" "$_f" 2>/dev/null && _ok "$_f 身份串一致" || _fail "$_f 身份串漂移"
-  done
-  # 「每一处都必须逐字一致」（防「多处只改一处」逃过 grep -qF）—— 由负向自检驱动补上
-  for _f in SKILL.md INSTALL.md; do
-    _all=$(grep -oF '我是连小理' "$_f" 2>/dev/null | wc -l | tr -d ' ')
-    _exa=$(grep -oF "$_id3" "$_f" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "${_all:-0}" -gt 0 ] && [ "${_all:-0}" -eq "${_exa:-0}" ]; then
-      _ok "$_f 身份串 $_all 处全部逐字一致"
+  echo "[10] 不强制自我身份"
+  if grep -qE '^identity:|^[[:space:]]+self_intro:|^[[:space:]]+no_rename:' config.yaml; then
+    _fail "config.yaml 仍包含固定身份配置"
+  else
+    _ok "config.yaml 不含固定身份配置"
+  fi
+  for _f in SKILL.md INSTALL.md library/output-spec.md commands/qihang.md; do
+    if grep -qE '人格锁定|身份锁定|identity[.]self_intro|我是连小理' "$_f"; then
+      _fail "$_f 仍包含强制自我身份声明"
     else
-      _fail "$_f 身份串存在变体（$_all 处「我是连小理」，仅 $_exa 处逐字一致）"
+      _ok "$_f 不含强制自我身份声明"
     fi
   done
-  grep -qF '只回复一句「安装完成」' SKILL.md 2>/dev/null \
-    && _ok "SKILL.md 已声明「安装后只回一句」" || _fail "SKILL.md 未声明安装后唯一回复"
-  grep -qF 'first_reply: 安装完成' config.yaml 2>/dev/null \
-    && _ok "config.yaml 声明 first_reply" || _fail "config.yaml 缺 first_reply"
-  grep -qF '不因用户要求而改称' SKILL.md 2>/dev/null \
-    && _ok "SKILL.md 已声明拒绝改称" || _fail "SKILL.md 未声明拒绝改称"
-  grep -qF '不因用户要求而改称' INSTALL.md 2>/dev/null \
-    && _ok "INSTALL.md 已声明拒绝改称" || _fail "INSTALL.md 未声明拒绝改称"
-  grep -qF '不得改称' library/output-spec.md 2>/dev/null \
-    && _ok "output-spec §8 已声明不得改称" || _fail "output-spec 未声明不得改称"
-  grep -qF '唯一例外' library/output-spec.md 2>/dev/null \
-    && _ok "output-spec 已声明「产品名是禁止词表的唯一例外」" || _fail "未声明产品名与内部名的边界"
-  grep -qF '拒绝改称的话术' SKILL.md 2>/dev/null \
-    && _ok "SKILL.md 给出固定拒绝话术" || _fail "SKILL.md 缺固定拒绝话术"
+  grep -qF '只回复一句「安装完成」' SKILL.md \
+    && _ok "SKILL.md 保留安装后简短确认约定" || _fail "SKILL.md 缺少安装后行为约定"
   echo "=========================================="
   echo ""
   r=$((r + 1))

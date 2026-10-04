@@ -1,7 +1,7 @@
 ---
 name: qihang-faster-cycle
 description: 「启航」S4 备考与记忆域库内 skill：一门课或一个技能的完整学习循环，先确认教材、章节范围与讲解方式，再按基础和目标设计分章学习与教学回讲。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

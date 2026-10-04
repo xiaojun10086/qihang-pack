@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-desk
 description: 「启航」F1 校园事务域库内 skill：先查 DUT 信息库锁定入口与电话，再给「去哪办 / 带什么 / 多久」，查不到就明说未收录。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

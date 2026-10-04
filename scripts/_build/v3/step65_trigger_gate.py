@@ -374,7 +374,7 @@ if NT is None:
 elif 'inject_no_gate' in NT:
     print('  [SAME] 已存在')
 else:
-    A1 = 'def inject_identity_drift(tree):'
+    A1 = 'def inject_no_isolation(tree):'
     B1 = ('''def inject_no_gate(tree):
     """把 SKILL.md 的触发门整段删掉 → selfcheck [8d] 应 FAIL（防触发门被静默移除）。"""
     p = os.path.join(tree, 'SKILL.md')
@@ -383,13 +383,13 @@ else:
     return [p], t
 
 
-def inject_identity_drift(tree):''')
-    A2 = ("        ('身份串漂移（INSTALL.md 与 config.yaml 不一致）', inject_identity_drift,\n"
-          "         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份串一致性'),")
-    B2 = ("        ('身份串漂移（INSTALL.md 与 config.yaml 不一致）', inject_identity_drift,\n"
-          "         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份串一致性'),\n"
-          "        ('触发门被移除（SKILL.md 少了触发门小节）', inject_no_gate,\n"
-          "         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8d] 触发门'),")
+def inject_no_isolation(tree):''')
+    A2 = ("        ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,\n"
+          "         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),")
+    B2 = ("        ('触发门被移除（SKILL.md 少了触发门小节）', inject_no_gate,\n"
+          "         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8d] 触发门'),\n"
+          "        ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,\n"
+          "         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),")
     if A1 in NT and A2 in NT:
         write('scripts/negative_test.py', NT.replace(A1, B1, 1).replace(A2, B2, 1))
         print('  [OK]   已加第 11 类注入')

@@ -1,7 +1,7 @@
 ---
 name: qihang
 description: 「启航」学生学习与信息搜集助手，优先处理课程理解、笔记、作业辅导、备考、表达、语言练习，以及可靠公开信息检索；其余校园生活与科研专域作为可选扩展。大工校情、学习与学生自述仍可触发；按用户任务直接选一个最匹配的 skill，只有缺少关键信息或跨域任务确有需要时才追问或展开，不强制跑完整工作流。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 tags: [dlut, campus, learning, library, orchestrator]
 ---

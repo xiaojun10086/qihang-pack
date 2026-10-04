@@ -1,7 +1,7 @@
 ---
 name: qihang-lecture-to-notes
 description: 「启航」S2 课堂与笔记域库内 skill：按用户指定粒度将讲义/录音/PPT 整理为来源可追溯、覆盖范围明确的结构化笔记。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

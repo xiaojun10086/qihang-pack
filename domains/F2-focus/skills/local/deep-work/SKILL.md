@@ -1,7 +1,7 @@
 ---
 name: qihang-deep-work
 description: 「启航」F2 作息与专注域库内 skill：深度工作日程——把一天的任务分成深 / 浅两类，深度任务最早、成块（≥90 分钟、日上限 4 小时），浅任务最多两批集中处理，晚间收尾清空大脑。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

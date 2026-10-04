@@ -1,7 +1,7 @@
 ---
 name: qihang-campus-search
 description: 学生公开信息检索：查学校、课程、通知、机构及一般学习/校园议题时，优先使用可用的官方或一手来源；给每项事实附出处与日期，不声称未执行的搜索或核验。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

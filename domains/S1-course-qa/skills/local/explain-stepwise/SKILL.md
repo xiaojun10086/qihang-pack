@@ -1,7 +1,7 @@
 ---
 name: qihang-explain-stepwise
 description: 课程概念与解题辅导：先给匹配问题的解释或提示；只有需要诊断学习卡点时才邀请学生展示尝试，随后给分步讲解和可选的迁移练习，不代做可提交作业。
-version: 3.3.8
+version: 3.3.9
 license: MIT
 ---
 

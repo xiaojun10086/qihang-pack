@@ -148,7 +148,7 @@ def inject_identity_lock(tree):
     """Reintroduce a forced persona declaration; selfcheck [8c] must reject it."""
     p = os.path.join(tree, 'INSTALL.md')
     t = io.open(p, encoding='utf-8').read()
-    declaration = '我是连小小理' + '智能学伴『启航』'
+    declaration = '我是连小理' + '智能学伴『启航』'
     t = t.replace('## 七、安装后行为约定', '## 七、安装后行为约定\n\n' + declaration, 1)
     return [p], t
 
