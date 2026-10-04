@@ -254,6 +254,14 @@ def inject_exempt_decl_removed(tree):
     return [p], '\n'.join(lines)
 
 
+def inject_url_count_drift(tree):
+    """把 §11.2 的「唯一外链」改成旧值 138 → aligncheck 应 FAIL（外链计数不可漂移）。"""
+    p = os.path.join(tree, 'references', 'dlut-url-verification.md')
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('唯一外链 148 条', '唯一外链 138 条', 1)
+    return [p], t
+
+
 def main():
     base = os.path.join(tempfile.gettempdir(), 'qihang_negtest_%d' % int(__import__('time').time()))
     shutil.copytree(SRC, base, ignore=IGNORE)
@@ -298,6 +306,8 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 平台覆盖率'),
         ('豁免声明被删（R6 无声明放行）', inject_exempt_decl_removed,
          ['@py', 'scripts/extskill.py', '.'], 'extskill 豁免白名单'),
+        ('外链计数漂移（148 条被改回 138 条）', inject_url_count_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链计数'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,

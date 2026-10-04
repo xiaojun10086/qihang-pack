@@ -37,8 +37,14 @@
 > 查完即止 —— **指定平台内没有合格候选，就按「无 skill 流程」回落**（见 §三），
 > **不换平台再找、不扩大到全表**。
 
+> **例外（1 域）**：`R6-info-retrieval` 不指定 skill 平台 —— 本域直查第一方官方来源
+> （教师主页 / 部门电话 / 通知公告），外部 skill 平台不是本域前置条件
+> （见 `domains/R6-info-retrieval/_domain.md` §工具与来源）。其余 19 域一律照本条执行。
+> 该例外由 `scripts/extskill.py` §6 断言：豁免集合与本行一致，多一个少一个都判 FAIL。
+
 ```
 ① 读该域 _domain.md 的「## 外部承接 → 指定检索平台（2–3 个）」—— 只查这几个
+   （S1-course-qa 该段名为「## 可选外部参考」，指定平台位相同；R6 见上方例外）
 ② 在指定平台内用「域检索词」检索；命中候选 → 进 GitHub 取 stars / license / pushed_at / archived
 ③ 读候选 SKILL.md 判可用性；读 scripts/ 与正文判「脚本与指令风险」（见 external-bridge §4）
 ④ 过 external-bridge §4 五步自检 → 全过才可外接

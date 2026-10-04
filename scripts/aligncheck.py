@@ -70,6 +70,8 @@ DEV_ONLY_DOCS = {
     'review-report-v2.2.md', 'review-report-v2.3.md', 'review-report-v2.4.md',
     'stress-test-v3.md', 'alignment-audit-v3.md', '需求确认书-v2三级结构.md',
 }
+# 开发侧版本控制元数据：release 树里没有（`.gitattributes` 有，故不在此列）。
+DELIV_EXCLUDE_FILES = {'.gitignore'}
 
 
 def walk_files():
@@ -84,6 +86,11 @@ def walk_files():
 
 FILES = walk_files()
 MD = [f for f in FILES if f.endswith('.md')]
+# 「活文档」= MD 去掉开发期生成器目录 `scripts/_build/`。
+# `_build/v3/README.md` 是**历史变更记录**（如「step62：平台 12 → 20」「12 平台入口表」），
+# 描述的是当时的状态，不是当下的声明 —— 拿它去对当下的实测数会误判。
+# 且 `_build` 不随包交付（release 树无此目录），用户永远看不到。
+LIVE_MD = [f for f in MD if not f.startswith('scripts/_build/')]
 SKILLS = [f for f in FILES if f.endswith('SKILL.md')]
 LOCAL = [f for f in SKILLS if '/skills/local/' in f]
 DOMAIN = [f for f in FILES if f.endswith('/_domain.md')]
@@ -870,7 +877,7 @@ def run_round(r):
                         bad(_f2, '「未核实清单」项数 %s ≠ 实测 %d'
                             % (_m2.group(1), _n8))
             # 「N 项待人工补」= §8 未核实清单（同一口径的另一种写法）
-            for _f2 in [x for x in MD if '待人工补' in rd(x)]:
+            for _f2 in [x for x in LIVE_MD if '待人工补' in rd(x)]:
                 for _m2 in re.finditer(r'(\d{1,3})\s*项待人工补', rd(_f2)):
                     if int(_m2.group(1)) != _n8:
                         bad(_f2, '「待人工补」项数 %s ≠ §8 未核实清单实测 %d'
@@ -894,7 +901,7 @@ def run_round(r):
             bad(_sp, '站点画像声明 %s 个站点 ≠ §一 表格实测 %d 行'
                 % (_dm.group(1), _nsp))
         if _nsp is not None:
-            for _f4 in MD:
+            for _f4 in LIVE_MD:
                 if not os.path.exists(_f4):
                     continue
                 for _m4 in re.finditer(r'(\d{1,3})\s*站画像', rd(_f4)):
@@ -904,14 +911,18 @@ def run_round(r):
 
     # 交付树文件总数：README 声明的「release 分支 = 纯净交付树（N 个文件）」必须等于交付集实际文件数。
     # 交付集口径 = 排除 .git/.idea/.learnbuddy/__pycache__/_build 与过程文档（与负向自测的复制口径一致）。
+    # 另排除开发侧版本控制元数据 `.gitignore`（release 树无此文件，实测 `git ls-tree release` 176 项）。
+    # ⚠️ `.gitattributes` **不排除** —— 它确实在 release 树里（与 main 同 blob），算进去才与
+    # 「release 分支 = 纯净交付树（176 个文件）」同解；把它一并排除会得到 175，反而与事实不符。
     # 为什么加：该计数曾长期停留在 173（实际 176），而四个校验器全绿。
     # 为什么不用 git 当唯一真值：负向自测在**无 .git 的临时树**上跑，只认 git 的断言在负向测试里会空转。
     _deliv = 0
     for _b5, _d5, _fs5 in os.walk('.'):
         _d5[:] = [d for d in _d5 if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
-        _deliv += len([f for f in _fs5 if f not in DEV_ONLY_DOCS])
+        _deliv += len([f for f in _fs5
+                       if f not in DEV_ONLY_DOCS and f not in DELIV_EXCLUDE_FILES])
     if _deliv:
-        for _f5 in MD:
+        for _f5 in LIVE_MD:
             if not os.path.exists(_f5):
                 continue
             for _m5 in re.finditer(r'交付树[^\n]{0,14}?(\d{2,4})\s*个文件', rd(_f5)):
@@ -965,7 +976,7 @@ def run_round(r):
                     _npl += 1
                 break
         if _npl:
-            for _f6 in MD:
+            for _f6 in LIVE_MD:
                 if not os.path.exists(_f6):
                     continue
                 _t6 = rd(_f6)
@@ -982,6 +993,46 @@ def run_round(r):
                         if int(_m6.group(1)) != _npl:
                             bad(_f6, '平台入口数声明 %s ≠ external-sources.md 实测 %d'
                                 % (_m6.group(1), _npl))
+
+    # §11.2 外链口径计数：`dlut-url-verification.md` 声明的「唯一外链 N 条 / 出现 M 处」
+    # 与「DUT 域内 N 条 / M 处」必须等于按 §11.7 ① 口径在交付集上的实测值。
+    # 为什么加：该行长期写「138 条 / 654 处」，无口径、复现命令还指向从未交付的 `urlcheck.py`，
+    # 四个校验器全绿 —— 数字对不上也没人发现。口径 = `https?://` 匹配 + http→https + 去尾斜杠。
+    _uv = 'references/dlut-url-verification.md'
+    if os.path.exists(_uv):
+        _occ = collections.Counter()
+        for _b8, _d8, _fs8 in os.walk('.'):
+            _d8[:] = [d for d in _d8
+                      if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
+            for _f8 in _fs8:
+                if _f8 in DEV_ONLY_DOCS or _f8 in DELIV_EXCLUDE_FILES:
+                    continue
+                _p8 = os.path.join(_b8, _f8)
+                try:
+                    _t8 = rd(_p8)
+                except Exception:
+                    continue
+                for _m8 in re.finditer(r'https?://[^\s`"\u3000）)】|>,;]+', _t8):
+                    _u8 = _m8.group(0)
+                    if _u8.startswith('http:'):
+                        _u8 = 'https' + _u8[4:]
+                    _occ[_u8.rstrip('/').rstrip('。').rstrip('、')] += 1
+        _dut8 = {u: v for u, v in _occ.items() if 'dlut' in u}
+        _uvt = rd(_uv)
+        for _m8 in re.finditer(r'唯一外链\s*(\d{1,4})\s*条\s*/\s*出现\s*(\d{1,4})\s*处', _uvt):
+            if int(_m8.group(1)) != len(_occ):
+                bad(_uv, '「唯一外链」声明 %s ≠ §11.7 口径实测 %d'
+                    % (_m8.group(1), len(_occ)))
+            if int(_m8.group(2)) != sum(_occ.values()):
+                bad(_uv, '「外链出现」声明 %s ≠ §11.7 口径实测 %d'
+                    % (_m8.group(2), sum(_occ.values())))
+        for _m8 in re.finditer(r'DUT 域内\s*(\d{1,4})\s*条\s*/\s*(\d{1,4})\s*处', _uvt):
+            if int(_m8.group(1)) != len(_dut8):
+                bad(_uv, '「DUT 域内外链」声明 %s ≠ 实测 %d'
+                    % (_m8.group(1), len(_dut8)))
+            if int(_m8.group(2)) != sum(_dut8.values()):
+                bad(_uv, '「DUT 域内外链出现」声明 %s ≠ 实测 %d'
+                    % (_m8.group(2), sum(_dut8.values())))
 
     # 触发门词表同源（config.yaml「词表同源铁律」）：`learning_markers` 必须**逐词等于**
     # 20 域 `## 触发词` 段的并集，且文档里「共 N 词」必须等于该词数。
@@ -1012,7 +1063,7 @@ def run_round(r):
             bad('config.yaml', 'learning_markers 多出 %d 个非域触发词: %s'
                 % (len(_extra), '、'.join(_extra[:8])))
         _nlm = len(set(_lmw))
-        for _f7 in MD:
+        for _f7 in LIVE_MD:
             if not os.path.exists(_f7):
                 continue
             for _l7 in rd(_f7).splitlines():
