@@ -154,7 +154,7 @@ while [ "$r" -le "$ROUNDS" ]; do
   echo "[4] 结构与计数不变量"
   _chk "域数" "$(find domains -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')" 20
   _chk "库内 skill 总数" "$(find domains -path '*skills/local/*/SKILL.md' | wc -l | tr -d ' ')" 92
-  _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 11
+  _chk "library 文件数" "$(ls -1 library/*.md | wc -l | tr -d ' ')" 12
   _chk "commands 数" "$(ls -1 commands/*.md | wc -l | tr -d ' ')" 22
   _chk "公开站表格行" "$(grep -c '^|' references/dlut-official-sites.md | tr -d ' ')" 162
   # 数据条目 = 表格行 − 分隔行 − 表头行（表头 = 下一行是分隔行的那些行）
@@ -290,8 +290,9 @@ while [ "$r" -le "$ROUNDS" ]; do
       _ok "$_f 不含强制自我身份声明"
     fi
   done
-  grep -qF '只回复一句「安装完成」' SKILL.md \
-    && _ok "SKILL.md 保留安装后简短确认约定" || _fail "SKILL.md 缺少安装后行为约定"
+  grep -qF '安装完成后回复一句「安装完成」' SKILL.md \
+    && grep -qF '首次使用引导' SKILL.md \
+    && _ok "SKILL.md 保留安装后简短确认 + 首次使用引导" || _fail "SKILL.md 缺少安装后行为约定"
   echo "=========================================="
   echo ""
   r=$((r + 1))

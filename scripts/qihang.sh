@@ -47,7 +47,7 @@ cmd_status() {
   echo "[1级] skill 库"
   for f in library/README.md library/clarity.md library/domain-review.md library/output-spec.md \
            library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md \
-           library/skill-evolution.md library/external-bridge.md library/general-fallback.md; do
+           library/skill-evolution.md library/external-bridge.md library/general-fallback.md library/experience.md; do
     [ -f "$ROOT/$f" ] && printf '  ✓ %s\n' "$f" || printf '  ✗ %s\n' "$f"
   done
   echo "[2级] 域（库内唯一通道）"
@@ -117,25 +117,19 @@ cmd_records() {
 cmd_quick() {
   echo "「启航」快速入口（第一阶段体验增强）"
   echo "----------------------------------------"
-  echo "直接输入任一问题即可："
-  echo "  1. 帮我理解这道题"
-  echo "  2. 整理这节课的笔记"
-  echo "  3. 查一下学校通知 / 课程安排"
-  echo "  4. 制定一周备考计划"
-  echo "  5. 帮我检查作业步骤和风险点"
-  echo "  6. 让我看论文/文献/来源"
+  echo "直接输入任一问题即可（不必先选分类）："
+  echo "  1. 「帮我理解这道题」"
+  echo "  2. 「这节课我没听懂，整理重点和笔记」"
+  echo "  3. 「我有作业，先拆任务，再给检查点」"
+  echo "  4. 「安排一周备考计划」"
+  echo "  5. 「查一下学校通知 / 课程安排 / 教务信息」"
+  echo "  6. 「我需要查学术资料，先给检索思路和可信来源」"
   echo ""
-  echo "在 LearnBuddy 中，直接输入下面的自然语言需求即可；无需先选域。"
+  echo "以上六条与本包入口文案逐条一致（唯一副本：library/experience.md 的起始句型清单）。"
+  echo "在 LearnBuddy 中直接输入自然语言需求即可；无需先选域。"
   echo "只在关键信息会改变回答时追问；复杂任务按需分轮确认，不为填表而追问。"
   echo "交付可按目标采用学习辅导、事实检索或行动规划；需要时可要求更简洁、更详细或核对来源。"
   echo "此菜单只展示文本示例，不启动对话；会话外记忆仅按用户明确要求处理。"
-  echo "----------------------------------------"
-  echo "常用起始句型："
-  echo "  1) 帮我理解 X 的核心概念和解题思路"
-  echo "  2) 我有一份作业，先拆任务再给我检查点"
-  echo "  3) 这门课我从零开始，给我一个学习节奏"
-  echo "  4) 查一下大工相关的公开信息，给出处和核验状态"
-  echo "  5) 我需要论文/参考文献，先给检索思路和可信来源"
 }
 
 cmd_platform() {

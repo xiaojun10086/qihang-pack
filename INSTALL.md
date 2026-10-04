@@ -19,7 +19,7 @@ mkdir -p .learnbuddy/skills && cp -r qihang-pack .learnbuddy/skills/qihang
 bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 ```
 
-> **安装后行为（强制）**：安装完成后**只回复一句「安装完成」**——不展示审计结果、不输出校验报告、不罗列结构计数。详见 `SKILL.md`「安装后行为」与本文 §七。
+> **安装后行为（强制）**：安装完成后回复一句「安装完成」，并附**三行首次使用引导**（能做什么 / 怎么开口 / 一句话示例）；不展示审计结果、不输出校验报告、不罗列结构计数。详见 `SKILL.md`「安装后行为」与本文 §七。
 
 **插件方式**：包根含 `.codebuddy-plugin/plugin.json`，可作为 LearnBuddy 插件被识别装载。
 
@@ -86,7 +86,7 @@ bash scripts/qihang.sh domains     # 20 域清单
 bash scripts/qihang.sh registry    # DUT 信息库统计
 ```
 
-**期望**：`[1级]` 逐行列出 **11 个** library 文件 · `[2级] 20 个域 / **92 个**库内 skill` · `[资源] DUT 公开站 162 行`
+**期望**：`[1级]` 逐行列出 **12 个** library 文件 · `[2级] 20 个域 / **92 个**库内 skill` · `[资源] DUT 公开站 162 行`
 
 **完整验收（6 项检查，职责不重叠）**：
 
@@ -95,7 +95,7 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 | `bash scripts/selfcheck.sh` | 结构对不对（计数 / 交叉引用 / 一致性） | `FAIL 0 → 可交付` |
 | `bash scripts/audit.sh` | 安不安全（凭证 / 危险命令 / L3 门禁 / 合规） | `0 警告 ｜ 0 失败 → 通过` |
 | `bash scripts/regress.sh 3` | **行为对不对**（澄清门算例 / L3 门禁矩阵 / 红线一致性） | 全 OK ｜ `FAIL 0` |
-| `python scripts/aligncheck.py . 5` | **全量文件级对齐**（18 组断言） | `FAIL 0 ｜ 全部通过` |
+| `python scripts/aligncheck.py . 5` | **全量文件级对齐**（20 组断言） | `FAIL 0 ｜ 全部通过` |
 | `python scripts/runcheck.py . 3` | 静态检查域路由、skill 内容、示例和输出契约；**不调用模型或 LearnBuddy** | `FAIL 0 ｜ 静态契约通过` |
 | `python scripts/checkall.py .` | **自检单入口**：跑齐检查项 + 逐项计时 + 结果摘要（`--quick` 加速 ｜ `--negative` 断言非空转） | `全部 PASS ｜ rc 0` |
 
@@ -114,6 +114,6 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 
 ## 七、安装后行为约定（强制）
 
-1. **只回一句**：安装完成后仅回复「安装完成」。不展示安全审计 / 合规检查结论、不输出任何报告或清单、不罗列结构计数。
+1. **一句确认 + 三行引导**：安装完成后回复「安装完成」，并附三行首次使用引导 —— ①能做什么 ②怎么开口 ③一句话示例。不展示安全审计 / 合规检查结论、不输出任何报告或清单、不罗列结构计数。
 2. **静默自检**：§五 的校验脚本属**内部自检**，可运行，但**成功时不输出任何内容**，仅在失败时报错。
 3. **按需说明**：不主动输出内部自检结果；用户明确索要时可说明已执行的检查及结果。

@@ -35,7 +35,7 @@ REQ="SKILL.md README.md INSTALL.md config.yaml
 LICENSE THIRD_PARTY_NOTICES.md
 library/README.md library/clarity.md library/domain-review.md library/output-spec.md
 library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md
-library/skill-evolution.md
+library/skill-evolution.md library/experience.md
 domains/_registry.md
 references/dlut-official-sites.md references/dlut-login-sites.md references/dlut-field-map.md
 references/dlut-url-verification.md references/dlut-site-profiles.md references/browser-matrix.md
@@ -246,7 +246,7 @@ _pbad=$(find domains -path '*skills/local/*/SKILL.md' 2>/dev/null | awk -F/ '{pr
         | sort | uniq -c | awk '$1<4 || $1>5' | wc -l | tr -d ' ')
 [ "${_pbad:-0}" -eq 0 ] && ok "每域均为 4–5 个库内 skill" || bad "$_pbad 个域的库内 skill 数不在 4–5"
 libn=$(ls -1 library/*.md 2>/dev/null | wc -l | tr -d ' ')
-[ "${libn:-0}" -eq 11 ] && ok "library 文件数 = 11" || warn "library 文件数 = $libn（期望 11）"
+[ "${libn:-0}" -eq 12 ] && ok "library 文件数 = 12" || warn "library 文件数 = $libn（期望 12）"
 cmdn=$(ls -1 commands/*.md 2>/dev/null | wc -l | tr -d ' ')
 [ "${cmdn:-0}" -eq 22 ] && ok "commands = 22" || warn "commands = $cmdn（期望 22）"
 pub=$(grep -c '^|' references/dlut-official-sites.md 2>/dev/null); pub=${pub:-0}
@@ -331,10 +331,11 @@ for _f in SKILL.md INSTALL.md library/output-spec.md commands/qihang.md; do
     ok "$_f 不含强制自我身份声明"
   fi
 done
-if grep -qF '只回复一句「安装完成」' SKILL.md 2>/dev/null; then
-  ok "SKILL.md 保留安装后简短确认约定"
+if grep -qF '安装完成后回复一句「安装完成」' SKILL.md 2>/dev/null \
+   && grep -qF '首次使用引导' SKILL.md 2>/dev/null; then
+  ok "SKILL.md 保留安装后简短确认 + 首次使用引导"
 else
-  bad "SKILL.md 缺少安装后行为约定"
+  bad "SKILL.md 缺少安装后行为约定（应含确认句与首次使用引导）"
 fi
 
 # ---------- 8d. 触发门与核心快路径 ----------
