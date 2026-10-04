@@ -370,6 +370,45 @@ def inject_experience_pointer_removed(tree):
     return [p], t.replace('`library/experience.md`', '`experience.md`', 1)
 
 
+def inject_restate_no_ambiguity(tree):
+    """B2 回归：复述档退回「档位驱动」，删掉实质歧义判据。"""
+    p = os.path.join(tree, 'library', 'clarity.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('实质歧义', '档位条件')
+
+
+def inject_memory_no_fixed_reply(tree):
+    """B3 回归：§3.2 续接固定回话被改写（唯一副本失效）。"""
+    p = os.path.join(tree, 'library', 'memory.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('不得假称记得', '尽量不要说得太肯定')
+
+
+def inject_login_no_handback(tree):
+    """C2 回归：登录后不再交还（删掉交还三步与固定一句话）。"""
+    p = os.path.join(tree, 'library', 'login-policy.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('交还三步', '权限说明').replace(
+        '不想登录也告诉我，我给通用流程', '需重新授权后继续')
+
+
+def inject_oos_priority_supreme(tree):
+    """C1 回归：越界表改回「优先级最高」（单词命中即终判）。"""
+    p = os.path.join(tree, 'config.yaml')
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('arbitration:', 'x_arbitration:')
+    return [p], t.replace('命中只做初筛，归属由下面的仲裁顺序定',
+                          '命中即不接管（优先级最高，压过宽词表）')
+
+
+def inject_experience_no_metrics(tree):
+    """C3 回归：§7 体验层自检指标被删除（体验层重新退化为零指标层）。"""
+    p = os.path.join(tree, 'library', 'experience.md')
+    t = io.open(p, encoding='utf-8').read()
+    i = t.find('## 7. 体验层自检指标')
+    return [p], (t[:i] if i >= 0 else t)
+
+
 def inject_entry_phrase_drift(tree):
     """改掉 README.md 的一个起始句型（与唯一副本分叉）→ aligncheck X 组应 FAIL。"""
     p = os.path.join(tree, 'README.md')
@@ -445,6 +484,16 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck X 呈现层指针'),
         ('入口文案分叉（README 起始句型与唯一副本不一致）', inject_entry_phrase_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck X 起始句型唯一副本'),
+        ('澄清门复述档失去歧义判据（B2）', inject_restate_no_ambiguity,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 澄清门实质歧义'),
+        ('续接固定回话被改写（B3）', inject_memory_no_fixed_reply,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 记忆口径单源'),
+        ('登录后不再交还（C2）', inject_login_no_handback,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 登录交还三步'),
+        ('越界表改回优先级最高（C1）', inject_oos_priority_supreme,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 越界仲裁顺序'),
+        ('体验层自检指标被删除（C3）', inject_experience_no_metrics,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 体验层自检指标'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,

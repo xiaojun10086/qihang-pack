@@ -95,7 +95,7 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 | `bash scripts/selfcheck.sh` | 结构对不对（计数 / 交叉引用 / 一致性） | `FAIL 0 → 可交付` |
 | `bash scripts/audit.sh` | 安不安全（凭证 / 危险命令 / L3 门禁 / 合规） | `0 警告 ｜ 0 失败 → 通过` |
 | `bash scripts/regress.sh 3` | **行为对不对**（澄清门算例 / L3 门禁矩阵 / 红线一致性） | 全 OK ｜ `FAIL 0` |
-| `python scripts/aligncheck.py . 5` | **全量文件级对齐**（20 组断言） | `FAIL 0 ｜ 全部通过` |
+| `python scripts/aligncheck.py . 5` | **全量文件级对齐**（21 组断言） | `FAIL 0 ｜ 全部通过` |
 | `python scripts/runcheck.py . 3` | 静态检查域路由、skill 内容、示例和输出契约；**不调用模型或 LearnBuddy** | `FAIL 0 ｜ 静态契约通过` |
 | `python scripts/checkall.py .` | **自检单入口**：跑齐检查项 + 逐项计时 + 结果摘要（`--quick` 加速 ｜ `--negative` 断言非空转） | `全部 PASS ｜ rc 0` |
 
