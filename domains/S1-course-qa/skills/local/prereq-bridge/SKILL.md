@@ -1,7 +1,7 @@
 ---
 name: qihang-prereq-bridge
 description: 「启航」S1 课程答疑域库内 skill：卡点在前置知识断层时先定位断点、只补一节最小前置。
-version: 3.3.6
+version: 3.3.7
 license: MIT
 ---
 

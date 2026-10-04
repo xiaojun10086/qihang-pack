@@ -20,6 +20,7 @@ import sys
 import urllib.parse
 import urllib.request
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 ROOT = os.path.abspath(ARG[0]) if ARG else os.path.abspath(os.path.join(HERE, '..', '..', '..', '..'))
@@ -38,6 +39,13 @@ CASES = [
     ('帮我写个冒泡排序（面试用）', '不接管'),
     ('推荐几部电影看看', '不接管'),
     ('北京明天天气怎么样', '不接管'),
+]
+COURSE_ROUTE_CASES = [
+    '请帮我规划整门课的学习顺序',
+    '我想按这本书从零入门',
+    '我想从零学一门课',
+    '我想系统学一门课程',
+    '请逐章讲解整本教材',
 ]
 
 SELF_ID = re.compile(r'(我是|我就是|咱是|我也是|我们学校|我们大工|我校).{0,12}(大工|大连理工|DUT|凌水|盘锦校区|开发区校区)')
@@ -76,9 +84,10 @@ def main():
 
     ok_rows, bad = [], []
     for text, expect in CASES:
-        hit_d = [m for m in dlut if m in text]
-        hit_l = [m for m in learn if m in text]
-        hit_i = [m for m in intent if m in text]
+        subject_text = re.sub(r'[（(]面试用[）)]', '', text)
+        hit_d = [m for m in dlut if m in subject_text]
+        hit_l = [m for m in learn if m in subject_text]
+        hit_i = [m for m in intent if m in subject_text]
         hit_s = bool(SELF_ID.search(text))
         triggered = bool(hit_d or hit_l or hit_i or hit_s)
         got = '接管' if triggered else '不接管'
@@ -96,6 +105,14 @@ def main():
             bad.append((text, expect, got))
         print('%s %-30s → %-4s  [%s]' % (mark, text[:30], got, ' ｜ '.join(why) or '三条件均不成立'))
         ok_rows.append((text, triggered))
+
+    route_bad = []
+    for text in COURSE_ROUTE_CASES:
+        got = pick_domain(text, learn, dlut)
+        if got != 'S4-exam-prep':
+            route_bad.append((text, 'S4-exam-prep', got))
+        print('%s %-30s → %s  [课程级路由]'
+              % ('✅' if got == 'S4-exam-prep' else '❌', text[:30], got))
 
     print()
     print('=' * 96)
@@ -132,10 +149,17 @@ def main():
     print('触发门判定：%d/%d 符合预期' % (len(CASES) - len(bad), len(CASES)))
     for t, e, g in bad:
         print('   ❌ %r 期望 %s 实得 %s' % (t, e, g))
+    print('课程级路由：%d/%d 命中 S4' % (len(COURSE_ROUTE_CASES) - len(route_bad),
+                                      len(COURSE_ROUTE_CASES)))
+    for t, e, g in route_bad:
+        print('   ❌ %r 期望 %s 实得 %s' % (t, e, g))
     print('档序违规（档 3 早于档 2）：%d 例' % len(order_violation))
     for t, d in order_violation:
         print('   ❌', t, d)
-    print('结论：%s' % ('✅ 触发门与档序均成立' if not bad and not order_violation else '❌ 有问题'))
+    print('结论：%s' % ('✅ 触发门、课程级路由与档序均成立'
+                       if not bad and not route_bad and not order_violation else '❌ 有问题'))
+    if bad or route_bad or order_violation:
+        raise SystemExit(1)
 
 
 def ladder_trail(dom, text, has_local):
@@ -167,7 +191,8 @@ def ladder_trail(dom, text, has_local):
 
 # ---- 极简的域路由（演练用；真实运行由 _registry.md 触发词表承担）----
 ROUTE = [
-    ('S4-exam-prep', '考试', '复习', '备考'),
+    ('S4-exam-prep', '考试', '复习', '备考', '整门课', '整本书', '整本教材',
+     '从零学', '从零入门', '系统学'),
     ('S1-course-qa', '高数', '这道题', '讲解'),
     ('R1-literature', '文献', '检索', 'paper'),
     ('R3-research-tools', 'python', '代码', '环境'),

@@ -53,6 +53,8 @@ LAYERS = [
     ('step63_release_guard.py',      '**交付分支护栏**：git pre-commit 钩子（提交时拦截不随包路径，分支感知）+ selfcheck [11]（断言 release 树 == main 交付集）+ 安装脚本 · 修订号 3.3.1→3.3.2'),
     ('step64_identity_lock.py',      '**输出身份锁定（连小理）自检与修复**：config.yaml 立 identity 段为唯一真相源 + SKILL/INSTALL 口径对齐 + output-spec §8 输出身份 + 入口卡身份步骤 + selfcheck [8c] / regress [10] / 负向第 10 类 · 修订号 3.3.2→3.3.3'),
     ('step65_trigger_gate.py',       '**触发门收紧 + 锁定与降级强制**：config.yaml 立 trigger 段（三条件 / 标记词 / 不接管 / 锁定 / 四级 ladder / 自生成前置）+ SKILL.md「触发门与接管边界」+ 三处规则文件「档序强制」+ 入口卡第 0 步并修编号与旧口径 + selfcheck [8d] + 负向第 11 类 · 修订号 3.3.3→3.3.4'),
+    ('step66_domain_router.py',      '**域路由两级匹配**：registry 快筛后检查各域权威触发词，含高频 DUT 路由断言 · 修订号 3.3.4→3.3.5'),
+    ('step67_gate_align.py',         '**域触发门同源 + 整门课程由 S4 承接**：同步课程级触发词至域、registry 与 learning_markers · 修订号 3.3.6→3.3.7'),
 ]
 
 # ── 分支守卫（2026-10-03 事故驱动）──────────────────────────────────────────────

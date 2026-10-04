@@ -15,7 +15,7 @@ SPEC.loader.exec_module(metrics)
 
 def record(**overrides):
     row = {
-        "v": "3.3.6", "ts": "2026-10-04T00:00:00+08:00",
+        "v": metrics.REV, "ts": "2026-10-04T00:00:00+08:00",
         "sid": "a1b2c3d4", "domain": "S4", "skill": "exam-sprint",
         "exit": "ok", "redline": 0, "rl_block": 0, "leak": 0,
         "iso": 0, "fab": 0, "corrected": 0, "degrade": 0,

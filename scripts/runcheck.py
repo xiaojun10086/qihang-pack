@@ -204,11 +204,46 @@ def run_round(r):
 
     # ---------- 全域触发词表（跨域共享判定用，以域文件为权威） ----------
     DMTRIG = {did: trigger_words(rd('domains/%s/_domain.md' % d)) for did, d in zip(DEVS, DOMS)}
+    _course_markers = ('整门课', '整本书', '整本教材', '从零学', '从零入门', '系统学')
+    _s4_registry = ROW.get('S4', {}).get('trig', [])
+    _learning = re.search(r'^\s*learning_markers:\s*\[(.*?)\]', rd('config.yaml'), re.M)
+    _learning_words = ([x.strip() for x in _learning.group(1).split(',')] if _learning else [])
+    _root = rd('SKILL.md')
+    _course_row = re.search(r'^\|\s*从零系统学习一门课或一本教材\s*\|\s*S4\b[^\n]*$', _root, re.M)
+    _course_instruction = re.search(r'^\*\*整门课级请求\*\*', _root, re.M)
+    for _marker in _course_markers:
+        if _marker not in DMTRIG.get('S4', []):
+            bad('domains/S4-exam-prep/_domain.md', '课程路由词「%s」未触发 S4' % _marker)
+        if _marker not in _s4_registry:
+            bad('domains/_registry.md', '课程路由词「%s」未进入 S4 快筛摘要' % _marker)
+        if _marker not in _learning_words:
+            bad('config.yaml', '课程路由词「%s」未进入触发门 learning_markers' % _marker)
+    if not _course_row or not _course_instruction or 'faster-cycle' not in _root:
+        bad('SKILL.md', '从零/整门课请求必须由入口明确路由至 S4 完整学习循环')
+
     TRIG = collections.defaultdict(set)
     for k, vs in DMTRIG.items():
         for t in vs:
             TRIG[t].add(k)
     dis = reg[reg.find('## 触发词消歧'):] if '## 触发词消歧' in reg else ''
+
+    _review = rd('library/domain-review.md')
+    if not all(x in _review for x in ('双向复核', '正向核对', '反向核对')):
+        bad('library/domain-review.md', '域审查须同时核对正向覆盖与不覆盖范围')
+    _out_spec = rd('library/output-spec.md')
+    _file_delivery = section(_out_spec, r'^###\s*1\.4\s*文件交付[^\n]*$') or ''
+    _checklist = rd('library/output-checklist.md')
+    if ('文件首行' not in _file_delivery or '回复【结论】' not in _file_delivery
+            or not re.search(r'^\|\s*2\s*\|[^|]*\|[^|]*文件首行[^|]*\|', _checklist, re.M)):
+        bad('library/output-spec.md', '文件交付须校验正文模板及文件首行与回复结论一致')
+    _identity = re.search(r'^\s*self_intro:\s*(.+?)\s*(?:#.*)?$', rd('config.yaml'), re.M)
+    if _identity:
+        _identity_text = _identity.group(1).strip()
+        for _file in ('SKILL.md', 'INSTALL.md', 'library/output-spec.md'):
+            if _identity_text not in rd(_file):
+                bad(_file, '固定身份串与 config.yaml 的 identity.self_intro 不一致')
+    else:
+        bad('config.yaml', '缺少 identity.self_intro，无法校验固定身份串')
 
     n_chain = 0
     for did, d in zip(DEVS, DOMS):

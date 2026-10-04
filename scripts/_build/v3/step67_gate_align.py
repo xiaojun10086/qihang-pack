@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------
-# 【v3 生成链 · 第 30 层 · 触发门与域表同源（v3.3.5 → v3.3.6）】
+# 【v3 生成链 · 第 30 层 · 触发门与域表同源（v3.3.6 → v3.3.7）】
 #
 # 触发（用户要求「按照相似问题继续自查，这次自查 12 轮以上」）：
 #   新增多轮自查台 `scripts/_build/v3/tests/e2e_rounds.py`（15 轮 / 69 题）→
@@ -36,7 +36,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-')
                        else os.path.join(HERE, '..', '..', '..'))
-OLD_REV, NEW_REV = '3.3.5', '3.3.6'
+OLD_REV, NEW_REV = '3.3.6', '3.3.7'
 
 # 越界信号：与 DUT、学习、校园生活**均无关**的通用事务（命中即不接管）
 OUT_OF_SCOPE = ['电影', '电视剧', '综艺', '追星', '游戏', '天气', '机票', '火车票', '酒店', '外卖',
@@ -105,14 +105,14 @@ DWORD_PATCH = {
     'S3-assignment': ('`作业` ｜ `实验报告` ｜ `课程设计` ｜ `平时分` ｜ `大作业` ｜ `论文作业` ｜ `提交` ｜ `报告怎么写` ｜ `自查`',
                       '`作业` ｜ `实验报告` ｜ `课程设计` ｜ `平时分` ｜ `大作业` ｜ `论文作业` ｜ `提交` ｜ `报告怎么写` ｜ `自查` ｜ `分工` ｜ `小组`'),
     'S4-exam-prep': ('`考试` ｜ `复习` ｜ `背诵` ｜ `突击` ｜ `卡组` ｜ `刷题` ｜ `期末` ｜ `期中` ｜ `四六级` ｜ `背单词` ｜ `记忆` ｜ `遗忘` ｜ `临时抱佛脚`',
-                     '`考试` ｜ `复习` ｜ `背诵` ｜ `突击` ｜ `卡组` ｜ `刷题` ｜ `期末` ｜ `期中` ｜ `四六级` ｜ `背单词` ｜ `记忆` ｜ `遗忘` ｜ `临时抱佛脚` ｜ `模拟题` ｜ `出题` ｜ `模拟卷`'),
+                     '`考试` ｜ `复习` ｜ `背诵` ｜ `突击` ｜ `卡组` ｜ `刷题` ｜ `期末` ｜ `期中` ｜ `四六级` ｜ `背单词` ｜ `记忆` ｜ `遗忘` ｜ `临时抱佛脚` ｜ `模拟题` ｜ `出题` ｜ `模拟卷` ｜ `整门课` ｜ `整本书` ｜ `整本教材` ｜ `从零学` ｜ `从零入门` ｜ `系统学`'),
     'F5-health': ('`生病` ｜ `就医` ｜ `医保` ｜ `锻炼` ｜ `饮食` ｜ `体检` ｜ `运动` ｜ `受伤`',
                   '`生病` ｜ `就医` ｜ `医保` ｜ `锻炼` ｜ `饮食` ｜ `体检` ｜ `运动` ｜ `受伤` ｜ `感冒` ｜ `发烧` ｜ `校医院`'),
 }
 DSENT = {
     'S1-course-qa': '`区别` ｜ `辨析` ｜ `没听懂` ｜ `再讲一遍`',
     'S3-assignment': '`自查` ｜ `分工` ｜ `小组`',
-    'S4-exam-prep': '`临时抱佛脚` ｜ `模拟题` ｜ `出题` ｜ `模拟卷`',
+    'S4-exam-prep': '`临时抱佛脚` ｜ `模拟题` ｜ `出题` ｜ `模拟卷` ｜ `整门课` ｜ `整本书` ｜ `整本教材` ｜ `从零学` ｜ `从零入门` ｜ `系统学`',
     'F5-health': '`受伤` ｜ `感冒` ｜ `发烧` ｜ `校医院`',
 }
 for d, (a, b) in DWORD_PATCH.items():
@@ -128,6 +128,15 @@ for d, (a, b) in DWORD_PATCH.items():
         continue
     write('domains/%s/_domain.md' % d, t.replace(a, b, 1))
     print('  [OK]   %s 补词' % d)
+
+_registry = read('domains/_registry.md')
+_s4_row = re.search(r'^(\|\s*`S4`\s*\|[^|]+\|)([^|]*)(\|.*)$', _registry or '', re.M)
+_s4_triggers = ' 考试、复习、背诵、整门课、整本书、整本教材、从零学、从零入门、系统学… '
+if _s4_row and _s4_row.group(2) != _s4_triggers:
+    write('domains/_registry.md', _registry[:_s4_row.start()]
+          + _s4_row.group(1) + _s4_triggers + _s4_row.group(3)
+          + _registry[_s4_row.end():])
+    print('  [OK]   registry S4 摘要已同步课程级触发词')
 
 print('== A) 派生 20 域触发词并集（同源）==')
 DOMWORDS = collector_domain_words()
@@ -147,7 +156,7 @@ else:
 # 否则**不接管**：按普通助手直接回答，不套模板、不写档案、不标 [已降级]。
 # 由 scripts/selfcheck.sh [8d] 断言本段字段齐全，且 SKILL.md 的触发门与之一致。
 #
-# ⚠️ **词表同源铁律（v3.3.6）**：`learning_markers` 是 **20 域触发词的并集**，
+# ⚠️ **词表同源铁律（v3.3.7）**：`learning_markers` 是 **20 域触发词的并集**，
 #    由构建层 scripts/_build/v3/step67_gate_align.py 从 `_registry.md` 与各域 `_domain.md` 的
 #    `## 触发词` 段**派生**，**不手工维护**。理由（实测）：门曾另起一套窄词表（50 词）而域表有 199 词
 #    → 交集仅 16 个 → 出现 **「域能锁定、门却不放行」** 的 39 处矛盾（干跑查出）。
@@ -177,6 +186,21 @@ trigger:
         write('config.yaml', t[:old_block.start()] + NEW + t[old_block.end():])
         print('  [OK]   门词表已改为域表并集（%d 词）+ 越界信号（%d 词）+ 边界说明'
               % (len(DOMWORDS), len(OUT_OF_SCOPE)))
+
+print('== B2) 同步已有 config.yaml 的域触发词并集 ==')
+t = read('config.yaml')
+_learn_line = re.search(r'^  learning_markers:\s*\[.*\]\s*$', t, re.M)
+_expected = '  learning_markers: [' + ', '.join(DOMWORDS) + ']'
+if not _learn_line:
+    print('  [MISS] config.yaml 缺少单行 learning_markers')
+elif _learn_line.group(0) == _expected:
+    print('  [SAME] learning_markers 与域触发词并集一致')
+else:
+    write('config.yaml', t[:_learn_line.start()] + _expected + t[_learn_line.end():])
+    print('  [OK]   learning_markers 已同步（%d 个词）' % len(DOMWORDS))
+t = read('config.yaml')
+if '词表同源铁律（v3.3.6）' in t:
+    write('config.yaml', t.replace('词表同源铁律（v3.3.6）', '词表同源铁律（v3.3.7）', 1))
 
 print('== C) SKILL.md：T2 表述 + 越界信号行 ==')
 t = read('SKILL.md')
@@ -225,7 +249,7 @@ elif 'out_of_scope_markers' in t:
     print('  [SAME] [8d] 已含越界信号断言')
 else:
     a = "for _t in 明确涉及大连理工大学 知识学习 自述为大连理工大学学生; do"
-    b = ("# 词表同源（v3.3.6）：门词表必须是 20 域触发词的并集 —— 防「域能锁、门不放行」的 39 处矛盾复发\n"
+    b = ("    # 词表同源（v3.3.7）：门词表必须是 20 域触发词的并集 —— 防「域能锁、门不放行」的 39 处矛盾复发\n"
          "_gatewords=$(sed -n '/^  learning_markers:/,/^  learning_intents:/p' config.yaml 2>/dev/null)\n"
          "_cov=0\n"
          "for _w in 概念图 卡组 引用规范 军训 作息 简历 投稿 专利 查重 讲义 emo 助学金; do\n"
@@ -246,13 +270,16 @@ else:
 
 print('== F) 构建侧层序 ==')
 t = read('scripts/_build/v3/README.md')
+if t:
+    t = t.replace('修订号 → `3.3.6` | 新增层 |', '修订号 → `3.3.7` | 新增层 |')
+    write('scripts/_build/v3/README.md', t)
 if t and 'step67_gate_align.py' not in t:
     a = '| 25 | `step66_domain_router.py` |'
     if a in t:
         write('scripts/_build/v3/README.md', t.replace(a,
               '| 26 | `step67_gate_align.py` | **触发门与域表同源**：`learning_markers` 改为 **20 域触发词并集**（构建期派生）'
               '+ `out_of_scope_markers` 越界信号 + `boundary_note`（顺带提及不算）+ SKILL.md §1.5 越界信号'
-              '+ selfcheck [8d] 词表同源断言；修订号 → `3.3.6` | 新增层 |\n' + a, 1))
+              '+ selfcheck [8d] 词表同源断言；修订号 → `3.3.7` | 新增层 |\n' + a, 1))
         print('  [OK]   已登记 step67')
     else:
         print('  [MISS] 层序锚点未命中')

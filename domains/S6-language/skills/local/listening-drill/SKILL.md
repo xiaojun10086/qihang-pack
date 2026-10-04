@@ -1,7 +1,7 @@
 ---
 name: qihang-listening-drill
 description: 「启航」S6 语言能力域库内 skill：用「盲听—听写—对照—跟读」四步做精听，配材料分级与错因统计。
-version: 3.3.6
+version: 3.3.7
 license: MIT
 ---
 

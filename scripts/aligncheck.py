@@ -118,6 +118,15 @@ def internal_leaks(o):
     return sorted(set(out))
 
 
+def section(text, title_re):
+    match = re.search(title_re, text, re.M)
+    if not match:
+        return None
+    rest = text[match.end():]
+    end = re.search(r'^##\s', rest, re.M)
+    return rest[:end.start()] if end else rest
+
+
 def output_blocks(t):
     """取出 SKILL.md 里全部 `**输出**` 代码块。"""
     return re.findall(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', t, re.S)
@@ -213,6 +222,62 @@ def run_round(r):
             bad('config.yaml', '%s 含重复项: %s' % (key, dup))
     if '成绩明细' not in cfg or '邮箱未读提示' not in cfg:
         bad('config.yaml', 'L3/L2 关键项缺失')
+
+    # ---------- C2 域与 skill 覆盖/摘要的双向路由对齐 ----------
+    for d in DOMS:
+        dm_path = 'domains/%s/_domain.md' % d
+        dm_text = rd(dm_path)
+        boundary = section(dm_text, r'^##\s*域边界[^\n]*$') or ''
+        domain_cover = re.search(r'^\s*-\s*\*\*覆盖\*\*[：:]\s*(.+)$', boundary, re.M)
+        if not domain_cover:
+            bad(dm_path, '域边界缺少可核验的「覆盖」声明')
+            continue
+        skill_sec = section(dm_text, r'^##\s*库内 skill[^\n]*$') or ''
+        skill_dirs = sorted(x for x in os.listdir('domains/%s/skills/local' % d)
+                            if os.path.isdir('domains/%s/skills/local/%s' % (d, x)))
+        for skill_name in skill_dirs:
+            skill_path = 'domains/%s/skills/local/%s/SKILL.md' % (d, skill_name)
+            skill_text = rd(skill_path)
+            cover = re.search(r'^\s*-\s*\*\*?覆盖\*\*?[：:]\s*(.+)$', skill_text, re.M)
+            if not cover:
+                cover = re.search(r'^\s*-\s*覆盖[：:]\s*(.+)$', skill_text, re.M)
+            if not cover:
+                bad(skill_path, '缺少可供域对齐的「覆盖」能力声明')
+                continue
+            entry = re.search(
+                r'^\s*-\s+\*\*`%s`\*\*[^\n]*(?:\n[ \t]+[^\n]+)?'
+                % re.escape(skill_name), skill_sec, re.M)
+            if not entry:
+                bad(dm_path, 'skill `%s` 缺少可读摘要行' % skill_name)
+
+    _s4_cover = re.search(r'^\s*-\s*\*\*覆盖\*\*[：:]\s*(.+)$',
+                          section(rd('domains/S4-exam-prep/_domain.md'),
+                                  r'^##\s*域边界[^\n]*$') or '', re.M)
+    _faster = rd('domains/S4-exam-prep/skills/local/faster-cycle/SKILL.md')
+    _s4_summary = section(rd('domains/S4-exam-prep/_domain.md'),
+                          r'^##\s*库内 skill[^\n]*$') or ''
+    _faster_summary = re.search(r'^\s*-\s+\*\*`faster-cycle`\*\*[^\n]*(?:\n[ \t]+[^\n]+)?',
+                                _s4_summary, re.M)
+    if (not _s4_cover or '完整学习循环' not in _s4_cover.group(1)
+            or '完整学习循环' not in _faster
+            or not _faster_summary or '完整学习循环' not in _faster_summary.group(0)):
+        bad('domains/S4-exam-prep/_domain.md',
+            '整门课/从零入门能力必须同时出现在 S4 覆盖声明、faster-cycle 覆盖和摘要')
+
+    _clarity = rd('library/clarity.md')
+    _ask_section = section(_clarity, r'^##\s*4\.\s*追问优先级[^\n]*$') or ''
+    _b_row = re.search(r'^\|\s*`B`\s*\|([^|]+)\|([^|]+)\|', _ask_section, re.M)
+    _course_steps = section(_faster, r'^##\s*执行步骤[^\n]*$') or ''
+    if (not _b_row or '条件可问' not in _b_row.group(1)
+            or not all(x in _course_steps for x in ('当前基础', '讲解路线', '诊断题'))):
+        bad('library/clarity.md',
+            'B 槽可问性必须允许课程 skill 在基础影响讲解路线时询问或诊断')
+
+    _exceptions = section(_clarity, r'^##\s*5\.\s*不追问的例外[^\n]*$') or ''
+    _general_exception = re.search(r'(?ms)^6\.\s*\*\*通用知识型\*\*.*?(?=^\s*>|^##|\Z)',
+                                   _exceptions)
+    if not _general_exception or '不豁免域路由与库内 skill 选择' not in _general_exception.group(0):
+        bad('library/clarity.md', '例外 6 必须明确只豁免追问、不豁免域路由')
 
     # ---------- D SKILL.md 契约 ----------
     NEED = ['## 前置', '## 边界', '## 执行步骤', '## 可执行示例', '## ⚠️ 红线', '## 输出', '## DUT 绑定点', '## 失败与降级']

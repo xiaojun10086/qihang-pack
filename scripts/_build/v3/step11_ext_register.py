@@ -15,7 +15,7 @@ NEW = {
     'S1-course-qa':        ('socratic-qa', '不直接给答案，用五类渐进提问引导自悟；卡壳 3 轮自动降级分步讲解'),
     'S2-lecture-notes':    ('link-notes', '用双链、标签层级与嵌入引用把讲义、错题、概念连成知识网络'),
     'S3-assignment':       ('imrad-scaffold', '课程论文 / 毕设的 IMRAD 四节骨架 + 对抗性自审；想法与数据由用户提供，正文不代写'),
-    'S4-exam-prep':        ('faster-cycle', '忘/练/态/教/恒/复六步循环 + 四种学习模式，以教学回讲为核心留存手段'),
+    'S4-exam-prep':        ('faster-cycle', '一门课或一个技能的完整学习循环（含从零入门），先确认教材、章节范围与讲解方式，再分章推进'),
     'S5-academic-writing': ('argument-slides', '每页标题写结论（行动标题）+ 幽灵测试 + 一页一论据的论证式演示结构'),
     'S6-language':         ('ielts-coach', '摸底三问 + 算分公式 + 80/20 时间分配 + 分数换算表的雅思应考策略'),
     'F2-focus':            ('deep-work', '深浅分类 + 时间块（≥90 分钟、日上限 4 小时）+ 浅工作两批 + 收尾仪式'),

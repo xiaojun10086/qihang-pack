@@ -1,7 +1,7 @@
 ---
 name: qihang-lang-drill
 description: 语言练习辅导：从一轮短练习或用户提供的样本开始，给针对性反馈并逐步适应难度；只有制定长期计划时才校准水平与训练周期。
-version: 3.3.6
+version: 3.3.7
 license: MIT
 ---
 
