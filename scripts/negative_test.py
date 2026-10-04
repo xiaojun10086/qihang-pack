@@ -453,11 +453,112 @@ def inject_oos_priority_supreme(tree):
 
 
 def inject_experience_no_metrics(tree):
-    """C3 回归：§7 体验层自检指标被删除（体验层重新退化为零指标层）。"""
+    """Y5 回归：§7 资产一致性指标被删除（体验层重新退化为零指标层）。"""
     p = os.path.join(tree, 'library', 'experience.md')
     t = io.open(p, encoding='utf-8').read()
-    i = t.find('## 7. 体验层自检指标')
+    i = t.find('## 7. 资产一致性指标')
     return [p], (t[:i] if i >= 0 else t)
+
+
+def inject_ask_variant_lost(tree):
+    """Z3 回归：把一个**已有**追问变体块的 skill 改成「只演示先给结论」。
+
+    选 stats-workflow 的理由：它声明「澄清判定 = 追问」并渲染了完整追问变体块。把块首
+    【还需确认】改成【结论】后，该块的首节不再是【还需确认】→ has_ask_variant 判定失败
+    → 产生**新缺口**，Z3 必须 FAIL。
+    """
+    p = os.path.join(tree, 'domains', 'R2-experiment-data', 'skills', 'local',
+                     'stats-workflow', 'SKILL.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('【还需确认】', '【结论】')
+
+
+def inject_ask_variant_unfenced(tree):
+    """Z3 回归：把追问变体块**拆掉围栏**，退回「裸写一行【还需确认】」。
+
+    裸写形态是真实的退化路径：它既不是输出块（T / Z2 / O6 的 `output_blocks()` 都看不到），
+    又让读者以为追问路径已被演示。唯一能拦住的是 Z3 的「【还需确认】不得出现在 fenced
+    输出块之外」。选 exam-sprint：它的追问块是示例 1 的第一个输出块。
+    """
+    p = os.path.join(tree, 'domains', 'S4-exam-prep', 'skills', 'local',
+                     'exam-sprint', 'SKILL.md')
+    t = io.open(p, encoding='utf-8').read()
+    old = ('**输出**\n\n```\n【还需确认】① 考到第几章 ② 要计划还是卡组\n'
+           '【依据】范围决定取舍哪几章，产出形式决定给时间表还是给错题卡；两者不同会做成两套东西\n'
+           '【下一步】回我「第几章 + 计划/卡组」两句话，我直接排每日安排\n```\n')
+    new = '**追问**\n\n【还需确认】① 考到第几章 ② 要计划还是卡组\n'
+    return [p], t.replace(old, new)
+
+
+def inject_output_field_invented(tree):
+    """Z2 回归：在输出块里自造一个不在白名单内的字段标签。
+
+    只在**输出块内部**替换（文件其余位置可能引用该词），且保持标签位置不变 ——
+    这样 T 组的「结论前置 / 下一步恰好 1 个 / 要点 ≤ 6」全部照旧通过，
+    唯一能拦住它的就是 Z2 的白名单断言。
+    """
+    for d in sorted(os.listdir(os.path.join(tree, 'domains'))):
+        base = os.path.join(tree, 'domains', d, 'skills', 'local')
+        if not os.path.isdir(base):
+            continue
+        for s in sorted(os.listdir(base)):
+            p = os.path.join(base, s, 'SKILL.md')
+            if not os.path.isfile(p):
+                continue
+            t = io.open(p, encoding='utf-8').read()
+            m = re.search(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', t, re.S)
+            if m and '\n【建议】' in m.group(1):
+                o = m.group(1)
+                new_o = o.replace('\n【建议】', '\n【补充】', 1)
+                return [p], t.replace(o, new_o, 1)
+    return [], None
+
+
+def inject_group_count_drift(tree):
+    """Z1 回归：把 README 声明的「N 组断言」手改回旧值（代码实体未变）。
+
+    这正是历史缺陷的形状：数字是手写的，文档之间互相对齐，但与代码不一致时全绿。
+    """
+    p = os.path.join(tree, 'README.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('22 组断言', '21 组断言')
+
+
+def inject_slot_sentence_short(tree):
+    """Z4 回归：只改一张域入口卡的澄清门句（去掉一个空格），其余 17 张不动。
+
+    「拆 6 槽位」只出现在这 18 张卡里，任何其它检查器都不引用它 —— 唯一能拦住的是 Z4。
+    """
+    p = os.path.join(tree, 'commands', 'qihang-f1.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('拆 6 槽位', '拆6槽位')
+
+
+def inject_crisis_number_dropped(tree):
+    """Z5 回归：README 首页的心理援助热线被抹掉（号码退回「只藏在域文件里」）。"""
+    p = os.path.join(tree, 'README.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('12356', '1235')
+
+
+def inject_card_roster_drift(tree):
+    """Z6 回归：把一张域入口卡的 skill 计数改掉（名册与目录实际数量不符）。
+
+    M 组只逐字比对卡与域文件的第 4/6 步，skill 名册无人断言 —— 唯一能拦住的是 Z6。
+    """
+    p = os.path.join(tree, 'commands', 'qihang-f1.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('本域 4 个库内 skill', '本域 5 个库内 skill')
+
+
+def inject_card_exempt_stale(tree):
+    """Z6 回归：给「豁免列名册」的入口卡补上名册 → 豁免必须自动失效。
+
+    豁免若只增不减，会变成「先放过」的静默通道：卡后来补了名册，却仍被豁免跳过校验。
+    """
+    p = os.path.join(tree, 'commands', 'qihang-s1.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t + '\n本域 4 个库内 skill（豁免卡补写名册后必须被 Z6 拦下）\n'
 
 
 def inject_silent_checker(tree):
@@ -573,10 +674,26 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 登录交还三步'),
         ('越界表改回优先级最高（C1）', inject_oos_priority_supreme,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 越界仲裁顺序'),
-        ('体验层自检指标被删除（C3）', inject_experience_no_metrics,
-         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 体验层自检指标'),
+        ('资产一致性指标被删除（§7）', inject_experience_no_metrics,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 资产一致性指标'),
         ('检查器无摘要但返回成功', inject_silent_checker,
          ['@py', 'scripts/checkall.py', '.', '--quick'], 'checkall 结果行必需'),
+        ('组数声明被手改回旧值（代码实体未变）', inject_group_count_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z1 组数自派生'),
+        ('输出块自造字段标签【补充】', inject_output_field_invented,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z2 字段白名单'),
+        ('已有追问变体的 skill 改成只演示结论', inject_ask_variant_lost,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z3 追问变体闭合'),
+        ('追问变体块被拆掉围栏退回裸写', inject_ask_variant_unfenced,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z3 追问块围栏'),
+        ('单张入口卡的澄清门句被改写', inject_slot_sentence_short,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z4 澄清门句完整性'),
+        ('首页危机转介号码被抹掉', inject_crisis_number_dropped,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z5 危机号码前台位'),
+        ('入口卡 skill 名册数量被改', inject_card_roster_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z6 入口卡 skill 名册'),
+        ('豁免列名册的入口卡被补上名册', inject_card_exempt_stale,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Z6 名册豁免只许收缩'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,

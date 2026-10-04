@@ -32,6 +32,8 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 - 「机械学院官网是啥」
 - 「帮我查下 XX 老师的联系方式和研究方向」
 
+> ⚠️ **危机与安全**：出现自伤 / 自杀念头 → 心理援助 **12356**（或 **010-82951332**）；遇诈骗 / 可疑转账 → **96110**。本包不做诊断与危机干预，只做转介。
+
 **记忆落点**（可选）：仅在用户明确要求保存时写入 `{ws}/.learnbuddy/memory/qihang/<域ID>.md`，见 `library/memory.md`。
 
 ---
@@ -95,8 +97,9 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 | `bash scripts/selfcheck.sh` | 结构对不对（计数 / 交叉引用 / 一致性） | `FAIL 0 → 可交付` |
 | `bash scripts/audit.sh` | 安不安全（凭证 / 危险命令 / L3 门禁 / 合规） | `0 警告 ｜ 0 失败 → 通过` |
 | `bash scripts/regress.sh 3` | **行为对不对**（澄清门算例 / L3 门禁矩阵 / 红线一致性） | 全 OK ｜ `FAIL 0` |
-| `python scripts/aligncheck.py . 5` | **全量文件级对齐**（21 组断言） | `FAIL 0 ｜ 全部通过` |
+| `python scripts/aligncheck.py . 5` | **全量文件级对齐**（22 组断言） | `FAIL 0 ｜ 全部通过` |
 | `python scripts/runcheck.py . 3` | 静态检查域路由、skill 内容、示例和输出契约；**不调用模型或 LearnBuddy** | `FAIL 0 ｜ 静态契约通过` |
+| `python scripts/metrics.py report` | 运行时指标状态（**建议性**，不进 PASS/FAIL）；无数据时会直接打印「无数据」 | 打印一行状态即可 |
 | `python scripts/checkall.py .` | **自检单入口**：跑齐检查项 + 逐项计时 + 结果摘要（`--quick` 加速 ｜ `--negative` 断言非空转） | `全部 PASS ｜ rc 0` |
 
 ---
