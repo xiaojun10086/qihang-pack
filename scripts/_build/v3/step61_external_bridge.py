@@ -257,7 +257,7 @@ BRIDGE = '''# 外部桥接规则（Level 1 · external-bridge）
 ## 7. 回落（档 3 = 原有流程）
 
 **12 个平台全部未找到合格候选，或用户/环境不允许联网** →
-回到 `general-fallback.md` 的**六步通用框架**，按原样输出，并在学习档案记「外部缺口」。
+回到 `general-fallback.md` 的**六步通用框架**，按原样输出；外部能力缺口默认不写入学习档案，仅在用户明确要求保存时按档案规则处理。
 
 **这不是失败路径，是保底路径** —— 本包的核心承诺是「**任何输入都能跑出有效结果**」，
 离线与零命中都必须能出结果。
@@ -511,11 +511,18 @@ print('== D) 20 个 _domain.md 增「## 外部承接」==')
 HEAD = ('## 外部承接（库内与同域降级都接不住时才启用）\n'
         '\n'
         '> **第三档入口**：先读 `library/external-bridge.md`（触发条件 + 五步自检 + 许可门禁），\n'
-        '> 再按 `references/external-sources.md` §1 的顺序检索 **12 个平台**。\n'
+        '> 按本域候选与检索词选择相关平台；无需遍历完整平台表。\n'
         '> **库内优先不变**：本域仍先用库内 skill；外部桥接只在**同域降级也接不住**时启用。\n'
         '> **禁止编造**外部链接（硬规则 2）；候选仓库已逐个双通道核验（2026-10-03）。\n'
         '\n'
         '**检索词**：%s\n'
+        '\n')
+SENSITIVE_HEAD = ('## 外部承接（F3 / F5 敏感域禁用）\n'
+        '\n'
+        '> 本域内容不得交给外部平台或 skill；库内能力不足时按本域安全规则降级。\n'
+        '> 以下候选信息仅保留为审阅记录，不构成外接授权。\n'
+        '\n'
+        '**审阅检索词（不用于域内外接）**：%s\n'
         '\n')
 
 NOCAND = ('**本域无合规且适配 DUT 的外部候选**（2026-10-02 已复核）：%s\n'
@@ -525,7 +532,7 @@ NOCAND = ('**本域无合规且适配 DUT 的外部候选**（2026-10-02 已复�
 TODO = ('**本域尚未完成外部候选复核**（2026-10-03 登记）：本域为 v3 期新增域，'
         'v2 期 19 域的候选比对表未覆盖它。\n'
         '\n'
-        '**本域结论**：按 `library/external-bridge.md` **现场检索 12 平台**；'
+        '**本域结论**：按需使用 `library/external-bridge.md`，仅查本域指定平台；'
         '未通过自检 → 直接**回落「纯提示词模式」**。\n')
 
 # terms / rows(repo, license, stars, score, verdict) / verdict_or_reason
@@ -630,8 +637,9 @@ for d in sorted(os.listdir(os.path.join(ROOT, 'domains'))):
         print('  [SAME] %s' % rel)
         continue
     terms, rows, verdict, reason = EXT[d]
+    head = SENSITIVE_HEAD if d.startswith(('F3-', 'F5-')) else HEAD
     if rows:
-        blk = HEAD % terms
+        blk = head % terms
         blk += ('**已核验候选**（仓库数据 2026-10-02 抓取 ｜ 链接 2026-10-03 双通道核验）\n'
                 '\n'
                 '| 候选仓库 | 许可 | ★ | 综合分 | 可用性判定 |\n'
@@ -641,10 +649,10 @@ for d in sorted(os.listdir(os.path.join(ROOT, 'domains'))):
         blk += '\n**本域结论**：%s\n' % verdict
         n_ok += 1
     elif d == 'R6-info-retrieval':
-        blk = HEAD % terms + TODO
+        blk = head % terms + TODO
         n_todo += 1
     else:
-        blk = HEAD % terms + (NOCAND % reason)
+        blk = head % terms + (NOCAND % reason)
         n_no += 1
     anchor = '## 执行顺序'
     if anchor not in t:
@@ -657,14 +665,16 @@ print('  合计：有候选 %d 域 / 已复核无候选 %d 域 / 待复核 %d �
 
 # 执行顺序补第 6 步（外部桥接）
 print('== D-2) _domain.md 执行顺序补「第 6 步」==')
-STEP6 = ('**外部桥接（最后的兜底）**：库内与同域降级都接不住时，'
-         '读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → '
+STEP6 = ('**外部桥接（按需）**：库内与同域降级都接不住，且外部能力确有帮助时，'
+         '读 `library/external-bridge.md` → 只查本域指定平台 → '
          '过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**。')
+SENSITIVE_STEP6 = ('**外部桥接禁用**：F3 / F5 敏感域不调用外部平台或 skill；'
+                   '库内能力不足时按本域安全规则降级，且不写入学习档案。')
 n = 0
 for d in sorted(os.listdir(os.path.join(ROOT, 'domains'))):
     rel = 'domains/%s/_domain.md' % d
     t = read(rel)
-    if t is None or STEP6 in t:
+    if t is None or STEP6 in t or (d.startswith(('F3-', 'F5-')) and '**外部桥接禁用**' in t):
         continue
     m = re.search(r'(^## 执行顺序\n(?:.*\n)*?)(\n## )', t, re.M)
     if not m:
@@ -673,7 +683,8 @@ for d in sorted(os.listdir(os.path.join(ROOT, 'domains'))):
     seg, tail = m.group(1), m.group(2)
     nums = re.findall(r'^(\d+)\.\s', seg, re.M)
     nxt = (max(int(x) for x in nums) + 1) if nums else 6
-    seg2 = seg.rstrip('\n') + '\n' + '%d. %s\n' % (nxt, STEP6)
+    step6 = SENSITIVE_STEP6 if d.startswith(('F3-', 'F5-')) else STEP6
+    seg2 = seg.rstrip('\n') + '\n' + '%d. %s\n' % (nxt, step6)
     write(rel, t.replace(seg + tail, seg2 + tail, 1))
     n += 1
 print('  已补 %d 个域' % n)
@@ -682,14 +693,18 @@ print('  已补 %d 个域' % n)
 print('== E) 92 个 SKILL.md 的降级段由两档改为三档 ==')
 OLD_TAIL = '仍不满足 → 纯提示词模式并标注'
 NEW_TAIL = ('仍不满足 → 按 `library/external-bridge.md` 走**外部桥接**'
-            '（12 平台检索 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；'
+            '（仅查本域指定平台 + 五步自检；输出首行标 `[外接] 来源 + 许可`）；'
             '外部桥接未命中 → 纯提示词模式并标注')
+SENSITIVE_TAIL = '仍不满足 → 纯提示词模式并标注'
 n = 0
 for p in sorted(glob.glob(os.path.join(ROOT, 'domains/*/skills/local/*/SKILL.md'))):
     t = io.open(p, 'r', encoding='utf-8').read()
     if OLD_TAIL not in t:
         continue
-    io.open(p, 'w', encoding='utf-8', newline='').write(t.replace(OLD_TAIL, NEW_TAIL))
+    rel = os.path.relpath(p, ROOT).replace('\\', '/')
+    domain = rel.split('/')[1].split('-', 1)[0]
+    tail = SENSITIVE_TAIL if domain in ('F3', 'F5') else NEW_TAIL
+    io.open(p, 'w', encoding='utf-8', newline='').write(t.replace(OLD_TAIL, tail))
     n += 1
     print('  [OK]   %s' % os.path.relpath(p, ROOT).replace('\\', '/'))
 print('  改写 %d 个（应为 92）' % n)
@@ -699,6 +714,21 @@ print('== F) commands 入口卡补「外部桥接」档 ==')
 n = 0
 for p in sorted(glob.glob(os.path.join(ROOT, 'commands/*.md'))):
     t = io.open(p, 'r', encoding='utf-8').read()
+    base = os.path.basename(p).lower()
+    if base in ('qihang-f3.md', 'qihang-f5.md'):
+        lines = t.split('\n')
+        replaced = False
+        for i, line in enumerate(lines):
+            if line.startswith('6.') and 'external-bridge.md' in line:
+                lines[i] = '6. ' + SENSITIVE_STEP6
+                replaced = True
+        if replaced:
+            io.open(p, 'w', encoding='utf-8', newline='').write('\n'.join(lines))
+            t = '\n'.join(lines)
+            print('  [OK]   %s（敏感域禁止外接）' % base)
+        if any(line.startswith('6.') and '外部桥接禁用' in line for line in t.split('\n')):
+            print('  [SAME] %s（敏感域禁止外接）' % base)
+            continue
     if 'library/external-bridge.md' in t:
         print('  [SAME] %s' % os.path.basename(p))
         continue
@@ -710,9 +740,12 @@ for p in sorted(glob.glob(os.path.join(ROOT, 'commands/*.md'))):
             last, num = i, int(m.group(1))
     if last is None:
         continue
-    ins = ('%d. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，'
-           '读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → '
-           '输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。' % (num + 1))
+    if base in ('qihang-f3.md', 'qihang-f5.md'):
+        ins = '%d. %s' % (num + 1, SENSITIVE_STEP6)
+    else:
+        ins = ('%d. **外部桥接（按需）**：库内 skill 与同域降级都接不住，且外部能力确有帮助时，'
+               '读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → '
+               '输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。' % (num + 1))
     lines.insert(last + 1, ins)
     io.open(p, 'w', encoding='utf-8', newline='').write('\n'.join(lines))
     n += 1
@@ -857,7 +890,7 @@ PAIRS = [
   '**外部未命中即回落原有流程**。'),
  ('domains/_registry.md',
   '| 库内 skill 覆盖 | **92 个（自建 80 + 外部改造 12，运行时零外部依赖）** |',
-  '| 库内 skill 覆盖 | **92 个（自建 80 + 外部改造 12，离线零依赖）**；另有**可选外部桥接**（12 平台 + 五步自检） |'),
+  '| 库内 skill 覆盖 | **92 个（自建 80 + 外部改造 12，离线零依赖）**；另有**可选外部桥接**（12 个平台目录，按域择用 + 五步自检） |'),
  ('SKILL.md',
   '1. **库内唯一**：本包为纯 DUT 特化库，全部场景均由库内 skill 承接，**不安装、不引用任何库外 skill**；库内无法覆盖的细分场景走降级流程并记「缺口」。',
   '1. **库内优先**：日常场景由库内 skill 承接，**不安装任何外部 skill**；'

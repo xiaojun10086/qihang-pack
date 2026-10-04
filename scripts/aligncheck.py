@@ -195,6 +195,10 @@ def run_round(r):
     for _key in ('courses', 'exam_weeks'):
         if not re.search(r'^\s*%s:\s*\[\]\s*(?:#.*)?$' % _key, cfg, re.M):
             bad('config.yaml', '%s 默认必须为空，避免把示例当成用户事实' % _key)
+    _output_spec = rd('library/output-spec.md')
+    if ('默认不读取或写入学习档案' not in _output_spec
+            or '仅当用户明确要求延续或保存时' not in _output_spec):
+        bad('library/output-spec.md', '档案写入必须默认关闭并以用户明确授权为前提')
     if 'threshold: 0.30' not in cfg:
         bad('config.yaml', '未声明 threshold: 0.30')
     if not re.search(r'weights:\s*\{O:\s*1\.5,\s*T:\s*1\.5,\s*D:\s*1\.5,\s*W:\s*0\.8,\s*C:\s*0\.6,\s*B:\s*0\.2\}', cfg):
@@ -422,7 +426,8 @@ def run_round(r):
                 bad(f, '域入口卡仍保留旧的全量平台检索口径')
             if '输出与归档' in t or '按 `library/memory.md` 归档' in t:
                 bad(f, '域入口卡仍要求默认归档学习档案')
-            if '输出与保存' in t and '仅用户明确要求保存时' not in t:
+            if ('输出与保存' in t and '仅用户明确要求保存时' not in t
+                    and '不写入任何记忆层' not in t):
                 bad(f, '域入口卡的保存动作缺少用户明确授权条件')
         for p in re.findall(r'(?:domains|library|references|scripts)/[^ )），、；;"“”<>*`]+', t):
             if not os.path.exists(p) and '<' not in p and '+' not in p:
@@ -517,7 +522,36 @@ def run_round(r):
         return [l.rstrip() for l in body.splitlines() if l.startswith('- ')]
     for d in DOMS:
         dm = 'domains/%s/_domain.md' % d
-        ref = sig(rd(dm))
+        _domain_text = rd(dm)
+        if ('检索 12 平台' in _domain_text or '检索 **12 个平台**' in _domain_text
+                or '（12 平台检索 +' in _domain_text):
+            bad(dm, '域说明仍保留旧的全量平台检索口径')
+        _domain_execution = re.search(r'^## 执行顺序\n(.*?)(?=\n## |\Z)', _domain_text, re.S)
+        _domain_steps = _domain_execution.group(1).splitlines() if _domain_execution else []
+        if any(line.startswith('4.') and 'library/output-spec.md' in line
+               and ('写入学习档案' in line or '按 `library/memory.md`' in line)
+               and '仅用户明确要求保存时' not in line
+               and '始终不得保存' not in line
+               for line in _domain_steps):
+            bad(dm, '域说明仍要求默认写入学习档案')
+        _domain_id = d.split('-', 1)[0].lower()
+        _command_text = rd('commands/qihang-%s.md' % _domain_id)
+        if _command_text:
+            _domain_memory_line = next((line for line in _domain_text.splitlines()
+                                        if line.startswith('4.') and 'library/output-spec.md' in line), None)
+            _command_memory_line = next((line for line in _command_text.splitlines()
+                                         if line.startswith('4.') and 'library/output-spec.md' in line), None)
+            if _domain_memory_line and _command_memory_line and _domain_memory_line != _command_memory_line:
+                bad(dm, '域说明保存策略与对应入口卡不一致')
+            _domain_bridge_line = next((line for line in _domain_text.splitlines()
+                                        if line.startswith('6.') and '外部桥接' in line), None)
+            _command_bridge_line = next((line for line in _command_text.splitlines()
+                                         if line.startswith('6.') and '外部桥接' in line), None)
+            if _domain_bridge_line and _command_bridge_line and _domain_bridge_line != _command_bridge_line:
+                bad(dm, '域说明外部桥接策略与对应入口卡不一致')
+        if d.startswith(('F3-', 'F5-')) and '外部桥接（按需）' in _domain_text:
+            bad(dm, 'F3/F5 敏感域不得启用外部桥接')
+        ref = sig(_domain_text)
         for s in sorted(glob.glob('domains/%s/skills/local/*/SKILL.md' % d)):
             s = s.replace('\\', '/')
             s2 = sig(rd(s))
@@ -537,6 +571,10 @@ def run_round(r):
     for f in LOCAL:
         t = rd(f)
         body = t.split('---\n', 2)[-1]
+        if '12 平台检索' in t or '学习档案记「缺口」' in t:
+            bad(f, 'skill 仍包含全平台检索或默认归档缺口的旧口径')
+        if f.startswith(('domains/F3-', 'domains/F5-')) and 'library/external-bridge.md' in t:
+            bad(f, 'F3/F5 敏感域 skill 不得外接')
         tm = re.search(r'^#\s*(.+)$', body, re.M)
         title = tm.group(1).strip() if tm else '(无标题)'
         titles.setdefault(title, []).append(f)

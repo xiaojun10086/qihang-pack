@@ -54,7 +54,7 @@ DOMAINS = [
                            "抽取 5–8 条核心结论（带出处页码或时间戳）",
                            "生成概念图（层级：章 → 节 → 关键概念）",
                            "生成 3 个可自测问题（覆盖最高频考点）",
-                           "标注 1–2 处未理解点，写入学习档案",
+                           "标注 1–2 处未理解点；仅在用户明确要求保存时写入学习档案",
                            "给出笔记文件落点"]),
          external=[("lecture-to-study-guide", "Jellypod-Inc/school-skills", "npx skills add Jellypod-Inc/school-skills"),
                    ("obsidian-skills", "kepano/obsidian-skills", "npx skills add kepano/obsidian-skills"),
@@ -397,7 +397,7 @@ def domain_md(d):
     lines.append(f"2. 1 级库完成**域审查**，确认命中 `{d['id']}`（`library/domain-review.md`）")
     lines.append(f"3. 用**库内 skill** `{l['slug']}` 执行（首选）")
     lines.append(f"4. 库内不满足 → 读 `skills/external.md` 走库外安装")
-    lines.append(f"5. 按 `library/output-spec.md` 输出，并写入学习档案")
+    lines.append(f"5. 按 `library/output-spec.md` 输出；默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理")
     lines.append("")
     return "\n".join(lines)
 
@@ -614,7 +614,7 @@ def domain_review_md():
     lines.append("命中 0 个域时，按顺序尝试：\n")
     lines.append("1. **模糊匹配**：用同义词重试触发词表（如「挂科」→「复习/考试」）")
     lines.append("2. **跨域组合**：拆成两个已知域分别处理")
-    lines.append("3. **降级为通用问答**：明确告知「本包暂无该方向的域」，按输出规范给通用建议，并在学习档案记录该缺口")
+    lines.append("3. **降级为通用问答**：明确告知「本包暂无该方向的域」，按输出规范给通用建议；缺口默认不记档案，仅用户明确要求保存时按档案规则处理")
     lines.append("4. **绝不硬塞**：不得把需求塞进不相干的域\n")
     lines.append("## 4. 跨域串联模板\n")
     lines.append("```")
@@ -670,7 +670,7 @@ def output_spec_md():
 
 ## 4. 输出后动作
 
-把「薄弱点 / 错因 / 结论」写入学习档案（Learning Records），下次触发时自动带出。
+默认不读写学习档案；仅用户明确要求延续或保存时，按记忆规则处理相关内容。
 **禁止**把 F3 域的敏感内容（情绪细节、心理记录）写入档案。
 """
 

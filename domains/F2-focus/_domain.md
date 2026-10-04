@@ -39,7 +39,7 @@
 ## 外部承接（库内与同域降级都接不住时才启用）
 
 > **第三档入口**：先读 `library/external-bridge.md`（触发条件 + 五步自检 + 许可门禁），
-> 再按 `references/external-sources.md` §1 的顺序检索 **12 个平台**。
+> 按本域候选与检索词选择相关平台；无需遍历完整平台表。
 > **库内优先不变**：本域仍先用库内 skill；外部桥接只在**同域降级也接不住**时启用。
 > **禁止编造**外部链接（硬规则 2）；候选仓库已逐个双通道核验（2026-10-03）。
 
@@ -64,9 +64,9 @@
 1. 1 级库完成**需求明确**（`library/clarity.md`）：先过 §5 例外，未命中的再按关键槽与 `U` 判定
 2. 1 级库完成**域审查**，确认命中 `F2`（`library/domain-review.md`）
 3. 用**库内 skill**（库内 5 个：`focus-block` · `task-decompose` · `deep-work` · `anti-procrastinate` · `sleep-reset`；按需求择一）执行
-4. 按 `library/output-spec.md` 输出，并写入学习档案
+4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理。
 5. 按 `library/skill-evolution.md` 记录本域习惯，并**只在可改段内**做非结构性自迭代（不改红线 / 输出契约 / 任何事实；不满足触发条件则不迭代）
-6. **外部桥接（最后的兜底）**：库内与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**。
+6. **外部桥接（按需）**：库内 skill 与同域降级都接不住，且外部能力确有帮助时，读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。
 
 ## ⚠️ 红线（不得绕过）
 

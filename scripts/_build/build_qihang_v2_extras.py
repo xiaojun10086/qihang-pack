@@ -257,7 +257,7 @@ argument-hint: [你的需求，可留空]
 3. **域审查**：读 `library/domain-review.md`，用该域「不覆盖」条目复核，越界则改锁。
 4. **锁定 skill**：读 `domains/<域>/_domain.md` → 用**库内 skill**（`skills/local/`）。
 5. **库外兜底**：仅当库内不满足，才读 `skills/external.md` 走安装。
-6. **输出**：按 `library/output-spec.md`，≤6 条要点，写入学习档案。
+6. **输出**：按 `library/output-spec.md`，≤6 条要点；默认不读写学习档案，仅用户明确要求保存时按记忆规则处理。
 """))
 
 files.append(("commands/qihang-dlut.md", """---

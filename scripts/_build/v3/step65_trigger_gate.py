@@ -181,7 +181,7 @@ edit('library/domain-review.md', [
      '        **前一档未穷尽不得进入下一档**；只有在档 2 也未命中（或红线域 / 离线被明确跳过并说明）时，才允许自生成。',
      '档序强制**：同域库内 skill → 外部桥接 → 自生成'),
     ('3. **降级为通用问答**：明确告知「本包暂无该方向的域」，**按 `library/general-fallback.md` §2 六步通用框架**给出结构完整、可执行、标注了不确定性的答复，并在学习档案记录该缺口',
-     '3. **降级为通用问答**：明确告知「本包暂无该方向的域」，**按 `library/general-fallback.md` §2 六步通用框架**给出结构完整、可执行、标注了不确定性的答复，并在学习档案记录该缺口\n'
+     '3. **降级为通用问答**：明确告知「本包暂无该方向的域」，**按 `library/general-fallback.md` §2 六步通用框架**给出结构完整、可执行、标注了不确定性的答复；缺口默认不记档案，仅用户明确要求保存时按档案规则处理。\n'
      '   > **档序前提**：进入本条 = **自生成**（档 3）→ 前置必须是「**档 1 已穷尽 + 档 2 已尝试未命中**」，\n'
      '   > 或「红线域（`F3`/`F5`）/ 离线」被明确跳过**且在输出里写明原因**。跳过前置即违规。',
      '档序前提**：进入本条 = **自生成**'),
@@ -238,6 +238,8 @@ _old_bridge = ('6. **外部桥接（最后的兜底）**：库内 skill 与同�
 _new_bridge = ('6. **外部桥接（按需）**：库内 skill 与同域降级都接不住，且外部能力确有帮助时，'
                '读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → '
                '输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。')
+_sensitive_bridge = ('6. **外部桥接禁用**：F3 / F5 敏感域不调用外部平台或 skill；'
+                     '库内能力不足时按本域安全规则降级，且不写入学习档案。')
 for _name in os.listdir(os.path.join(ROOT, 'commands')):
     if not re.fullmatch(r'qihang-[sfr]\d\.md', _name, re.I):
         continue
@@ -245,11 +247,81 @@ for _name in os.listdir(os.path.join(ROOT, 'commands')):
     _text = read(_rel)
     if _text is None:
         continue
+    _lower_name = _name.lower()
+    _memory_policy = _new_memory
+    if _lower_name == 'qihang-f3.md':
+        _memory_policy = ('4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；'
+                          '默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理'
+                          '（F3 内容不写入任何记忆层）。')
+    elif _lower_name == 'qihang-f4.md':
+        _memory_policy = ('4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；'
+                          '默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` §4 处理；'
+                          '禁止写入金额明细、债务、账户流水与凭证。')
+    elif _lower_name == 'qihang-f5.md':
+        _memory_policy = ('4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；'
+                          '默认不读写学习档案；F5 全域任何内容均不写入任何记忆层。')
+    elif _lower_name == 'qihang-f6.md':
+        _memory_policy = ('4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；'
+                          '默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` §4 处理；'
+                          '禁止写入伤病记录。')
+    _lines = _text.splitlines()
+    _updated_lines = []
+    for _line in _lines:
+        if _lower_name in ('qihang-f3.md', 'qihang-f5.md') and _line.startswith('6.') \
+                and 'external-bridge.md' in _line:
+            _updated_lines.append(_sensitive_bridge)
+        elif _line.startswith('4.') and 'library/output-spec.md' in _line:
+            _updated_lines.append(_memory_policy)
+        else:
+            _updated_lines.append(_line)
+    _text = '\n'.join(_updated_lines) + ('\n' if _text.endswith('\n') else '')
     _updated = _text.replace(_old_memory, _new_memory)
     _updated = _updated.replace(_old_bridge, _new_bridge)
     if _updated != _text:
         write(_rel, _updated)
         print('  [OK]   %s' % _rel)
+
+_domain_old_bridge = ('**外部桥接（最后的兜底）**：库内与同域降级都接不住时，'
+                      '读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → '
+                      '过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**。')
+_domain_new_bridge = ('**外部桥接（按需）**：库内与同域降级都接不住，且外部能力确有帮助时，'
+                       '读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → '
+                       '输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**。')
+for _name in os.listdir(os.path.join(ROOT, 'domains')):
+    _rel = 'domains/' + _name + '/_domain.md'
+    _text = read(_rel)
+    if _text is None:
+        continue
+    _domain_id = _name.split('-', 1)[0].lower()
+    _command = read('commands/qihang-' + _domain_id + '.md')
+    _memory_line = None
+    if _command:
+        _memory_line = next((line for line in _command.splitlines()
+                             if line.startswith('4.') and 'library/output-spec.md' in line), None)
+    _lines = _text.splitlines()
+    _normalized_lines = []
+    for _line in _lines:
+        if _memory_line and _line.startswith('4.') and 'library/output-spec.md' in _line:
+            _normalized_lines.append(_memory_line)
+        else:
+            _normalized_lines.append(_line)
+    _updated = '\n'.join(_normalized_lines) + ('\n' if _text.endswith('\n') else '')
+    _updated = _updated.replace(_domain_old_bridge, _domain_new_bridge)
+    if _command:
+        _bridge_line = next((line for line in _command.splitlines()
+                             if line.startswith('6.') and '外部桥接' in line), None)
+        if _bridge_line:
+            _updated_lines = []
+            for _line in _updated.splitlines():
+                if (_line.startswith('6.') and '外部桥接' in _line
+                        and _line != _bridge_line):
+                    _updated_lines.append(_bridge_line)
+                else:
+                    _updated_lines.append(_line)
+            _updated = '\n'.join(_updated_lines) + ('\n' if _updated.endswith('\n') else '')
+    if _updated != _text:
+        write(_rel, _updated)
+        print('  [OK]   domains/%s/_domain.md' % _name)
 
 # =============================================================== E) selfcheck [8d]
 print('== E) selfcheck.sh 新增 [8d] 触发门与降级顺序 ==')

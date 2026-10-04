@@ -19,6 +19,6 @@ description: F3 身心与社交（生活类）域入口卡：焦虑、压力、e
 2. **域审查**：读 `domains/F3-wellbeing/_domain.md` 确认边界；越界按 `library/domain-review.md` 改锁到对应域。
 3. **库内择优**：按**主体与任务**在本域 5 个库内 skill 中择优 —— 首选 `wellbeing-checkin`；其余 `adapt-guide` / `club-pick` / `peer-talk-script` / `roommate-mediate` 按触发场景择用
    路径：`domains/F3-wellbeing/skills/local/adapt-guide/SKILL.md`、`domains/F3-wellbeing/skills/local/club-pick/SKILL.md`、`domains/F3-wellbeing/skills/local/peer-talk-script/SKILL.md`、`domains/F3-wellbeing/skills/local/roommate-mediate/SKILL.md`、`domains/F3-wellbeing/skills/local/wellbeing-checkin/SKILL.md`
-4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理（F3 内容始终不得保存）。
+4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理（F3 内容不写入任何记忆层）。
 5. **DUT 绑定点**：见 `domains/F3-wellbeing/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（用户自查页面；工具不采集页面内容）。
-6. **外部桥接（按需）**：库内 skill 与同域降级都接不住，且外部能力确有帮助时，读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。
+6. **外部桥接禁用**：F3 敏感域不调用外部平台或 skill；库内能力不足时按本域安全规则降级，且不写入学习档案。
