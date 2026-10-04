@@ -169,7 +169,7 @@ bash scripts/qihang.sh new-term   # 换学期重置
 | 类型 | 文件 | 融入方式 |
 |---|---|---|
 | 公开站 | `references/dlut-official-sites.md` | **142 条**条目（表格行 162），20 个域的 `_domain.md` 各自标注绑定点 |
-| 私密站 | `references/dlut-login-sites.md` | 38 个需登录站点（§1 主表 19 + §1.1 补充 19），**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
+| 私密站 | `references/dlut-login-sites.md` | 45 个需登录站点（§1 主表 19 + §1.1 补充 26），**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
 | 校内信息搜集 | `domains/R6-info-retrieval/` | 导师/教师公开资料（`faculty.dlut.edu.cn`、`gs.dlut.edu.cn`）+ 公开信息检索与路由 |
 
 **私密站安全边界**：访问脚本只打开用户可见的本机浏览器，不采集或输出网页内容；使用随机会话和一次性 Profile，退出后清理，不关闭用户的其他浏览器会话。用户自行查看页面，并可选择只分享回答必需的信息。L3 级（缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细）**一律不读取**。

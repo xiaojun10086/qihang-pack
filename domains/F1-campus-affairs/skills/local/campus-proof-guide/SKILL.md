@@ -113,7 +113,7 @@ agent_created: true
 
 **私密站（需登录，见 `references/dlut-login-sites.md`）**
 - 一卡通 https://ecard.dlut.edu.cn/
-- 校园门户办事大厅
+- 办事大厅（一网通办） https://ehall.dlut.edu.cn/
 - 离校系统 http://lx.dlut.edu.cn/
 
 ## 失败与降级

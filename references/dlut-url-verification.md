@@ -303,7 +303,7 @@
 
 ---
 
-## 十一、全量外链自查（2026-10-03 三通道交叉；2026-10-04 补录后重算）· 167 条外链
+## 十一、全量外链自查（2026-10-03 三通道交叉；2026-10-04 补录后重算）· 174 条外链
 
 **为什么重做**：此前各轮都只用**一条**出网通道（WebFetch 或 `node fetch`），
 且部分轮次把「本机抓取失败」直接判为「站点失效」→ 结论里混入了**通道噪声**。
@@ -324,7 +324,7 @@
 | **旁证** | 校方官方目录（`www.dlut.edu.cn/xbxy.htm` / `…/zzjg.htm`）+ 主机侧 WebFetch（**另一条出口**） | 判定「站点身份」与「官方是否仍挂此链」，不只判「通不通」 |
 
 > ⚠️ **通道自身的坑（本轮实测）**：① 主机侧 WebFetch **会把 http 强制升级为 https**，
-> 因此它对 13 个「仅 HTTP」站点一律报 `fetch failed` —— **不能**据此判它们失效；
+> 因此它对 15 个「仅 HTTP」站点一律报 `fetch failed` —— **不能**据此判它们失效；
 > ② AliDNS 偶尔返回 `Status=2`（SERVFAIL，限流/抖动），**对可达站点也会出现**，
 > 故 `alidns:2` **不作**失效证据，只作参考；
 > ③ 本机出网**只能到达 AliDNS / DNSPub**，`dns.google` 与 `cloudflare-dns.com` 均不可达 ——
@@ -332,18 +332,19 @@
 
 ### 11.2 总量与结论
 
-- 范围：包内**唯一外链 167 条 / 出现 542 处**；其中 **DUT 域内 137 条 / 504 处**，非 DUT 站点 30 条
+- 范围：包内**唯一外链 174 条 / 出现 553 处**；其中 **DUT 域内 144 条 / 515 处**，非 DUT 站点 30 条
   （`github.com` 11 条等）—— 口径与复现命令见 §11.7 ①（`http` 与 `https` 视为同一条、去尾斜杠）。
-- 📌 **2026-10-04 补录**：登录站清单新增 19 条 **DUT 域内**外链（WebVPN、大模型网关、智慧学工 /
-  学工系统、研究生管理信息系统、迎新、一网通办、图书馆三站等），本节四数按**同一口径**重算为
-  `167 / 542 / 137 / 504`（非 DUT 仍 30 条）。新增条目的溯源与逐条实测见
-  `dlut-login-sites.md` §0.3 / §1.1；这 19 条已单独实抓（200 或 `302 → SSO`），
-  **未并入**下表 2026-10-03 的可达性分布快照。
+- 📌 **2026-10-04 补录**：登录站清单新增 26 条外链（首轮 19 条 + 第二轮 7 条：办事大厅
+  `ehall`、自助证明打印 `eproofweb`、认证大屏 `apm`、国际学生系统 `is`、问卷系统 `dlutwj.wjx.cn`、
+  成果转化 `tt`、校园网测速 `speedtest`），本节四数按**同一口径**重算为
+  `174 / 553 / 144 / 515`（非 DUT 仍 30 条 —— `dlutwj.wjx.cn` 按「URL 含 `dlut`」口径计入 DUT 侧）。
+  新增条目的溯源与逐条实测见 `dlut-login-sites.md` §0.3 / §1.1；这 26 条已单独实抓
+  （200 / 302 / 303），**未并入**下表 2026-10-03 的可达性分布快照。
 - ⚠️ **口径更正**：本节初版写「唯一外链 138 条 / 引用 654 处」，但**未声明口径**，且 §11.7 的
   复现命令指向**从未随包交付**的 `urlcheck.py` → 该两数**无法复现**（已删）。现按 §11.7 ① 重算，
   并由 `scripts/aligncheck.py` 断言：改了链接不同步本节 → 直接 FAIL。
 - ⚠️ **可达性分布是快照、未复测**：下表 `135 / 1 / 1 / 1` 之和 = 138，是 **2026-10-03 网络实测**
-  的当时口径（口径未记录），与上行的「唯一外链 167 条」**不是同一口径**，勿混用。
+  的当时口径（口径未记录），与上行的「唯一外链 174 条」**不是同一口径**，勿混用。
 - **135 条 200 ｜ 1 条 404 ｜ 1 条 NXDOMAIN ｜ 1 条为通配写法（非真实 URL）**。
 
 | 判定 | 条数 | 说明 |
@@ -368,10 +369,10 @@
 （生成链第 23 层 `step60_url_audit.py`）。这也是「依据里的链接进不去」的**第三个独立根因**
 （前两个是 URL 紧贴中文、http 被浏览器升级为 https）。
 
-### 11.4 「仅 HTTP」站点清单（13 个主机 · 勿手动改 https）
+### 11.4 「仅 HTTP」站点清单（15 个主机 · 勿手动改 https）
 
 > **2026-10-04 更正**：本节初版写「8 条」却只列出 **6 个主机**（把 `jxgl` 的三个路径算作三条）
-> → **数量与清单都不符**。现按**双协议对照实测**重列：下表中 **13 个主机的 443 全部无服务**
+> → **数量与清单都不符**。现按**双协议对照实测**重列：下表中 **15 个主机的 443 全部无服务**
 > （`ECONNREFUSED` 或超时），而 **80 端口全部有服务在听**。**必须写 http**。
 
 | 主机（包内引用路径） | `http://` 实测 | `https://` 实测 | 包内引用处 |
@@ -382,19 +383,22 @@
 | `dutxg.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` |
 | `ecardpayment.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` |
 | `etd.lib.dlut.edu.cn` | 200 | **超时** | `dlut-official-sites.md` |
+| `is.dlut.edu.cn/isms/user/tylogin` | 303 → 登录页 | **拒绝连接** | `dlut-login-sites.md` |
 | `lx.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` + `dlut-official-sites.md` + `domains/F1` |
 | `map.dlut.edu.cn` | 200 | **超时** | `dlut-official-sites.md` + `domains/R6` |
 | `pan.dlut.edu.cn/cas` | 303 → SSO | **拒绝连接** | `dlut-login-sites.md` |
 | `pay.dlut.edu.cn` | 302 → SSO | **超时** | `dlut-login-sites.md` + `dlut-official-sites.md` + `domains/F4` |
+| `speedtest.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` |
 | `szdx.dlut.edu.cn` | 200 | **超时** | `dlut-login-sites.md` |
 | `tulip.dlut.edu.cn` | 302 | **超时** | `dlut-login-sites.md` + `dlut-official-sites.md` |
 | `xinlixlt.dlut.edu.cn/xlogin/cas` | 302 → SSO | **超时** | `dlut-login-sites.md` |
 
-> **其中 5 个（`aigw` / `dutsa` / `dutxg` / `ecardpayment` / `szdx`）是 2026-10-04 登录站清单
-> 新增后才出现在包内的**，故初版「8 条」未含。
-> 反向案例：`https://yjszs.dlut.edu.cn/zsbm` **只有 443**（无 80），故必须写 https。
+> **其中 7 个（`aigw` / `dutsa` / `dutxg` / `ecardpayment` / `is` / `speedtest` / `szdx`）是
+> 2026-10-04 登录站清单新增后才出现在包内的**，故初版「8 条」未含。
+> 反向案例（**只有 443、无 80，故必须写 https**）：`yjszs.dlut.edu.cn/zsbm`、
+> `tt.dlut.edu.cn`（http 路径实测 000）。
 > **例外（可升级协议）**：`eproof.dlut.edu.cn` 的 `sso/login.jsp` 入口（包内以 HTTP 写法登记）
-> **会 302 升级到 https 并可用**，故**不属于**本节 13 个「仅 HTTP」主机。
+> **会 302 升级到 https 并可用**，故**不属于**本节 15 个「仅 HTTP」主机。
 
 ### 11.5 「解析层查不到记录」的判定（2026-10-04 加 D4 权威 NS 复核）
 

@@ -32,7 +32,8 @@
 | 综合教务系统 | `jxgl.dlut.edu.cn` | 课表、考试安排、培养方案、选课结果 | S1 S3 S4 F1 | L1（**成绩等级可读；成绩明细 L3 禁读**） |
 | 图书馆 | `lib.dlut.edu.cn` | 借阅清单、续借、座位/研讨间预约 | S2 S5 R1 | L1 |
 | 一卡通 | `ecard.dlut.edu.cn` | 余额（不含消费金额与流水） | F1 F4 | L1（**金额明细 L3**） |
-| 校园门户办事大厅 | `portal.dlut.edu.cn` | 待办、申请进度 | F1 | L1 |
+| 校园门户 | `portal.dlut.edu.cn` | 待办、日程、校内通知、信息专栏 | F1 | L1 |
+| 办事大厅（一网通办） | `ehall.dlut.edu.cn` | 申请、办理进度（**与门户 SPA 是两个系统**） | F1 | L1 |
 | 学生工作系统 | `xsc.dlut.edu.cn` | 资助状态、评奖、请假、第二课堂 | F1 F3 F4 F6 | L2 |
 | 就业信息网 | `job.dlut.edu.cn` | 招聘、宣讲会、投递记录 | F8 | L2 |
 | 研究生系统 | `gs.dlut.edu.cn` | 培养、导师、开题 | R4 R5 F7 | L2 |

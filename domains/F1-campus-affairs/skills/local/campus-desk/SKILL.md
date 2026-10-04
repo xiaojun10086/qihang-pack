@@ -114,7 +114,7 @@ license: MIT
 
 需登录（方案 A · 只读 · 须隔离 profile）：
 - 一卡通 https://ecard.dlut.edu.cn/
-- 校园门户办事大厅
+- 办事大厅（一网通办） https://ehall.dlut.edu.cn/
 - 离校系统 http://lx.dlut.edu.cn/
 
 ## 失败与降级
