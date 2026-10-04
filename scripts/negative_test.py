@@ -3,7 +3,7 @@
 """负向自测：把「断言是否真的会 FAIL」变成可重复验证（防断言静默空转）。
 
 为什么要有它：自检全绿只证明「断言集通过」，不证明「断言集有效」。开发期多次出现
-「注入缺陷后校验器毫无反应」（断言恒真）= 最危险的一类错。本脚本把 6 类注入固化成常驻测试。
+「注入缺陷后校验器毫无反应」（断言恒真）= 最危险的一类错。本脚本把多类注入固化成常驻测试。
 
 在**临时树**上跑（按交付口径复制：排除 .git / _build / .learnbuddy / __pycache__ / .idea），
 逐类注入 → 跑对应校验器 → 断言**必须 FAIL** → 打印捕获率。真实树**只读**，不写任何文件。
@@ -119,6 +119,20 @@ def inject_no_gate(tree):
     return [p], t
 
 
+def inject_missing_course_gate_marker(tree):
+    """Drop one course marker from the gate; runcheck must detect the broken route chain."""
+    p = os.path.join(tree, 'config.yaml')
+    t = io.open(p, encoding='utf-8').read()
+    m = re.search(r'^(  learning_markers:\s*\[)(.*?)(\])\s*$', t, re.M)
+    if not m:
+        return [p], t
+    words = [x.strip() for x in m.group(2).split(',')]
+    if '整门课' not in words:
+        return [p], t
+    words.remove('整门课')
+    return [p], t[:m.start()] + m.group(1) + ', '.join(words) + m.group(3) + t[m.end():]
+
+
 def inject_identity_drift(tree):
     """把 INSTALL.md 的身份串改一个字 → selfcheck [8c] 应 FAIL（防身份口径静默漂移）。"""
     p = os.path.join(tree, 'INSTALL.md')
@@ -129,21 +143,36 @@ def inject_identity_drift(tree):
 
 def inject_fake_platform(tree):
     """把某域「指定检索平台」改成不存在的平台 → extskill 应 FAIL（防编造平台）。"""
-    p = os.path.join(tree, 'domains', 'S1-course-qa', '_domain.md')
+    p = os.path.join(tree, 'domains', 'S4-exam-prep', '_domain.md')
     t = io.open(p, encoding='utf-8').read()
-    t = re.sub(r'\*\*指定检索平台[^\n]*\n',
-               '**指定检索平台（只查这几个，不穷举）**：`no-such-platform.example` ｜ `also-fake.example`（共 2 个）\n',
-               t, count=1)
-    return [p], t
+    m = re.search(r'(?ms)^##\s*外部承接[^\n]*\n(.*?)(?=^##\s|\Z)', t)
+    if not m:
+        return [p], t
+    body = m.group(1)
+    changed, n = re.subn(
+        r'(?m)^(\*\*指定检索平台[^\n]*：).*?$',
+        r'\1 `no-such-platform.example` ｜ `also-fake.example`（共 2 个）',
+        body, count=1)
+    if not n:
+        return [p], t
+    return [p], t[:m.start(1)] + changed + t[m.end(1):]
 
 
 def inject_bridge_broken(tree):
     """把某个 3 级 skill 的降级段改回「两档」（去掉外部桥接）→ extskill 应 FAIL。"""
     import glob as _g
+    for p in sorted(_g.glob(os.path.join(tree, 'domains/*/skills/local/*/SKILL.md'))):
+        t = io.open(p, encoding='utf-8').read()
+        m = re.search(r'(?ms)^##\s*失败与降级[^\n]*\n(.*?)(?=^##\s|\Z)', t)
+        if not m or 'library/external-bridge.md' not in m.group(1):
+            continue
+        body = m.group(1)
+        if '纯提示词模式' not in body:
+            continue
+        broken = body.replace('纯提示词模式', '自生成模式', 1)
+        return [p], t[:m.start(1)] + broken + t[m.end(1):]
     p = sorted(_g.glob(os.path.join(tree, 'domains/*/skills/local/*/SKILL.md')))[0]
-    t = io.open(p, encoding='utf-8').read()
-    t = t.replace('按 `library/external-bridge.md` 走**外部桥接**', '走外部')
-    return [p], t
+    return [p], io.open(p, encoding='utf-8').read()
 
 
 def inject_url_boundary(tree):
@@ -183,6 +212,8 @@ def main():
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份串一致性'),
         ('触发门被移除（SKILL.md 少了触发门小节）', inject_no_gate,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8d] 触发门'),
+        ('整门课词未进入触发门', inject_missing_course_gate_marker,
+         ['@py', 'scripts/runcheck.py', '.'], 'runcheck 课程路由完整性'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,

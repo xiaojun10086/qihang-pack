@@ -1,7 +1,7 @@
 ---
 name: qihang-rebuttal-structure
 description: 「启航」R4 学术产出与投稿域库内 skill：审稿意见逐条回复表（意见-回应-修改位置），不代投稿。
-version: 3.3.6
+version: 3.3.7
 license: MIT
 agent_created: true
 ---

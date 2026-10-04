@@ -1,7 +1,7 @@
 ---
 name: qihang-team-project
 description: 「启航」S3 作业与考核域库内 skill：把小组作业拆成可认领任务块与里程碑，生成分工表与进度看板。
-version: 3.3.6
+version: 3.3.7
 license: MIT
 ---
 

@@ -33,7 +33,7 @@
 | `S1` | 课程答疑 | 讲一下、这题、为什么、推导、证明… | `concept-contrast` · `error-diagnose` · `explain-stepwise` · `prereq-bridge` · `socratic-qa` |
 | `S2` | 课堂与笔记 | 笔记、讲义、录音、整理、概念图… | `lecture-to-notes` · `link-notes` · `note-normalize` · `reading-note` |
 | `S3` | 作业与考核 | 作业、实验报告、课程设计、平时分、大作业… | `assignment-plan` · `code-assignment` · `imrad-scaffold` · `lab-report` · `team-project` |
-| `S4` | 备考与记忆 | 考试、复习、背诵、突击、卡组… | `exam-sprint` · `faster-cycle` · `mock-paper` · `open-book-index` · `recall-schedule` |
+| `S4` | 备考与记忆 | 考试、复习、背诵、整门课、整本书、整本教材、从零学、从零入门、系统学… | `exam-sprint` · `faster-cycle` · `mock-paper` · `open-book-index` · `recall-schedule` |
 | `S5` | 学术表达 | 论文、综述、答辩、PPT、引用… | `abstract-tune` · `argument-slides` · `cite-normalize` · `paper-outline` · `thesis-format` |
 | `S6` | 语言能力 | 英语、四六级、雅思、托福、口语… | `academic-english` · `ielts-coach` · `lang-drill` · `listening-drill` · `pronounce-drill` |
 
