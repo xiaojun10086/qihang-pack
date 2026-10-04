@@ -61,7 +61,7 @@ def rd(p):
 # 两次迭代各因「同一字面量多处出现、只换首处」而报出自相矛盾的 FAIL。
 # 现在改版本只需改 config.yaml 一处 + 生成器全量替换，断言强度不变。
 _cv = re.search(r'^version:\s*([\d.]+)', rd('config.yaml'), re.M) if os.path.isfile('config.yaml') else None
-REV = _cv.group(1) if _cv else '3.2.5'      # 修订号（三位，用于字段与断言）
+REV = _cv.group(1) if _cv else ''      # 修订号（三位，用于字段与断言）
 PKG = '.'.join(REV.split('.')[:2])          # 包版本（两位，用于展示位）
 
 # 评审 / 审计 / 验收 / 需求书等过程文档不属交付物，统计时应一并排除。
@@ -189,6 +189,12 @@ def run_round(r):
 
     # ---------- C config.yaml ----------
     cfg = rd('config.yaml')
+    for _key in ('campus', 'college', 'grade', 'term', 'sleep_window'):
+        if not re.search(r'^\s*%s:\s*null\s*(?:#.*)?$' % _key, cfg, re.M):
+            bad('config.yaml', '%s 默认值必须为 null，避免把示例当成用户事实' % _key)
+    for _key in ('courses', 'exam_weeks'):
+        if not re.search(r'^\s*%s:\s*\[\]\s*(?:#.*)?$' % _key, cfg, re.M):
+            bad('config.yaml', '%s 默认必须为空，避免把示例当成用户事实' % _key)
     if 'threshold: 0.30' not in cfg:
         bad('config.yaml', '未声明 threshold: 0.30')
     if not re.search(r'weights:\s*\{O:\s*1\.5,\s*T:\s*1\.5,\s*D:\s*1\.5,\s*W:\s*0\.8,\s*C:\s*0\.6,\s*B:\s*0\.2\}', cfg):
@@ -411,6 +417,13 @@ def run_round(r):
         t = rd(f)
         if not t.startswith('---'):
             warn(f, '无 frontmatter（slash 命令通常需要）')
+        if re.fullmatch(r'commands/qihang-[sfr]\d\.md', f):
+            if '12 平台' in t or '检索 12' in t:
+                bad(f, '域入口卡仍保留旧的全量平台检索口径')
+            if '输出与归档' in t or '按 `library/memory.md` 归档' in t:
+                bad(f, '域入口卡仍要求默认归档学习档案')
+            if '输出与保存' in t and '仅用户明确要求保存时' not in t:
+                bad(f, '域入口卡的保存动作缺少用户明确授权条件')
         for p in re.findall(r'(?:domains|library|references|scripts)/[^ )），、；;"“”<>*`]+', t):
             if not os.path.exists(p) and '<' not in p and '+' not in p:
                 bad(f, '引用不存在: %s' % p)

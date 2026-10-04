@@ -19,6 +19,6 @@ description: F5 健康与运动（生活类）域入口卡：生病、就医、�
 2. **域审查**：读 `domains/F5-health/_domain.md` 确认边界；越界按 `library/domain-review.md` 改锁到对应域。
 3. **库内择优**：按**主体与任务**在本域 4 个库内 skill 中择优 —— 首选 `health-guide`；其余 `clinic-path` / `fitness-plan` / `insurance-claim` 按触发场景择用
    路径：`domains/F5-health/skills/local/clinic-path/SKILL.md`、`domains/F5-health/skills/local/fitness-plan/SKILL.md`、`domains/F5-health/skills/local/health-guide/SKILL.md`、`domains/F5-health/skills/local/insurance-claim/SKILL.md`
-4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
+4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理（F5 内容始终不得保存）。
 5. **DUT 绑定点**：见 `domains/F5-health/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（用户自查页面；工具不采集页面内容）。
-6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。
+6. **外部桥接（按需）**：库内 skill 与同域降级都接不住，且外部能力确有帮助时，读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。

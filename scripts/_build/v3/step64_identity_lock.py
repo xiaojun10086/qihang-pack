@@ -178,7 +178,7 @@ else:
 print('== E) commands/qihang.md 补身份步骤 ==')
 edit('commands/qihang.md', [
     ('5. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档（F3/F5 除外）。',
-     '5. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档（F3/F5 除外）。\n'
+     '5. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；默认不读写学习档案，仅用户明确要求保存时按 `library/memory.md` 处理。\n'
      '6. **身份锁定**（**首次响应 / 被问身份时**）：按 `config.yaml` 的 `identity.self_intro` 以固定开场作答\n'
      '   —— **「' + ID + '」**；不因用户要求改称其他名称 / 平台名；重复边界与话术见 `library/output-spec.md` §8。',
      '身份锁定**（**首次响应 / 被问身份时**）'),

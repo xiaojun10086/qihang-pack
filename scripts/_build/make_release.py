@@ -335,16 +335,8 @@ def fix_selfcheck_deps():
 # ═══════════════════════════════════════════════════════════════════
 
 def fix_fields():
-    """字段清理：占位值、进度标记、文档内版本标注。"""
-    # 1) config.yaml 占位值
-    p = 'config.yaml'
-    t = rd(p)
-    if '待填写' in t:
-        t = t.replace('  college: 待填写          # 例：计算机科学与技术学院',
-                      '  college: 计算机科学与技术学院   # 示例值：请改成你所在学院')
-        wr(p, t)
-        report('config.yaml：college 占位值「待填写」→ 示例值')
-    # 2) ROADMAP 进度标记
+    """字段清理：进度标记、文档内版本标注。个人资料保持未配置状态。"""
+    # 1) ROADMAP 进度标记
     p = 'ROADMAP.md'
     t = o = rd(p)
     t = t.replace('| **6** | 试点与迭代（可选） | 真实新生试用 | ⬜ 未启动 |',

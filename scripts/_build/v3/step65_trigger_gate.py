@@ -227,6 +227,30 @@ edit('commands/qihang.md', [
      '7. **外部桥接（倒数第二档）**'),
 ])
 
+# Keep generated domain cards aligned with the current optional-memory policy and bridge scope.
+print('== D-2) 域入口卡对齐：可选保存 + 按域指定外接平台 ==')
+_old_memory = '4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。'
+_new_memory = ('4. **输出与保存**：按 `library/output-spec.md` 输出 ≤6 条要点；默认不读写学习档案，'
+               '仅用户明确要求保存时按 `library/memory.md` 处理。')
+_old_bridge = ('6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，'
+               '读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → '
+               '过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。')
+_new_bridge = ('6. **外部桥接（按需）**：库内 skill 与同域降级都接不住，且外部能力确有帮助时，'
+               '读 `library/external-bridge.md` → 只查本域指定平台 → 过五步自检 → '
+               '输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。')
+for _name in os.listdir(os.path.join(ROOT, 'commands')):
+    if not re.fullmatch(r'qihang-[sfr]\d\.md', _name, re.I):
+        continue
+    _rel = 'commands/' + _name
+    _text = read(_rel)
+    if _text is None:
+        continue
+    _updated = _text.replace(_old_memory, _new_memory)
+    _updated = _updated.replace(_old_bridge, _new_bridge)
+    if _updated != _text:
+        write(_rel, _updated)
+        print('  [OK]   %s' % _rel)
+
 # =============================================================== E) selfcheck [8d]
 print('== E) selfcheck.sh 新增 [8d] 触发门与降级顺序 ==')
 S8D = '''# ---------- 8d. 触发门与降级顺序（v3.3.4） ----------
