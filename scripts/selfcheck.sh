@@ -210,18 +210,24 @@ done
   || bad "L3 关键词表漏覆盖 $_l3miss 项（config 共 $_l3cnt 项）"
 grep -q '最后 3 条是反例' library/domain-review-cases.md 2>/dev/null && bad "用例集反例表述过时" || ok "用例集反例表述正确"
 
-# ---------- 7c. 隔离 / L3 判级 / 指标埋点（v3.2.5 新增）----------
-# 依据：FM-1（隔离可被静默绕过）/ FM-2（L3 插入型变体失配）/ FM-3（零可观测）。
-# 这四条断言的作用是把「承诺」变成「可判 FAIL 的检查」，而不是装饰性描述。
+# ---------- 7c. 隔离 / L3 判级 / 指标埋点 ----------
+# 把临时 Profile、会话隔离与页面内容不采集等承诺变成可判 FAIL 的检查。
 echo "[7c] 隔离 / L3 判级 / 指标埋点"
-_iso1=$(grep -c 'close --all >/dev/null 2>&1 || true' scripts/dlut-read.sh 2>/dev/null); _iso1=${_iso1:-0}
-[ "$_iso1" -ge 1 ] && ok "私密站读取前先关闭既有会话（隔离前置）" \
-  || bad "dlut-read.sh 缺隔离前置（--profile 可被 daemon 静默忽略）"
+_iso1=$(grep -c 'SESSION_ID="qihang-' scripts/dlut-read.sh 2>/dev/null); _iso1=${_iso1:-0}
+_iso2=$(grep -c 'PROFILE_DIR="$(mktemp -d' scripts/dlut-read.sh 2>/dev/null); _iso2=${_iso2:-0}
+_iso3=$(grep -c 'rm -rf -- "$PROFILE_DIR"' scripts/dlut-read.sh 2>/dev/null); _iso3=${_iso3:-0}
+_all=$(grep -c 'close --all' scripts/dlut-read.sh 2>/dev/null); _all=${_all:-0}
+[ "$_iso1" -ge 1 ] && [ "$_iso2" -ge 1 ] && [ "$_iso3" -ge 1 ] && [ "$_all" -eq 0 ] \
+  && ok "独立随机会话 + 一次性 Profile + 退出清理，不影响其他会话" \
+  || bad "dlut-read.sh 缺少会话隔离 / Profile 清理护栏"
 _iso2=$(grep -cE 'profile\[\[:space:\]\]\+ignored' scripts/dlut-read.sh 2>/dev/null); _iso2=${_iso2:-0}
 _iso3=$(grep -c '^  exit 5$' scripts/dlut-read.sh 2>/dev/null); _iso3=${_iso3:-0}
 [ "$_iso2" -ge 1 ] && [ "$_iso3" -ge 1 ] \
   && ok "隔离校验生效（扫描 ignored 警告 + rc=5 中止）" \
   || bad "dlut-read.sh 缺隔离校验（警告扫描 $_iso2 / rc=5 $_iso3）"
+_capture=$(grep -cE '(^|[[:space:]])ab[[:space:]]+(snapshot|read)([[:space:]]|$)' scripts/dlut-read.sh 2>/dev/null); _capture=${_capture:-0}
+[ "$_capture" -eq 0 ] && ok "网页内容不由脚本读取或打印" \
+  || bad "dlut-read.sh 包含页面读取命令"
 _l3b=$(grep -c '插入型变体' scripts/dlut-read.sh 2>/dev/null); _l3b=${_l3b:-0}
 [ "$_l3b" -ge 3 ] && ok "L3 类 B 共现规则齐备（$_l3b 条）" \
   || bad "L3 类 B 共现规则不足（$_l3b 条，期望 ≥3）"
@@ -356,16 +362,15 @@ if grep -qF '身份锁定' commands/qihang.md 2>/dev/null; then
   ok "库入口卡已接入身份锁定"
 else bad "commands/qihang.md 未接入身份锁定（只加载入口卡时会漏）"; fi
 
-# ---------- 8d. 触发门与降级顺序（v3.3.4） ----------
-# 为什么单列：触发口径原先只是 frontmatter 里的一句软描述，**无可判定门槛、也无人保证它不被删**；
-#   降级虽已三档，但「未走完前两档不得自生成」没有明文与断言 → 模型很容易直接自生成。
-echo "[8d] 触发门与降级顺序"
+# ---------- 8d. 触发门与核心快路径 ----------
+# 核心请求直接走学习/公开信息快路径；外部桥接、复杂澄清和扩展域均按需使用。
+echo "[8d] 触发门与核心快路径"
 for _k in '^trigger:' '^  when_any:' '^  dlut_markers:' '^  learning_markers:' '^  learning_intents:' \
           '^  not_triggered_behavior:' '^  lock_after_trigger:' '^  ladder:' '^  self_generate_requires:'; do
   if grep -q "$_k" config.yaml 2>/dev/null; then ok "config.yaml 含 $_k"
   else bad "config.yaml 缺 $_k（触发门真相源不完整）"; fi
 done
-for _k in '触发门与接管边界' '不接管' '必须走三级结构' '未穷尽档 1、未尝试档 2，不得进入档 3 自行生成'; do
+for _k in '触发门与接管边界' '不接管' '优先走核心快路径' '需要时加载官方资料或专项规则'; do
   if grep -qF "$_k" SKILL.md 2>/dev/null; then ok "SKILL.md 触发门含「$_k」"
   else bad "SKILL.md 触发门缺「$_k」"; fi
 done
@@ -381,13 +386,13 @@ for _k in '^  out_of_scope_markers:' '^  boundary_note:'; do
   grep -q "$_k" config.yaml 2>/dev/null && ok "config.yaml 含 $_k" || bad "config.yaml 缺 $_k"
 done
 grep -qF '越界信号' SKILL.md 2>/dev/null && ok "SKILL.md 已声明越界信号" || bad "SKILL.md 缺越界信号"
-for _t in 明确涉及大连理工大学 知识学习 自述为大连理工大学学生; do
+for _t in 明确涉及大连理工大学 '学习或校园生活诉求' 自述为大连理工大学学生; do
   if grep -qF "$_t" SKILL.md 2>/dev/null; then ok "触发条件在位：$_t"
   else bad "触发条件缺：$_t"; fi
 done
 for _f in library/domain-review.md library/general-fallback.md library/external-bridge.md; do
-  if grep -qF '档序强制' "$_f" 2>/dev/null; then ok "$(basename "$_f") 已声明「档序强制」"
-  else bad "$(basename "$_f") 缺「档序强制」（降级顺序未强制）"; fi
+  if grep -qF '核心快路径' "$_f" 2>/dev/null; then ok "$(basename "$_f") 已声明核心快路径优先"
+  else bad "$(basename "$_f") 未说明核心请求不走强制降级链"; fi
 done
 if grep -qF '触发门' commands/qihang.md 2>/dev/null; then ok "入口卡已接入触发门"
 else bad "commands/qihang.md 未接入触发门"; fi

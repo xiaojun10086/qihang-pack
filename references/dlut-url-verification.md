@@ -1,6 +1,8 @@
 # DUT 网址循环核验记录
 
 > 核验日期：2026-10-01 ｜ 方式：**3 路并行子代理 · 逐域实抓**（WebFetch × 多轮）
+>
+> ⚠️ 本文件中的浏览器读取步骤与 Profile 记录为历史核验方法，不是当前用户数据访问流程；当前规则以 `references/browser-matrix.md` 与 `references/dlut-login-sites.md` 为准。当前脚本不采集网页内容，不使用或保留固定 Profile。
 > 范围：`*.dlut.edu.cn` 全量唯一域名 **93 个**（含 1 个非 dlut 域 `www.dlutci.edu.cn`）
 > 规则：**未抓到页面内容的，一律判 ⚠️ 或 ❌，不凭常识标 ✅**；待确认项**每个至少尝试 5 次**
 >

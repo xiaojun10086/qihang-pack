@@ -99,20 +99,13 @@ def inject_build_path(tree):
 
 
 def inject_no_isolation(tree):
-    """移除隔离前置与隔离校验，模拟「--profile 可被 daemon 静默忽略」的回归。
+    """移除一次性 Profile 创建，模拟固定 / 持久化 Profile 回归。
     期望：selfcheck [7c] 断言 FAIL（证明该断言不是装饰）。"""
     p = os.path.join(tree, 'scripts', 'dlut-read.sh')
     t = io.open(p, encoding='utf-8').read()
     out, skipping = [], False
     for ln in t.split('\n'):
-        if 'close --all >/dev/null 2>&1 || true' in ln:
-            out.append('')
-            continue
-        if 'grep -qiE' in ln and 'profile' in ln:
-            skipping = True
-        if skipping:
-            if ln.strip() == 'fi':
-                skipping = False
+        if 'PROFILE_DIR="$(mktemp -d' in ln:
             continue
         out.append(ln)
     return [p], '\n'.join(out)

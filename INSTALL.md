@@ -2,7 +2,7 @@
 
 > 「启航」是 `SKILL.md` 标准件，**面向 LearnBuddy / WorkBuddy 单一目标平台**。
 > 平台差异详见 `references/platforms.md`；就绪度探测用 `bash scripts/qihang.sh platform`。
-> 本包为 **DUT 特化库（库内优先）**：库内 skill 开箱即用，**离线零依赖**；外部桥接为**可选增强**（见 `library/external-bridge.md`）。
+> 本包为 **DUT 特化规则与 skill 库（库内优先）**：文本资产离线可读，实际执行依赖宿主平台的模型与工具；外部桥接为**可选增强**（见 `library/external-bridge.md`）。
 
 ---
 
@@ -24,12 +24,14 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 **插件方式**：包根含 `.codebuddy-plugin/plugin.json`，可作为 LearnBuddy 插件被识别装载。
 
+**默认重点**：课程学习（理解、笔记、作业辅导、备考、表达、语言练习）与公开信息搜集。其他校园生活和专项科研域按需启用，不必先选域或执行完整工作流。
+
 **用法**：直接用自然语言，**不需要斜杠命令**。例如：
 - 「我高数快挂了」
 - 「机械学院官网是啥」
 - 「帮我查下 XX 老师的联系方式和研究方向」
 
-**记忆落点**（自动）：`{ws}/.learnbuddy/memory/qihang/<域ID>.md`，见 `library/memory.md`。
+**记忆落点**（可选）：仅在用户明确要求保存时写入 `{ws}/.learnbuddy/memory/qihang/<域ID>.md`，见 `library/memory.md`。
 
 ---
 
@@ -40,7 +42,7 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 
 | 入口卡 | 作用 |
 |---|---|
-| `commands/qihang.md` | 库入口（澄清门 → 锁域 → 锁 skill） |
+| `commands/qihang.md` | 学习与信息搜集默认入口；其他域按需扩展 |
 | `commands/qihang-dlut.md` | 查大工校情（公开站 + 私密站） |
 | `commands/qihang-s1.md` … `qihang-r6.md` | 20 个域入口卡 |
 
@@ -55,8 +57,8 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 | 项 | 说明 |
 |---|---|
 | 通道 | **库内优先** —— 日常不装任何外部 skill；缺口时可**可选外接**（12 平台 + 五步自检） |
-| 来源 | 自建 80 个 + 由 MIT/Apache 许可外部最优解「骨架提取 + 重写」12 个 |
-| 依赖 | **核心能力零外部依赖**，全程离线可用；外接为可选项 |
+| 来源 | 自建 80 个 + 12 个有来源记录（10 个基于 MIT 来源重写，2 个仅方法论参考且零内容摘录） |
+| 依赖 | **技能文本离线可读**；实际执行依赖宿主平台的模型与工具能力；外接为可选项 |
 | 缺口 | 库内无法覆盖的细分场景走**同域降级**并记「缺口」，不引入库外通道 |
 
 > 改造来源与许可归属见 `THIRD_PARTY_NOTICES.md`；来源合规自检见 `references/skill-compliance-audit.md`。
@@ -82,9 +84,9 @@ bash scripts/qihang.sh domains     # 20 域清单
 bash scripts/qihang.sh registry    # DUT 信息库统计
 ```
 
-**期望**：`[1级]` 逐行列出 **9 个** library 文件 · `[2级] 20 个域 / **92 个**库内 skill` · `[资源] DUT 公开站 162 行`
+**期望**：`[1级]` 逐行列出 **11 个** library 文件 · `[2级] 20 个域 / **92 个**库内 skill` · `[资源] DUT 公开站 162 行`
 
-**完整验收（5 个脚本，职责不重叠）**：
+**完整验收（6 项检查，职责不重叠）**：
 
 | 脚本 | 管什么 | 期望 |
 |---|---|---|
@@ -92,8 +94,8 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 | `bash scripts/audit.sh` | 安不安全（凭证 / 危险命令 / L3 门禁 / 合规） | `0 警告 ｜ 0 失败 → 通过` |
 | `bash scripts/regress.sh 3` | **行为对不对**（澄清门算例 / L3 门禁矩阵 / 红线一致性） | 全 OK ｜ `FAIL 0` |
 | `python scripts/aligncheck.py . 5` | **全量文件级对齐**（18 组断言） | `FAIL 0 ｜ 全部通过` |
-| `python scripts/runcheck.py . 3` | **跑得通不通**（每域跑完整三级链，逐级确认返回结果） | `FAIL 0 ｜ 运行链全部可解` |
-| `python scripts/checkall.py .` | **自检单入口**：跑齐 5 个校验器 + 逐项计时 + 模拟跑摘要（`--quick` 加速 ｜ `--negative` 断言非空转） | `全部 PASS ｜ rc 0` |
+| `python scripts/runcheck.py . 3` | 静态检查域路由、skill 内容、示例和输出契约；**不调用模型或 LearnBuddy** | `FAIL 0 ｜ 静态契约通过` |
+| `python scripts/checkall.py .` | **自检单入口**：跑齐检查项 + 逐项计时 + 结果摘要（`--quick` 加速 ｜ `--negative` 断言非空转） | `全部 PASS ｜ rc 0` |
 
 ---
 
@@ -101,9 +103,9 @@ bash scripts/qihang.sh registry    # DUT 信息库统计
 
 | 项 | 说明 |
 |---|---|
-| 库内 skill | **开箱即用，无需安装任何东西**（92 个，离线零依赖） |
-| 网络 | 库内 skill 全程离线可用（**核心能力不触网**） |
-| 私密站（需登录）· **可选功能** | **属可选增强：不装也不影响核心能力**。需 `agent-browser` 或同类浏览器自动化（`npm i -g agent-browser`）；**必须用独立 Profile**（见 `references/dlut-login-sites.md` §0.1） |
+| 库内 skill 文本 | **开箱即用，无需安装任何东西**（92 个，离线可读；执行依赖宿主模型） |
+| 网络 | 规则与技能文本可离线查看；实时信息与外部桥接需要网络 |
+| 私密站（需登录）· **可选功能** | 不装不影响文本 skill 使用。需 `agent-browser`（`npm i -g agent-browser`）；脚本只打开用户可见的独立本机浏览器，不读取或输出网页内容，使用随机会话和一次性 Profile，退出后清理且不关闭其他会话（见 `references/browser-matrix.md`） |
 | 校内站点协议 | 部分校内系统**仅提供 `http://`**（教务 / 财务 / 缴费 / 信息服务等，域名均为 `*.dlut.edu.cn`）→ **访问时注意网络环境**；本包**不改写**站点协议，只如实登记 |
 
 ---

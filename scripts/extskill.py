@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""外部 skill 桥接 · 静态自检器（第 6 个校验器）。
+"""可选外部 skill 桥接 · 静态自检器（第 6 个校验器）。
 
-它把 `library/external-bridge.md` 的规则变成**可执行的断言**，覆盖两头：
-  一、**接线完整性**：1 级规则在位 → 2 级每域有「外部承接」→ 3 级每个 skill 的降级段是三档。
+它检查外部桥接规则与实际引用的一致性。外部桥接是可选能力，不要求每个域或每个 skill 都接线：
+  一、**按需接线**：若域或 skill 声明使用外部桥接，则检查其规则、来源与许可门禁。
   二、**登记一致性**：凡被引用的外部仓库，必须在 `references/external-sources.md` 的核验范围内，
       且许可门禁被如实标注（GPL/AGPL/CC-BY-NC 必须标「仅外部调用」）。
 
@@ -102,7 +102,7 @@ if os.path.isfile('references/external-sources.md'):
 else:
     bad('缺 references/external-sources.md（无 12 平台入口表）')
 
-# ---------- 3. 2 级：每域都要有「外部承接」 ----------
+# ---------- 3. 2 级：有引用才检查「外部承接」 ----------
 dom_dirs = sorted(d for d in os.listdir('domains')
                   if os.path.isdir(os.path.join('domains', d)))
 n_ok = n_none = n_todo = 0
@@ -113,7 +113,6 @@ for d in dom_dirs:
     t = rd(p)
     m = re.search(r'^##\s*外部承接[^\n]*$', t, re.M)
     if not m:
-        bad('%s 缺「## 外部承接」段（外部桥接断链）' % p)
         continue
     nxt = re.search(r'^##\s', t[m.end():], re.M)
     body = t[m.end():][:nxt.start() if nxt else len(t)]
@@ -138,7 +137,7 @@ for d in dom_dirs:
         bad('%s 的候选含 GPL/AGPL/CC-BY-NC 但未标「仅外部调用」' % p)
 ok('外部承接：有候选 %d 域 / 已复核无候选 %d 域 / 待复核 %d 域' % (n_ok, n_none, n_todo))
 
-# ---------- 4. 3 级：92 个 skill 的降级段必须是三档 ----------
+# ---------- 4. 3 级：仅校验主动声明外部桥接的 skill ----------
 sk = sorted(glob_sk := [p.replace(os.sep, '/') for p in
                         __import__('glob').glob('domains/*/skills/local/*/SKILL.md')])
 bad3 = []
@@ -146,13 +145,12 @@ for p in sk:
     t = rd(p)
     m = re.search(r'^##\s*失败与降级[^\n]*$', t, re.M)
     if not m:
-        bad3.append((p, '缺段'))
         continue
     nxt = re.search(r'^##\s', t[m.end():], re.M)
     body = t[m.end():][:nxt.start() if nxt else len(t)]
-    miss = []
     if 'external-bridge.md' not in body:
-        miss.append('未接 external-bridge.md')
+        continue
+    miss = []
     if '纯提示词模式' not in body:
         miss.append('未保留档 3（纯提示词）')
     if '降级承接' not in body:

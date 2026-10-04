@@ -107,12 +107,16 @@ while [ "$r" -le "$ROUNDS" ]; do
     out=""; rc=127; i=1
     while [ "$i" -le 5 ]; do
       out=$(bash scripts/dlut-read.sh "$tgt" --dry-run </dev/null 2>&1); rc=$?
-      { [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q "未启动浏览器" && printf '%s' "$out" | grep -q "独立Profile"; } && break
+      { [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q "未启动浏览器" && \
+        printf '%s' "$out" | grep -q "一次性独立会话" && \
+        printf '%s' "$out" | grep -q "工具不读取或输出页面内容"; } && break
       [ "$rc" -eq 127 ] || break        # 非 127 = 真实结论，不重试
       i=$((i + 1))
     done
-    if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q "未启动浏览器" && printf '%s' "$out" | grep -q "独立Profile"; then
-      _ok "$(printf '%-10s L1 dry-run + 强制独立 Profile' "$tgt")"
+    if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q "未启动浏览器" && \
+       printf '%s' "$out" | grep -q "一次性独立会话" && \
+       printf '%s' "$out" | grep -q "工具不读取或输出页面内容"; then
+      _ok "$(printf '%-10s L1 dry-run + 隐私隔离约束' "$tgt")"
     elif [ "$rc" -eq 127 ]; then _fail "$(printf '%-10s L1 环境抖动·重试 5 次仍未启动（rc=127）' "$tgt")"
     else _fail "$(printf '%-10s L1 路径异常（rc=%s）' "$tgt" "$rc")"; fi
   done
@@ -172,15 +176,15 @@ while [ "$r" -le "$ROUNDS" ]; do
   if [ -f library/general-fallback.md ]; then
     _ok "兜底框架 library/general-fallback.md 在位"
   else _fail "缺 library/general-fallback.md（零命中无成文框架）"; fi
-  for _k in '## 2. 六步通用框架' '## 3. 域通用框架' '【结论】与【下一步】'; do
+  for _k in '## 2. 六步通用框架' '## 3. 域通用框架' '简短问题不强制套模板'; do
     if grep -qF -- "$_k" library/general-fallback.md 2>/dev/null; then _ok "兜底框架含「$_k」"
     else _fail "兜底框架缺「$_k」"; fi
   done
-  # 入口 1：无域 → domain-review.md §3 必须把兜底路由到 general-fallback.md 的六步通用框架
+  # 入口 1：无域 → 按需路由到通用框架，保持简洁且标注不确定性
   if grep -q 'general-fallback.md' library/domain-review.md 2>/dev/null \
-     && grep -q '§2 六步通用框架' library/domain-review.md 2>/dev/null; then
-    _ok "domain-review.md 无域兜底 → 路由到六步通用框架"
-  else _fail "domain-review.md 无域兜底未路由到 general-fallback.md §2"; fi
+     && grep -q '简洁、可执行且标注不确定性' library/domain-review.md 2>/dev/null; then
+    _ok "domain-review.md 无域兜底 → 按需路由到通用框架"
+  else _fail "domain-review.md 无域兜底未路由到简洁通用框架"; fi
   # 入口 2：有域无对口 skill → 输出规格必须承认「域通用框架」这一备选
   if grep -q 'general-fallback.md' library/output-spec.md 2>/dev/null; then
     _ok "output-spec.md 降级备选 → 引用兜底框架"

@@ -1,24 +1,19 @@
 ---
 name: qihang-s1
-description: S1 课程答疑（学习类）域入口卡：讲一下、这题、为什么、推导、证明、不会做。当用户提出该域相关需求时使用，按 1 级库工作流处理。
+description: 课程答疑入口：解释概念、题目思路和错因；清晰问题直接回答，解题辅导按需提示，不代做可提交作业。
 ---
 
-# S1 · 课程答疑（LearnBuddy 域入口卡）
+# 课程答疑
 
-> **用法**：在 LearnBuddy / WorkBuddy 中**直接用自然语言**说出需求即可；本卡用于人工检索与插件装载，
-> **不需要输入任何命令**。
+适用于「讲一下」「为什么」「这题怎么做」「我哪里错了」等单点学习请求。按用户的问题直接切入：
 
-**触发表述**：讲一下、这题、为什么、推导、证明、不会做
+| 用户当前需要 | 处理方式 |
+|---|---|
+| 问概念或原理 | 先用直白语言给结论，再解释必要条件或例子 |
+| 不会开始解题 | 给一个关键提示；只有需要定位卡点时才请用户贴出尝试 |
+| 已有解法但结果错误 | 找到最早出现偏差的一步，针对性纠正 |
+| 要完整学习路径/考试安排 | 转为课程计划或备考任务；多目标时再串联对应技能 |
+| 要直接完成可提交的作业 | 不代做；提供方法讲解、检查清单或类似练习 |
 
-**边界**：单点题目/概念的分步讲解、错因诊断、举一反三
-**不覆盖**：不代写作业（→S3）；不做整门课备考规划（→S4）
-
-**处理步骤**
-
-1. **需求明确**：读 `library/clarity.md` 拆 6 槽位，算 U；**先过 §5 的 6 条「不追问例外」（优先级 4 红线 > 6 通用知识型 > 1 校情横切 > 2 关键槽齐全 > 5 紧急豁免 > 3 显式要求）**；未命中例外且关键槽 `O/T/D` 缺失 / 歧义（`cᵢ = 0.5`）→ 才追问。
-2. **域审查**：读 `domains/S1-course-qa/_domain.md` 确认边界；越界按 `library/domain-review.md` 改锁到对应域。
-3. **库内择优**：按**主体与任务**在本域 5 个库内 skill 中择优 —— 首选 `explain-stepwise`；其余 `concept-contrast` / `error-diagnose` / `prereq-bridge` / `socratic-qa` 按触发场景择用
-   路径：`domains/S1-course-qa/skills/local/concept-contrast/SKILL.md`、`domains/S1-course-qa/skills/local/error-diagnose/SKILL.md`、`domains/S1-course-qa/skills/local/explain-stepwise/SKILL.md`、`domains/S1-course-qa/skills/local/prereq-bridge/SKILL.md`、`domains/S1-course-qa/skills/local/socratic-qa/SKILL.md`
-4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
-5. **DUT 绑定点**：见 `domains/S1-course-qa/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（只读 / 不外传 / 不落盘）。
-6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。
+题面或材料缺失且会妨碍正确讲解时才索取。无需强制复述、填齐 6 个槽位或每次附同类题。
+复杂或有歧义的请求可参考 `library/clarity.md`、`library/domain-review.md` 和 `domains/S1-course-qa/_domain.md`。
