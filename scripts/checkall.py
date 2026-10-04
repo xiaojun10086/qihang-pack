@@ -16,7 +16,8 @@
 时间只**报告**与提示（超基线记 WARN，不判 FAIL）—— 本机在高负载下会偶发 rc=127 抖动，硬失败会制造假故障。
 
 时间基线（本机实测，2026-10-03）：selfcheck ~27s ｜ audit ~46s ｜ aligncheck ~0.6s ｜ runcheck ~0.3s ｜
-regress ~44s ｜ negative ~3s ｜ **--quick 全跑 ~28s ／ full+negative ~121s**。基线只作「速度回归」参照。
+regress ~44s ｜ negative ~3s（2026-10-04 起含「零注入交付树基线」，多跑一遍 checkall → ~30s）｜
+**--quick 全跑 ~28s ／ full+negative ~121s**。基线只作「速度回归」参照。
 """
 import os, re, sys, time, shutil, subprocess
 
@@ -28,6 +29,10 @@ ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 ROOT = os.path.abspath(ARG[0]) if ARG else os.path.abspath(os.path.join(HERE, '..'))
 QUICK = '--quick' in sys.argv
 NEGATIVE = '--negative' in sys.argv
+# ⚠️ 递归护栏：`negative_test.py` 的「零注入交付树基线」会回调 checkall —— 不阻断的话
+# `checkall.py . --negative` 会变成 checkall → negative → checkall → … 无限递归。
+if os.environ.get('QIHANG_NEGTEST_CHILD'):
+    NEGATIVE = False
 ROUNDS = '1'
 if '--rounds' in sys.argv:
     ROUNDS = sys.argv[sys.argv.index('--rounds') + 1]
