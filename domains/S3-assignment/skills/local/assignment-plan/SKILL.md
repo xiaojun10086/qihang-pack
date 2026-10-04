@@ -1,7 +1,7 @@
 ---
 name: qihang-assignment-plan
 description: 「启航」S3 作业与考核域库内 skill：把大作业/课程设计拆成里程碑与工作量排期，标注风险项。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 agent_created: true
 ---

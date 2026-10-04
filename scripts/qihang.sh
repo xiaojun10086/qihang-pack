@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# 「启航」学伴包 v3.3 · 三级结构管理脚本
-# 用法: bash qihang.sh {status|platform|domains|registry|records|new-term}
+# 「启航」学伴包 v3.4 · 三级结构管理脚本
+# 用法: bash qihang.sh {status|platform|domains|registry|records|quick|new-term}
 # 定位：纯 DUT 特化库 —— 库内 skill 唯一通道，无任何库外安装通道。
+# 第一阶段体验增强：降低门槛，提供统一入口与快速模板，不要求用户理解 skill/domain。
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -41,7 +42,7 @@ cmd_domains() {
 }
 
 cmd_status() {
-  echo "「启航」学伴包 v3.3 · 状态"
+  echo "「启航」学伴包 v3.4 · 状态"
   echo "----------------------------------------"
   echo "[1级] skill 库"
   for f in library/README.md library/clarity.md library/domain-review.md library/output-spec.md \
@@ -113,6 +114,30 @@ cmd_records() {
   esac
 }
 
+cmd_quick() {
+  echo "「启航」快速入口（第一阶段体验增强）"
+  echo "----------------------------------------"
+  echo "直接输入任一问题即可："
+  echo "  1. 帮我理解这道题"
+  echo "  2. 整理这节课的笔记"
+  echo "  3. 查一下学校通知 / 课程安排"
+  echo "  4. 制定一周备考计划"
+  echo "  5. 帮我检查作业步骤和风险点"
+  echo "  6. 让我看论文/文献/来源"
+  echo ""
+  echo "在 LearnBuddy 中，直接输入下面的自然语言需求即可；无需先选域。"
+  echo "只在关键信息会改变回答时追问；复杂任务按需分轮确认，不为填表而追问。"
+  echo "交付可按目标采用学习辅导、事实检索或行动规划；需要时可要求更简洁、更详细或核对来源。"
+  echo "此菜单只展示文本示例，不启动对话；会话外记忆仅按用户明确要求处理。"
+  echo "----------------------------------------"
+  echo "常用起始句型："
+  echo "  1) 帮我理解 X 的核心概念和解题思路"
+  echo "  2) 我有一份作业，先拆任务再给我检查点"
+  echo "  3) 这门课我从零开始，给我一个学习节奏"
+  echo "  4) 查一下大工相关的公开信息，给出处和核验状态"
+  echo "  5) 我需要论文/参考文献，先给检索思路和可信来源"
+}
+
 cmd_platform() {
   echo "「启航」平台探测（LearnBuddy / WorkBuddy）"
   echo "----------------------------------------"
@@ -165,6 +190,7 @@ case "${1:-status}" in
   domains)  cmd_domains ;;
   registry) cmd_registry ;;
   records)  shift; cmd_records "$@" ;;
+  quick)    cmd_quick ;;
   new-term) cmd_new_term ;;
-  *) echo "用法: bash qihang.sh {status|platform|domains|registry|records|new-term}"; exit 1 ;;
+  *) echo "用法: bash qihang.sh {status|platform|domains|registry|records|quick|new-term}"; exit 1 ;;
 esac

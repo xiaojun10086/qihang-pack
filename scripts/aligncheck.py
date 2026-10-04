@@ -22,6 +22,9 @@
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
   D SKILL.md 契约：frontmatter / 归属域 / 必需小节 / 步骤数 / 示例三要素 / 输出字段 /
     输出段须含库内规范引用 + 标准交付校验句（措辞唯一）
+  D2 来源标签 ↔ 第三方台账：`**来源**` 口径唯一（自建系 / 改造自 / 方法论思路参考）；
+    点名 `owner/repo` ⇒ 须逐条登记于 THIRD_PARTY_NOTICES.md §三（恰好 12 条）；
+    `_domain.md` 括注与 SKILL.md 的自建/外部归属须一致
   F _domain.md 契约：必需小节 / 库内 skill 实体存在 / 「不覆盖→X域」指向存在
   G 交叉引用：文档里写的路径真实存在；节号引用 `X.md` §N(.M) 须落在目标真实编号内
   H 计数与版本：registry 声明 skill 数 == 实体、版本号全域唯一（含插件清单）
@@ -334,6 +337,66 @@ def run_round(r):
             if t.count(CANON_DELIVERY_LINE) != 1:
                 bad(f, '标准交付校验句出现 %d 次（应恰好 1 次）：%s'
                     % (t.count(CANON_DELIVERY_LINE), CANON_DELIVERY_LINE))
+
+    # ---------- D2 来源标签 ↔ 第三方台账（2026-10-04 实测缺陷）----------
+    # 为什么断言：`lecture-to-notes` / `exam-sprint` 曾写 `**来源**：摘录+自建`（v2 遗留标签），
+    # 与 THIRD_PARTY_NOTICES.md §一「其余 80 个为自建」+ §三「未吸收（v2 摘录，v3 改自建）」
+    # 直接矛盾，而当时 6 个校验器全绿 —— 来源口径属校验盲区，只能靠精确断言兜住。
+    # 口径（SKILL.md 与 _domain.md 两处必须同源，任一侧单独改动即 FAIL）：
+    #   ① `**来源**` 前缀只能是 `自建` / `改造自` / `方法论思路参考`（挡住「摘录+自建」类混血标签）；
+    #   ② 点名了 `owner/repo` ⇒ (域, skill, repo) 须逐条登记于 §三，且 §三 恰好 12 条；
+    #   ③ 未点名仓库 ⇒ 不得出现在 §三；
+    #   ④ `_domain.md` 行尾括注：SKILL.md 属自建系须以 `自建` 开头，属外部系不得以 `自建` 开头。
+    SRC_PREFIX = ('自建', '改造自', '方法论思路参考')
+    # 库内文档路径（`references/x.md`、`library/y.md`）形似 `owner/repo`，须排除，
+    # 否则「自建 · DUT 特化（数据基础：`references/dlut-official-sites.md`）」会被误判为外部来源。
+    REPO_RE = re.compile(r'`([A-Za-z0-9][A-Za-z0-9_.\-]*/[A-Za-z0-9][A-Za-z0-9_.\-]*)`')
+    NOT_REPO = re.compile(r'^(references|library|domains|scripts|commands|\.)|\.(md|py|sh|json|ya?ml|txt|html?|csv)$')
+    def repos_in(s):
+        return [x for x in REPO_RE.findall(s) if not NOT_REPO.search(x)]
+    _led = set()
+    if os.path.isfile('THIRD_PARTY_NOTICES.md'):
+        _s3 = re.search(r'(?ms)^##\s*三、.*?(?=^##\s)', rd('THIRD_PARTY_NOTICES.md'))
+        if not _s3:
+            bad('THIRD_PARTY_NOTICES.md', '缺「## 三、」已吸收来源台账段')
+        else:
+            _led = set(re.findall(
+                r'\|\s*`([A-Za-z]\d)/([A-Za-z0-9_-]+)`\s*\|\s*`([A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+)`',
+                _s3.group(0)))
+            if len(_led) != 12:
+                bad('THIRD_PARTY_NOTICES.md', '§三 台账登记 %d 条（期望 12）' % len(_led))
+    SRC = {}      # (域, skill) -> (标签, 是否点名仓库)
+    for f in LOCAL:
+        did = f.split('/')[1].split('-')[0]
+        slug = f.split('/skills/local/')[1].split('/')[0]
+        m = re.search(r'-\s*\*\*来源\*\*[：:]\s*(.+)', rd(f))
+        if not m:
+            bad(f, '缺「**来源**」标注'); continue
+        lab = m.group(1).strip()
+        repo = repos_in(lab)
+        SRC[(did, slug)] = (lab, bool(repo))
+        if not lab.startswith(SRC_PREFIX):
+            bad(f, '来源标签「%s」不在合法口径（自建 / 改造自 / 方法论思路参考）' % lab)
+        if repo:
+            for rp in repo:
+                if (did, slug, rp) not in _led:
+                    bad(f, '来源点名 `%s`，但 §三 未登记「%s/%s ↔ 该仓库」' % (rp, did, slug))
+        elif (did, slug) in {(d, s) for d, s, _ in _led}:
+            bad(f, '已在 §三 登记外部来源，但「来源」标签未点名仓库')
+    for f in DOMAIN:
+        did = f.split('/')[1].split('-')[0]
+        for ln in rd(f).splitlines():
+            b = re.match(r'-\s*\*\*`([A-Za-z0-9_-]+)`\*\*', ln.strip())
+            if not b or (did, b.group(1)) not in SRC:
+                continue
+            ext = SRC[(did, b.group(1))][1]
+            pm = re.search(r'[（(]([^）)]*)[）)]\s*$', ln.strip())
+            dom = pm.group(1) if pm else ''
+            if ext and dom.startswith('自建'):
+                bad(f, '`%s` 在 SKILL.md 标为外部来源，此处括注却写「%s」' % (b.group(1), dom))
+            if not ext and not dom.startswith('自建'):
+                bad(f, '`%s` 在 SKILL.md 标为自建，此处括注为「%s」（应以「自建」开头）'
+                    % (b.group(1), dom or '（无）'))
 
     # ---------- F _domain.md 契约 ----------
     for f in DOMAIN:

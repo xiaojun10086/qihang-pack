@@ -276,6 +276,46 @@ def inject_section_ref_dotted_drift(tree):
     return [p], t.replace('`output-spec.md` §2.1', '`output-spec.md` §2.9', 1)
 
 
+def _first_selfbuilt_skill(tree):
+    import glob as _g
+    for p in sorted(_g.glob(os.path.join(tree, 'domains/*/skills/local/*/SKILL.md'))):
+        if '- **来源**：自建\n' in io.open(p, encoding='utf-8').read():
+            return p
+    return None
+
+
+def inject_source_label_hybrid(tree):
+    """把某 skill 的「**来源**：自建」退回 v2 混血标签「摘录+自建」→ aligncheck D2 应 FAIL。
+    历史缺陷：`lecture-to-notes` / `exam-sprint` 曾长期如此，且 6 个校验器全绿。"""
+    p = _first_selfbuilt_skill(tree)
+    if not p:
+        return [first_skill(tree)], io.open(first_skill(tree), encoding='utf-8').read()
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('- **来源**：自建\n', '- **来源**：摘录+自建\n', 1)
+
+
+def inject_source_repo_unregistered(tree):
+    """把某 skill 的来源标签点名一个未登记仓库 → aligncheck D2 应 FAIL（台账交叉核对非空转）。"""
+    p = _first_selfbuilt_skill(tree)
+    if not p:
+        return [first_skill(tree)], io.open(first_skill(tree), encoding='utf-8').read()
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace(
+        '- **来源**：自建\n',
+        '- **来源**：改造自 `evilcorp/no-such-repo`（MIT）· 骨架提取重写 + DUT 特化\n', 1)
+
+
+def inject_domain_source_label_drift(tree):
+    """只改 `_domain.md` 一侧的括注（SKILL.md 仍为「自建」）→ aligncheck D2 应 FAIL（两处须同源）。"""
+    import glob as _g
+    for p in sorted(_g.glob(os.path.join(tree, 'domains/*/_domain.md'))):
+        t = io.open(p, encoding='utf-8').read()
+        if '（自建）' in t:
+            return [p], t.replace('（自建）', '（摘录+自建）', 1)
+    p = sorted(_g.glob(os.path.join(tree, 'domains/*/_domain.md')))[0]
+    return [p], io.open(p, encoding='utf-8').read()
+
+
 def main():
     base = os.path.join(tempfile.gettempdir(), 'qihang_negtest_%d' % int(__import__('time').time()))
     shutil.copytree(SRC, base, ignore=IGNORE)
@@ -326,6 +366,12 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 模板句唯一'),
         ('子节号引用漂移（output-spec §2.1 → §2.9）', inject_section_ref_dotted_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 节号引用'),
+        ('来源标签退回混血口径（自建 → 摘录+自建）', inject_source_label_hybrid,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck D2 来源口径'),
+        ('来源点名未登记仓库（evilcorp/no-such-repo）', inject_source_repo_unregistered,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck D2 台账交叉核对'),
+        ('仅 _domain.md 一侧改括注（与 SKILL.md 不同源）', inject_domain_source_label_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck D2 两处同源'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,

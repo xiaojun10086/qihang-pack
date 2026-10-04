@@ -1,7 +1,7 @@
 ---
 name: qihang-service-log
 description: 「启航」F6 军训与志愿域库内 skill：军训期给体能/物资/防晒准备清单；志愿侧帮选项目并归档时长与收获。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 ---
 

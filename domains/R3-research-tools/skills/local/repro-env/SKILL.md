@@ -1,7 +1,7 @@
 ---
 name: qihang-repro-env
 description: 「启航」R3 科研工具与代码域库内 skill：固定依赖版本/随机种子/目录结构，产出可复现运行脚本。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 agent_created: true
 ---

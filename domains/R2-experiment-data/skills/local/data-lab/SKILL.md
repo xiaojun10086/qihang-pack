@@ -1,7 +1,7 @@
 ---
 name: qihang-data-lab
 description: 「启航」R2 实验与数据域库内 skill：先确认数据与假设，再选检验方法，跑完给出「图 + 一句话结论 + 不能下的结论」。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 ---
 

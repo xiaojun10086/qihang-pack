@@ -1,7 +1,7 @@
 ---
 name: qihang-sim-tool
 description: 「启航」R3 科研工具与代码域库内 skill：面向 MATLAB / COMSOL 等的建模流程、参数化、网格与收敛判断。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: qihang-aid-apply
 description: 「启航」F4 财务与安全域库内 skill：梳理奖助勤工的条件、材料与时间线，做资格自评，不代提交。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 ---
 
