@@ -6,10 +6,21 @@
 「注入缺陷后校验器毫无反应」（断言恒真）= 最危险的一类错。本脚本把多类注入固化成常驻测试。
 
 在**临时树**上跑（按交付口径复制：排除 .git / _build / .learnbuddy / __pycache__ / .idea / .github），
-逐类注入 → 跑对应校验器 → 断言**必须 FAIL** → 打印捕获率。真实树**只读**，不写任何文件。
+先跑一次**零注入基线**（交付树必须自检全绿），再逐类注入 → 跑对应校验器 → 断言**必须 FAIL** → 打印捕获率。
+真实树**只读**，不写任何文件。
+
+零注入基线为什么必须有（2026-10-04 实测缺陷）：`README.md` 曾写「生成链的逐层变更记录见
+`scripts/_build/v3/README.md`（…不随包分发）」。开发树里该路径**存在** → 全部门禁绿；交付树里
+`scripts/_build/**` 被排除 → **用户下载到的 README 是断链**。注入式用例永远抓不到它 —— 它们只判
+「注入**之后**是否被抓」，从不判「注入**之前**是否本来就绿」；没有控制组时，「交付树本就不绿」会
+伪装成「断言全绿」。基线把「交付树全绿」变成前置条件。
+
+空转护栏（2026-10-04 加入）：每例注入后比对「注入后文本 == 注入前文本」，相同即判**用例腐化**
+（目标串已不存在）而非「漏网」。为什么必须分开：注入写死数字/锚点跨行/同一串出现多处只改一处，
+这三种腐化都会让注入静默失效，报出来的却是「断言可能空转」—— 把「测试写坏了」误导成「产品断言坏了」。
 
 用法：python scripts/negative_test.py [源树] [--with-regress]
-判据：捕获率 100% → rc 0；否则 rc 1。
+判据：基线全绿 **且** 捕获率 100% → rc 0；否则 rc 1。
 """
 import os, re, sys, io, shutil, tempfile, subprocess
 
@@ -26,6 +37,8 @@ SRC = os.path.abspath(ARG[0]) if ARG else os.path.abspath(os.path.join(HERE, '..
 WITH_REGRESS = '--with-regress' in sys.argv
 PY = sys.executable or 'python'
 IGNORE = shutil.ignore_patterns('.git', '_build', '.learnbuddy', '__pycache__', '.idea', '.github')
+# 传给子进程：告知 checkall「你是被负向自测调起的」，禁止它再跑 --negative（防无限递归）。
+CHILD_ENV = {'QIHANG_NEGTEST_CHILD': '1'}
 
 
 def bash_bin():
@@ -42,10 +55,12 @@ def bash_bin():
 BASH = bash_bin()
 
 
-def run(tree, cmd):
+def run(tree, cmd, extra_env=None):
     # ⚠️ 在 Python 里直接调 `bash` 会落到 WSL（System32\bash.exe）→ 秒退零输出。
     env = dict(os.environ)
     env['PYTHONIOENCODING'] = 'utf-8'
+    if extra_env:
+        env.update(extra_env)
     argv = list(cmd)
     if argv[0] == '@bash':
         argv = ([BASH] + argv[1:]) if BASH else None
@@ -291,24 +306,29 @@ def inject_exempt_decl_removed(tree):
 
 
 def inject_url_count_drift(tree):
-    """把 §11.2 的「唯一外链」改成旧值 138 → aligncheck 应 FAIL（外链计数不可漂移）。"""
+    """把 §11.2 的「唯一外链 N 条」改成旧值 138 → aligncheck 应 FAIL（外链计数不可漂移）。
+
+    ⚠️ 不要硬编码 N：本用例曾写死「148 条」，计数改为 174 后 `str.replace` **静默空转**
+    （注入没发生 → 用例报「漏网」，看起来像断言坏了）。改为按通用模式替换**当前值**；
+    138 是初版口径，永远不等于实测值。
+    """
     p = os.path.join(tree, 'references', 'dlut-url-verification.md')
     t = io.open(p, encoding='utf-8').read()
-    t = t.replace('唯一外链 148 条', '唯一外链 138 条', 1)
-    return [p], t
+    return [p], re.sub(r'唯一外链\s*\d{1,4}\s*条', '唯一外链 138 条', t, count=1)
 
 
 def inject_cross_file_url_count_drift(tree):
-    """把引用方的「148 条外链」改成旧值 138 → aligncheck 应 FAIL（引用方不可漂移）。
+    """把引用方的「N 条外链」改成旧值 138 → aligncheck 应 FAIL（引用方不可漂移）。
 
     与 inject_url_count_drift 是同一根因的两半：那条改的是**本源文件**的声明，
     这条改的是**引用方**（official-sites.md）转述的数字。原断言只扫本源文件，
     所以引用方写旧值能长期存活。
+
+    ⚠️ 同 inject_url_count_drift：不得硬编码 N（曾写死 148 → 计数改 174 后空转）。
     """
     p = os.path.join(tree, 'references', 'dlut-official-sites.md')
     t = io.open(p, encoding='utf-8').read()
-    t = t.replace('148 条外链', '138 条外链', 1)
-    return [p], t
+    return [p], re.sub(r'\d{1,4}\s*条外链', '138 条外链', t, count=1)
 
 
 def inject_delivery_line_wording_drift(tree):
@@ -377,10 +397,14 @@ def inject_oos_overlap(tree):
 
 
 def inject_oos_skill_md_skew(tree):
-    """只在 SKILL.md §1.5 内联列举里加一个越界词（config.yaml 不动）→ aligncheck U 应 FAIL（两处须同步）。"""
+    """只在 SKILL.md §1.5 内联列举里加一个越界词（config.yaml 不动）→ aligncheck U 应 FAIL（两处须同步）。
+
+    ⚠️ 锚点必须落在**行内**：该列举在 SKILL.md 里是折行的（`… 外卖 / 股票 / 彩票 /` 后换行接
+    `购物 / …`），原先锚 `股票 / 彩票 / `（末尾要求空格）跨行匹配不到 → 注入空转。改用 `外卖 / 股票 / `。
+    """
     p = os.path.join(tree, 'SKILL.md')
     t = io.open(p, encoding='utf-8').read()
-    return [p], re.sub(r'(股票 / 彩票 / )', r'\g<1>刷剧 / ', t, count=1)
+    return [p], re.sub(r'(外卖 / 股票 / )', r'\g<1>刷剧 / ', t, count=1)
 
 
 def inject_experience_pointer_removed(tree):
@@ -430,10 +454,14 @@ def inject_experience_no_metrics(tree):
 
 
 def inject_entry_phrase_drift(tree):
-    """改掉 README.md 的一个起始句型（与唯一副本分叉）→ aligncheck X 组应 FAIL。"""
+    """改掉 README.md 的起始句型（与唯一副本分叉）→ aligncheck X 组应 FAIL。
+
+    ⚠️ 必须替换**全部**出现处：该句型在 README 里出现两次（一句话示例 + 入口文案），
+    原先 `count=1` 只改掉第一处，第二处仍在 → X 组按「逐条含全部起始句型」判定，照样通过 → 空转。
+    """
     p = os.path.join(tree, 'README.md')
     t = io.open(p, encoding='utf-8').read()
-    return [p], t.replace('「安排一周备考计划」', '「给我排一个复习节奏」', 1)
+    return [p], t.replace('「安排一周备考计划」', '「给我排一个复习节奏」')
 
 
 def main():
@@ -441,6 +469,19 @@ def main():
     shutil.copytree(SRC, base, ignore=IGNORE)
     print('负向自测 · 临时树：%s' % base)
     print('=' * 76)
+
+    # ---------- 控制组：零注入的交付树必须自检全绿 ----------
+    # 临时树按 IGNORE 复制 → 不含 scripts/_build/** 与 .github/**，即**交付树的形状**。
+    # 下面的用例都是「注入 → 必须 FAIL」的实验组；控制组失败时，实验组的「捕获」无意义。
+    base_rc, base_out = run(base, ['@py', 'scripts/checkall.py', '.'], CHILD_ENV)
+    base_ok = (base_rc == 0) and ('FAIL' not in base_out)
+    print('%-46s → %-12s %s' % ('基线：零注入交付树自检全绿', 'checkall',
+                                '✅ 全绿' if base_ok else '❌ 交付树本就不绿'))
+    if not base_ok:
+        for _l in base_out.splitlines():
+            if 'FAIL' in _l:
+                print('      %s' % _l.strip())
+
     cases = [
         ('同域红线漂移（注入一条不属于域红线的红线）', inject_redline,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
@@ -486,9 +527,9 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 平台覆盖率'),
         ('豁免声明被删（R6 无声明放行）', inject_exempt_decl_removed,
          ['@py', 'scripts/extskill.py', '.'], 'extskill 豁免白名单'),
-        ('外链计数漂移（148 条被改回 138 条）', inject_url_count_drift,
+        ('外链计数漂移（唯一外链数被改回旧值 138）', inject_url_count_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链计数'),
-        ('跨文件引用过期（引用方 148 条外链改回 138）', inject_cross_file_url_count_drift,
+        ('跨文件引用过期（引用方外链数改回旧值 138）', inject_cross_file_url_count_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链引用'),
         ('模板交付句措辞漂移（硬校验 → 校验）', inject_delivery_line_wording_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 模板句唯一'),
@@ -524,21 +565,32 @@ def main():
                       ['@bash', 'scripts/regress.sh', '1'], 'regress [5]'))
 
     caught = 0
+    noop_cases = []
     for name, fn, cmd, which in cases:
         paths, newt = fn(base)
         backups = {}
         for p in paths:
             if os.path.isfile(p):
                 backups[p] = io.open(p, 'rb').read()
+        before = io.open(paths[0], encoding='utf-8').read() if os.path.isfile(paths[0]) else None
         if newt is None:
             shutil.move(paths[0], paths[0] + '.moved')
         else:
             for p in paths:
                 io.open(p, 'w', encoding='utf-8', newline='').write(newt)
+        # 空转护栏：注入后内容与原文逐字相同 = 目标串已不存在（用例腐化），**不是**「断言空转」。
+        # 没有这道护栏时，用例腐化会伪装成「漏网」，与「断言真的坏了」混在一起，定位成本极高
+        # ——本脚本 2026-10-04 就实测到 4 例（计数 148→174 后写死值失效、锚点跨行失配、
+        # 同一句型出现两次而只替换一处）。
+        noop = (newt is not None) and (newt == before)
         rc, out = run(base, cmd)
         hit = (rc != 0) or ('FAIL' in out and 'FAIL 0' not in out)
-        print('%-46s → %-12s %s' % (name, which, '✅ 捕获' if hit else '❌ 漏网（断言可能空转）'))
-        if hit:
+        if noop:
+            print('%-46s → %-12s %s' % (name, which, '❌ 注入未生效（目标串已不存在，用例已腐化）'))
+            noop_cases.append(name)
+        else:
+            print('%-46s → %-12s %s' % (name, which, '✅ 捕获' if hit else '❌ 漏网（断言可能空转）'))
+        if hit and not noop:
             caught += 1
         # 还原
         for p, b in backups.items():
@@ -546,9 +598,15 @@ def main():
         if newt is None and os.path.exists(paths[0] + '.moved'):
             shutil.move(paths[0] + '.moved', paths[0])
     print('=' * 76)
-    print('捕获率 %d/%d' % (caught, len(cases)))
-    print('结论：%s' % ('✅ 断言非空转' if caught == len(cases) else '❌ 存在空转断言，须修断言'))
-    sys.exit(0 if caught == len(cases) else 1)
+    if noop_cases:
+        print('注入未生效 %d 例（用例已腐化，须更新锚点/取值方式）：%s'
+              % (len(noop_cases), '、'.join(noop_cases)))
+    print('基线（零注入交付树）%s ｜ 捕获率 %d/%d'
+          % ('✅ 全绿' if base_ok else '❌ 不绿', caught, len(cases)))
+    ok = base_ok and caught == len(cases) and not noop_cases
+    print('结论：%s' % ('✅ 交付树自洽，断言非空转' if ok
+                      else '❌ 交付树本就不绿 或 存在空转断言/腐化用例，须修'))
+    sys.exit(0 if ok else 1)
 
 
 if __name__ == '__main__':
