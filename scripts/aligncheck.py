@@ -16,7 +16,7 @@
   python scripts/aligncheck.py .            # 单轮
   python scripts/aligncheck.py . 5          # 连跑 5 轮（校验确定性）
 
-检查项（19 组：A–D、F–Q、S–U）：
+检查项（20 组：A–D、F–Q、S–U、X）：
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
@@ -46,7 +46,7 @@
   U 触发门越界表不变式：`out_of_scope_markers` 与接管词表（`learning_markers` / `dlut_markers` /
     `learning_intents`）**零交集** / 表内无互为子串的冗余项 / SKILL.md §1.5 内联列举 ⊆ 越界表 /
     「需求主键」「优先级最高」双处声明
-"""
+  X 学生呈现层：`library/experience.md` 在位（白名单 / 禁止物 / 翻译规则 / 三视图 / 反例 / 起始句型）·\n    1 级清单三处同步 · 输出契约两处指针在位 · 四处入口文案与唯一副本逐条一致 · 组数声明同源\n"""
 import os, re, sys, json, glob, io, hashlib, collections, subprocess
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -1267,6 +1267,62 @@ def run_round(r):
                 bad(f, '输出块要点 %d 条（>6，违 output-spec §1.1）' % len([x for x in labels if x != '结论']))
     if n_blk == 0:
         bad('（全域）', '未检出任何输出块（output-spec 契约无法落地）')
+
+    # ---------- X 学生呈现层（体验层）----------
+    # 防复发：92 个库内 skill 的输出块同时承担契约与渲染两职，前台白名单 / 禁止物 / 翻译规则
+    # 无唯一副本、无断言 —— 体验层曾是全包唯一的「零断言层」。X 组把它钉住。
+    XPATH = 'library/experience.md'
+    if not os.path.exists(XPATH):
+        bad('README.md', '缺少学生呈现层规则 %s（前台白名单 / 禁止物 / 翻译规则无唯一副本）' % XPATH)
+    else:
+        _xt = rd(XPATH)
+        _xsec = (('白名单', r'^##\s*1[.、]?\s*前台白名单'),
+                 ('禁止物', r'^##\s*2[.、]?\s*前台禁止物'),
+                 ('翻译规则', r'^##\s*3[.、]?\s*翻译规则'),
+                 ('三视图', r'^##\s*4[.、]?\s*三视图'),
+                 ('反例', r'^##\s*5[.、]?\s*反例'),
+                 ('起始句型', r'^##\s*6[.、]?\s*起始句型'))
+        for _xk, _xpat in _xsec:
+            if not re.search(_xpat, _xt, re.M):
+                bad(XPATH, '缺小节「%s」（体验层六要素之一）' % _xk)
+        if not _xt.startswith('#'):
+            bad(XPATH, '首行不是标题（1 级规则文件不应含 frontmatter）')
+
+        # 1 级清单三处必须同步（status 清单用全路径，库导航与规则文件表用文件名）
+        if XPATH not in rd('scripts/qihang.sh'):
+            bad('scripts/qihang.sh', 'cmd_status 的 [1级] 清单漏列 %s' % XPATH)
+        _xname = os.path.basename(XPATH)
+        if _xname not in rd('library/README.md'):
+            bad('library/README.md', '1 级库导航漏列 %s' % XPATH)
+        if _xname not in rd('SKILL.md'):
+            bad('SKILL.md', '1 级规则文件表漏列 %s' % XPATH)
+
+        # 输出契约两处指针必须指向唯一副本（渲染层规则可被 92 个 skill 顺链读到）
+        _xops = rd('library/output-spec.md')
+        if _xops.count(XPATH) != 2:
+            bad('library/output-spec.md',
+                '前台渲染口径指针应为 2 处（§1.4 降级标注 + 链接呈现规范外接标注），实测 %d'
+                % _xops.count(XPATH))
+
+        # 入口文案唯一副本：四处呈现位必须逐条含全部起始句型
+        _xm = re.search(r'^##\s*6[.、]?\s*起始句型[^\n]*\n(.*?)(?=^##\s|\Z)', _xt, re.M | re.S)
+        _xcanon = list(dict.fromkeys(re.findall(r'「([^」\n]+)」', _xm.group(1)))) if _xm else []
+        if len(_xcanon) < 5:
+            bad(XPATH, '起始句型清单少于 5 条（实测 %d，唯一副本失效）' % len(_xcanon))
+        for _xf, _xlbl in (('README.md', 'README §2.1'),
+                           ('SKILL.md', 'SKILL.md 统一快速入口'),
+                           ('commands/qihang.md', '入口卡'),
+                           ('scripts/qihang.sh', 'qihang.sh cmd_quick')):
+            _xft = rd(_xf)
+            _xmiss = [c for c in _xcanon if ('「%s」' % c) not in _xft]
+            if _xmiss:
+                bad(_xf, '%s 的起始句型与唯一副本不一致（缺 %s）' % (_xlbl, ' / '.join(_xmiss)))
+
+        # 组数声明同源（防止新增组后文档计数漂移）
+        _xngroups = 20
+        if ('%d 组断言' % _xngroups) not in rd('README.md') or \
+           ('%d 组断言' % _xngroups) not in rd('INSTALL.md'):
+            warn('README.md', 'aligncheck 组数声明与实现不一致（期望「%d 组断言」）' % _xngroups)
 
     # ---------- 汇总 ----------
     nf = sum(1 for x in FIND if x[0] == 'FAIL')

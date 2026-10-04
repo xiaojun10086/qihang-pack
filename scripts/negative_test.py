@@ -363,6 +363,20 @@ def inject_oos_skill_md_skew(tree):
     return [p], re.sub(r'(股票 / 彩票 / )', r'\g<1>刷剧 / ', t, count=1)
 
 
+def inject_experience_pointer_removed(tree):
+    """删掉 output-spec.md 的一处前台渲染口径指针 → aligncheck X 组应 FAIL。"""
+    p = os.path.join(tree, 'library', 'output-spec.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('`library/experience.md`', '`experience.md`', 1)
+
+
+def inject_entry_phrase_drift(tree):
+    """改掉 README.md 的一个起始句型（与唯一副本分叉）→ aligncheck X 组应 FAIL。"""
+    p = os.path.join(tree, 'README.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('「安排一周备考计划」', '「给我排一个复习节奏」', 1)
+
+
 def main():
     base = os.path.join(tempfile.gettempdir(), 'qihang_negtest_%d' % int(__import__('time').time()))
     shutil.copytree(SRC, base, ignore=IGNORE)
@@ -427,6 +441,10 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck U 越界表互斥'),
         ('SKILL.md §1.5 越界词与 config 不同步', inject_oos_skill_md_skew,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck U 越界表同步'),
+        ('前台渲染口径指针被删（契约层不再顺链到呈现层）', inject_experience_pointer_removed,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck X 呈现层指针'),
+        ('入口文案分叉（README 起始句型与唯一副本不一致）', inject_entry_phrase_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck X 起始句型唯一副本'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,
