@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """多轮端到端自查台（build 侧工具，不随包分发）。
 
-与 `e2e_sim.py` 的关系：那个是单轮样例；这个是**分轮批量**（本版 15 轮 / 65 题），
+与 `e2e_sim.py` 的关系：那个是单轮样例；这个是**分轮批量**（本版 15 轮 / 69 题），
 复用它的解析与链路（导入同目录的 e2e_sim），并**逐轮统计 + 汇总违规清单**。
 
 尺子仍然全部来自包内：config.yaml 的 trigger · SKILL.md 红线总览 ·
@@ -29,7 +29,7 @@ LIVE = '--live' in sys.argv
 S.ROOT = ROOT
 S.LIVE = LIVE
 
-# ── 15 轮 / 65 题 ────────────────────────────────────────────────────────────────
+# ── 15 轮 / 69 题 ────────────────────────────────────────────────────────────────
 ROUNDS = [
     ('R1 课程答疑 S1', [
         ('这道题为什么用洛必达法则', '接管', 'S1', 1),
@@ -143,6 +143,7 @@ def main():
 
     tot = dict(接管=0, 不接管=0, 红线=0, 档1=0, 档2=0, 档3=0, 域未命中=0, 不达标=0)
     bad = []
+    info = []
     for rname, cases in ROUNDS:
         r_ok = 0
         r_bad = []
@@ -193,7 +194,7 @@ def main():
                 tot['不达标'] += 1
                 r_bad.append((text, '；'.join(errs)))
             elif kind == '边界':
-                r_bad.append((text, '【边界情形·仅报告】实得 %s（由 §1.5 主键判据定）' % got_kind))
+                info.append((rname, text, '实得 %s（由 §1.5 主键判据定）' % got_kind))
             else:
                 r_ok += 1
 
@@ -202,6 +203,11 @@ def main():
         for t, w in r_bad:
             print('      ✗ %s → %s' % (t, w))
             bad.append((rname, t, w))
+
+    if info:
+        print('边界情形（仅供人工复核，不计失败）：')
+        for rname, text, note in info:
+            print('      · %s / %s → %s' % (rname, text, note))
 
     print('=' * 108)
     print('汇总：接管 %d ｜ 不接管 %d ｜ 红线 %d ｜ 档 1/2/3 = %d/%d/%d'
