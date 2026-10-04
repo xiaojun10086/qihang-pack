@@ -5,7 +5,7 @@
 为什么要有它：自检全绿只证明「断言集通过」，不证明「断言集有效」。开发期多次出现
 「注入缺陷后校验器毫无反应」（断言恒真）= 最危险的一类错。本脚本把多类注入固化成常驻测试。
 
-在**临时树**上跑（按交付口径复制：排除 .git / _build / .learnbuddy / __pycache__ / .idea），
+在**临时树**上跑（按交付口径复制：排除 .git / _build / .learnbuddy / __pycache__ / .idea / .github），
 逐类注入 → 跑对应校验器 → 断言**必须 FAIL** → 打印捕获率。真实树**只读**，不写任何文件。
 
 用法：python scripts/negative_test.py [源树] [--with-regress]
@@ -25,7 +25,7 @@ ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 SRC = os.path.abspath(ARG[0]) if ARG else os.path.abspath(os.path.join(HERE, '..'))
 WITH_REGRESS = '--with-regress' in sys.argv
 PY = sys.executable or 'python'
-IGNORE = shutil.ignore_patterns('.git', '_build', '.learnbuddy', '__pycache__', '.idea')
+IGNORE = shutil.ignore_patterns('.git', '_build', '.learnbuddy', '__pycache__', '.idea', '.github')
 
 
 def bash_bin():
@@ -231,6 +231,26 @@ def inject_stale_file_count(tree):
     if not m:
         return [p], t
     return [p], t[:m.start(2)] + str(int(m.group(2)) - 3) + t[m.end(2):]
+
+
+def inject_login_site_count_drift(tree):
+    """把「N 个需登录站点（§1 主表 a + §1.1 补充 b）」退回旧口径，只留 §1 主表 a → aligncheck 应 FAIL。"""
+    p = os.path.join(tree, 'README.md')
+    t = io.open(p, encoding='utf-8').read()
+    m = re.search(r'(\d{1,3})\s*个需登录站点（\s*§1\s*主表\s*(\d{1,3})\s*\+[^）]*）', t)
+    if not m:
+        return [p], t
+    return [p], t[:m.start()] + m.group(2) + ' 个需登录站点' + t[m.end():]
+
+
+def inject_login_site_split_drift(tree):
+    """只改分项括注（§1 主表 a → a+2），总量仍写对 → aligncheck 分项断言应 FAIL。"""
+    p = os.path.join(tree, 'README.md')
+    t = io.open(p, encoding='utf-8').read()
+    m = re.search(r'§1\s*主表\s*(\d{1,3})', t)
+    if not m:
+        return [p], t
+    return [p], t[:m.start()] + '§1 主表 %d' % (int(m.group(1)) + 2) + t[m.end():]
 
 
 def inject_stale_platform_count(tree):
@@ -450,8 +470,12 @@ def main():
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
-        ('交付树文件数声明过期（173 vs 176）', inject_stale_file_count,
+        ('交付树文件数声明过期（声明数 −3）', inject_stale_file_count,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 交付树文件数'),
+        ('需登录站点数退回旧口径（只算 §1 主表）', inject_login_site_count_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 需登录站点数'),
+        ('需登录站点分项括注漂移（§1 主表 +2）', inject_login_site_split_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 需登录站点分项'),
         ('平台目录数退回旧口径 12', inject_stale_platform_count,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 平台数'),
         ('status 1 级清单漏列 library 文件', inject_gate_list_short,

@@ -157,7 +157,11 @@ def check_output_block(o):
     labels = re.findall(r'^【([^】]+)】', o, re.M)
     if not labels:
         return ['输出块无【】小节 → 不合输出规范'], []
-    if labels[0] != '结论':
+    # 追问变体（output-spec §2 硬约束）：首节必须是【还需确认】，且不得同时出现【结论】。
+    if '还需确认' in labels[0]:
+        if '结论' in labels:
+            F.append('追问变体不得同时出现【结论】（首节【%s】）' % labels[0])
+    elif labels[0] != '结论':
         F.append('输出未「结论前置」（首节为【%s】）' % labels[0])
     if len([x for x in labels if '下一步' in x]) != 1:
         F.append('【下一步】应恰好 1 个，实为 %d 个' % len([x for x in labels if '下一步' in x]))
@@ -373,11 +377,11 @@ def run_round(r):
                     warn(sp, '澄清判定给 U=%s 但未附依据' % mu.group(1))
 
             # L3-5 输出形态硬契约（口径真相源 = library/output-spec.md §0–§2）
-            ob = re.search(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', st, re.S)
-            if not ob:
+            # 扫**全部**输出块（含边界 / 降级 / 拒绝示例），避免第 2 个及以后的示例漏检。
+            obs = re.findall(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', st, re.S)
+            if not obs:
                 bad(sp, '示例缺「输出」代码块 → 级别3 返回结果为空')
-            else:
-                o = ob.group(1)
+            for o in obs:
                 for _m in check_output_block(o)[0]:
                     bad(sp, _m)
                 # L3-6 输出里的 dlut URL 必须已在官方站库登记

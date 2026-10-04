@@ -90,12 +90,16 @@ DEV_ONLY_DOCS = {
 }
 # 开发侧版本控制元数据：release 树里没有（`.gitattributes` 有，故不在此列）。
 DELIV_EXCLUDE_FILES = {'.gitignore'}
+# 开发侧仓库元数据目录：CI 工作流（`.github/`）与 `.gitignore` 同口径 —— 只服务开发期门禁，
+# release 树里没有（`release_branch.py` 的 EXCL 同步排除），算进交付数会让 177 变成 178。
+DELIV_EXCLUDE_DIRS = ('.github',)
 
 
 def walk_files():
     out = []
     for base, dirs, files in os.walk('.'):
-        dirs[:] = [d for d in dirs if d not in ('.git', '.idea', '.learnbuddy', '__pycache__')]
+        dirs[:] = [d for d in dirs
+                   if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '.github')]
         for fn in files:
             if fn in DEV_ONLY_DOCS:
                 continue
@@ -778,13 +782,17 @@ def run_round(r):
             warn(f, '未声明降级标注 [已降级]')
         # O6 示例输出按 output-spec 校验（**变体无关**，只查规格真约束）
         # 口径真相源 = library/output-spec.md §0–§2，与 runcheck.py 的 L3-5 同源。
-        ob = re.search(r'\*\*输出\*\*\n\n```\n(.*?)```', t, re.S)
-        if not ob:
+        # 扫**全部**输出块（含边界 / 降级 / 拒绝示例），避免第 2 个及以后的示例漏检。
+        obs = re.findall(r'\*\*输出\*\*\n\n```\n(.*?)```', t, re.S)
+        if not obs:
             bad(f, '示例缺「输出」代码块')
-        else:
-            o = ob.group(1)
+        for o in obs:
             labels = re.findall(r'^【([^】]+)】', o, re.M)
-            if '结论' not in labels:
+            # 追问变体（output-spec §2 硬约束）：首节【还需确认】，且不得同时出现【结论】。
+            if labels and '还需确认' in labels[0]:
+                if '结论' in labels:
+                    bad(f, '追问变体不得同时出现【结论】（首节【%s】）' % labels[0])
+            elif '结论' not in labels:
                 bad(f, '示例输出缺【结论】（结论未前置）')
             if '下一步' not in labels:
                 bad(f, '示例输出缺【下一步】（应只给 1 个动作）')
@@ -1004,16 +1012,57 @@ def run_round(r):
                         bad(_f4, '「站画像」声明 %s ≠ 实测 %d'
                             % (_m4.group(1), _nsp))
 
+    # 私密站（需登录）计数：`references/dlut-login-sites.md` §1 主表 + §1.1 补充清单的数据行数之和，
+    # 必须等于各处「N 个需登录站点」的声明值；同一行若写分项口径，分项也要逐一对上。
+    # 为什么加：README 长期只写 §1 主表的 19，而文件自身已扩到 §1 + §1.1 共 38 条
+    # （§1.1 标题即写「实测新增 19 条」，编号 20–38 顺接 §1 的 1–19，无重叠）——
+    # 四个校验器全绿，口径漂移无人断言。
+    _ls = 'references/dlut-login-sites.md'
+    if os.path.exists(_ls):
+        _secs, _cur = {}, None
+        for _l6 in rd(_ls).splitlines():
+            _h6 = re.match(r'^#{2,3}\s+(\S+)', _l6)
+            if _h6:
+                _cur = _h6.group(1)
+                _secs[_cur] = []
+            elif _cur:
+                _secs[_cur].append(_l6)
+
+        def _rows6(_ls6):
+            _rr = [x for x in _ls6 if x.startswith('|')]
+            _sp6 = {i for i, x in enumerate(_rr) if set(x.strip()) <= set('|-: ')}
+            return len([x for i, x in enumerate(_rr)
+                        if i not in _sp6 and (i - 1) not in _sp6])
+
+        _n1 = _rows6(_secs.get('1.', []))
+        _n11 = _rows6(_secs.get('1.1', []))
+        if _n1 and _n11:
+            _ntot = _n1 + _n11
+            for _f6 in LIVE_MD:
+                if not os.path.exists(_f6):
+                    continue
+                for _i6, _l6 in enumerate(rd(_f6).splitlines(), 1):
+                    for _m6 in re.finditer(r'(\d{1,3})\s*个需登录站点', _l6):
+                        if int(_m6.group(1)) != _ntot:
+                            bad(_f6, '「需登录站点」声明 %s ≠ 实测 §1 %d + §1.1 %d = %d（行 %d）'
+                                % (_m6.group(1), _n1, _n11, _ntot, _i6))
+                    _m6b = re.search(r'§1\s*主表\s*(\d{1,3})\s*\+\s*§1\.1\s*补充\s*(\d{1,3})', _l6)
+                    if _m6b and (int(_m6b.group(1)) != _n1 or int(_m6b.group(2)) != _n11):
+                        bad(_f6, '「需登录站点」分项声明 %s + %s ≠ 实测 %d + %d（行 %d）'
+                            % (_m6b.group(1), _m6b.group(2), _n1, _n11, _i6))
+
     # 交付树文件总数：README 声明的「release 分支 = 纯净交付树（N 个文件）」必须等于交付集实际文件数。
-    # 交付集口径 = 排除 .git/.idea/.learnbuddy/__pycache__/_build 与过程文档（与负向自测的复制口径一致）。
-    # 另排除开发侧版本控制元数据 `.gitignore`（release 树无此文件，实测 `git ls-tree release` 176 项）。
+    # 交付集口径 = 排除 .git/.idea/.learnbuddy/__pycache__/_build/.github 与过程文档（与负向自测的复制口径一致）。
+    # 另排除开发侧版本控制元数据 `.gitignore`（release 树无此文件）。
     # ⚠️ `.gitattributes` **不排除** —— 它确实在 release 树里（与 main 同 blob），算进去才与
-    # 「release 分支 = 纯净交付树（176 个文件）」同解；把它一并排除会得到 175，反而与事实不符。
-    # 为什么加：该计数曾长期停留在 173（实际 176），而四个校验器全绿。
+    # 「release 分支 = 纯净交付树（177 个文件）」同解；把它一并排除会得到 176，反而与事实不符。
+    # 为什么加：该计数曾长期停留在 173（实际 177），而四个校验器全绿。
     # 为什么不用 git 当唯一真值：负向自测在**无 .git 的临时树**上跑，只认 git 的断言在负向测试里会空转。
     _deliv = 0
     for _b5, _d5, _fs5 in os.walk('.'):
-        _d5[:] = [d for d in _d5 if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
+        _d5[:] = [d for d in _d5
+                  if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')
+                  and d not in DELIV_EXCLUDE_DIRS]
         _deliv += len([f for f in _fs5
                        if f not in DEV_ONLY_DOCS and f not in DELIV_EXCLUDE_FILES])
     if _deliv:
@@ -1037,9 +1086,9 @@ def run_round(r):
                 bad('README.md', '交付集文件数 %d ≠ release ref %d（工作树与 release 不一致）'
                     % (_deliv, _nr))
 
-    # qihang.sh status 的 1 级清单 == library/ 实际文件（INSTALL.md 声明「逐行列出 11 个」）
-    # 为什么加：实测该循环漏列 external-bridge.md / general-fallback.md（9/11），
-    # 而 selfcheck 只断言 library 文件数 = 11，不断言「被列出的」是不是同一批。
+    # qihang.sh status 的 1 级清单 == library/ 实际文件（INSTALL.md 声明「逐行列出 12 个」）
+    # 为什么加：实测该循环漏列 external-bridge.md / general-fallback.md（9/12），
+    # 而 selfcheck 只断言 library 文件数 = 12，不断言「被列出的」是不是同一批。
     if os.path.exists('scripts/qihang.sh'):
         _qs = rd('scripts/qihang.sh')
         _blk = re.search(r'\[1级\] skill 库"(.*?); do', _qs, re.S)
@@ -1098,7 +1147,8 @@ def run_round(r):
         _occ = collections.Counter()
         for _b8, _d8, _fs8 in os.walk('.'):
             _d8[:] = [d for d in _d8
-                      if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
+                      if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')
+                      and d not in DELIV_EXCLUDE_DIRS]
             for _f8 in _fs8:
                 if _f8 in DEV_ONLY_DOCS or _f8 in DELIV_EXCLUDE_FILES:
                     continue
@@ -1269,7 +1319,11 @@ def run_round(r):
             if lk:
                 bad(f, '输出块泄漏内部名 %d 处: %s' % (len(lk), '、'.join(lk[:6])))
             labels = re.findall(r'^【([^】]+)】', o, re.M)
-            if labels and labels[0] != '结论' and '还需确认' not in labels[0]:
+            if labels and '还需确认' in labels[0]:
+                # 追问变体（output-spec §2）：首节【还需确认】合法，但不得同时出现【结论】。
+                if '结论' in labels:
+                    bad(f, '追问变体不得同时出现【结论】（首节【%s】）' % labels[0])
+            elif labels and labels[0] != '结论':
                 bad(f, '输出块未「结论前置」（首节为【%s】）' % labels[0])
             if len([x for x in labels if '下一步' in x]) != 1:
                 bad(f, '输出块【下一步】应恰好 1 个，实为 %d 个'

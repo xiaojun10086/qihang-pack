@@ -303,11 +303,13 @@
 
 ---
 
-## 十一、全量外链自查（2026-10-03）· 148 条外链 · 三通道交叉
+## 十一、全量外链自查（2026-10-03 三通道交叉；2026-10-04 补录后重算）· 174 条外链
 
 **为什么重做**：此前各轮都只用**一条**出网通道（WebFetch 或 `node fetch`），
 且部分轮次把「本机抓取失败」直接判为「站点失效」→ 结论里混入了**通道噪声**。
-本轮改为**多通道交叉**：任一条通道成功即算可达；「不存在」必须**三条独立 DNS 通道一致**才成立。
+本轮改为**多通道交叉**：任一条通道成功即算可达；「解析层查不到记录」必须
+**D1/D2/D3 三条独立公共解析通道一致否定**，且 **D4 直查权威 NS 得到授权级 NXDOMAIN**，
+才能作为**实测事实**登记（**且不据此断言「站点不存在」** —— 见 §11.5 口径）。
 
 ### 11.1 方法（可复现）
 
@@ -316,24 +318,33 @@
 | **D1** | `socket.getaddrinfo` ×5 次（间隔重试） | 系统解析 |
 | **D2** | AliDNS DoH `https://dns.alidns.com/resolve` | 独立解析商 ① |
 | **D3** | DNSPub DoH `https://doh.pub/dns-query` | 独立解析商 ② |
+| **D4** | **直查权威 NS**（`nslookup <名> 202.118.66.6`，2026-10-04 加） | **授权应答**，不受公共解析器缓存 / 限流影响 |
 | **T** | `socket.create_connection` 测 **80 / 443** 端口 | 与 HTTP 层无关的「有没有服务在听」 |
 | **G** | 双协议实抓（HTTP 与 HTTPS **各重试 3 次**）→ 状态码 + 最终 URL + `<title>` | 真实页面 |
-| **旁证** | 主机侧 WebFetch（**另一条出口**）+ WebSearch 抓校方官方通知 | 判定「站点身份」，不只判「通不通」 |
+| **旁证** | 校方官方目录（`www.dlut.edu.cn/xbxy.htm` / `…/zzjg.htm`）+ 主机侧 WebFetch（**另一条出口**） | 判定「站点身份」与「官方是否仍挂此链」，不只判「通不通」 |
 
 > ⚠️ **通道自身的坑（本轮实测）**：① 主机侧 WebFetch **会把 http 强制升级为 https**，
-> 因此它对 8 个「仅 HTTP」站点一律报 `fetch failed` —— **不能**据此判它们失效；
+> 因此它对 15 个「仅 HTTP」站点一律报 `fetch failed` —— **不能**据此判它们失效；
 > ② AliDNS 偶尔返回 `Status=2`（SERVFAIL，限流/抖动），**对可达站点也会出现**，
-> 故 `alidns:2` **不作**失效证据，只作参考。
+> 故 `alidns:2` **不作**失效证据，只作参考；
+> ③ 本机出网**只能到达 AliDNS / DNSPub**，`dns.google` 与 `cloudflare-dns.com` 均不可达 ——
+> 故「多解析商交叉」实为**两家**，需与 **D4 权威应答**合用才构成充分证据。
 
 ### 11.2 总量与结论
 
-- 范围：包内**唯一外链 148 条 / 出现 523 处**；其中 **DUT 域内 118 条 / 485 处**，非 DUT 站点 30 条
+- 范围：包内**唯一外链 174 条 / 出现 553 处**；其中 **DUT 域内 144 条 / 515 处**，非 DUT 站点 30 条
   （`github.com` 11 条等）—— 口径与复现命令见 §11.7 ①（`http` 与 `https` 视为同一条、去尾斜杠）。
+- 📌 **2026-10-04 补录**：登录站清单新增 26 条外链（首轮 19 条 + 第二轮 7 条：办事大厅
+  `ehall`、自助证明打印 `eproofweb`、认证大屏 `apm`、国际学生系统 `is`、问卷系统 `dlutwj.wjx.cn`、
+  成果转化 `tt`、校园网测速 `speedtest`），本节四数按**同一口径**重算为
+  `174 / 553 / 144 / 515`（非 DUT 仍 30 条 —— `dlutwj.wjx.cn` 按「URL 含 `dlut`」口径计入 DUT 侧）。
+  新增条目的溯源与逐条实测见 `dlut-login-sites.md` §0.3 / §1.1；这 26 条已单独实抓
+  （200 / 302 / 303），**未并入**下表 2026-10-03 的可达性分布快照。
 - ⚠️ **口径更正**：本节初版写「唯一外链 138 条 / 引用 654 处」，但**未声明口径**，且 §11.7 的
   复现命令指向**从未随包交付**的 `urlcheck.py` → 该两数**无法复现**（已删）。现按 §11.7 ① 重算，
   并由 `scripts/aligncheck.py` 断言：改了链接不同步本节 → 直接 FAIL。
 - ⚠️ **可达性分布是快照、未复测**：下表 `135 / 1 / 1 / 1` 之和 = 138，是 **2026-10-03 网络实测**
-  的当时口径（口径未记录），与上行的「唯一外链 148 条」**不是同一口径**，勿混用。
+  的当时口径（口径未记录），与上行的「唯一外链 174 条」**不是同一口径**，勿混用。
 - **135 条 200 ｜ 1 条 404 ｜ 1 条 NXDOMAIN ｜ 1 条为通配写法（非真实 URL）**。
 
 | 判定 | 条数 | 说明 |
@@ -358,26 +369,75 @@
 （生成链第 23 层 `step60_url_audit.py`）。这也是「依据里的链接进不去」的**第三个独立根因**
 （前两个是 URL 紧贴中文、http 被浏览器升级为 https）。
 
-### 11.4 「仅 HTTP」站点清单（8 条 · 勿手动改 https）
+### 11.4 「仅 HTTP」站点清单（15 个主机 · 勿手动改 https）
 
-`jxgl`（裸根 / `/student/home` / `/student/ucas-sso/login`）· `lx` · `map` · `pay` · `tulip` · `etd.lib`
+> **2026-10-04 更正**：本节初版写「8 条」却只列出 **6 个主机**（把 `jxgl` 的三个路径算作三条）
+> → **数量与清单都不符**。现按**双协议对照实测**重列：下表中 **15 个主机的 443 全部无服务**
+> （`ECONNREFUSED` 或超时），而 **80 端口全部有服务在听**。**必须写 http**。
 
-> 实测：这 8 条的 **443 端口均无监听**，`https://` 版本在多种通道下均失败；
-> 而 `http://` 版本返回 200。**必须写 http**。
-> 反向案例：`https://yjszs.dlut.edu.cn/zsbm` **只有 443**（无 80），故必须写 https。
+| 主机（包内引用路径） | `http://` 实测 | `https://` 实测 | 包内引用处 |
+|---|---|---|---|
+| `jxgl.dlut.edu.cn`（裸根 · `/student/home` · `/student/ucas-sso/login`） | 404 · 200 · 200 | **拒绝连接** | `config.yaml` + `domains/S1`·`S3` 等 + 三个 `references/` |
+| `aigw.dlut.edu.cn` | 200 | **超时** | `dlut-login-sites.md` |
+| `dutsa.dlut.edu.cn/cas/account/index` | 302 → SSO | **拒绝连接** | `dlut-login-sites.md` |
+| `dutxg.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` |
+| `ecardpayment.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` |
+| `etd.lib.dlut.edu.cn` | 200 | **超时** | `dlut-official-sites.md` |
+| `is.dlut.edu.cn/isms/user/tylogin` | 303 → 登录页 | **拒绝连接** | `dlut-login-sites.md` |
+| `lx.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` + `dlut-official-sites.md` + `domains/F1` |
+| `map.dlut.edu.cn` | 200 | **超时** | `dlut-official-sites.md` + `domains/R6` |
+| `pan.dlut.edu.cn/cas` | 303 → SSO | **拒绝连接** | `dlut-login-sites.md` |
+| `pay.dlut.edu.cn` | 302 → SSO | **超时** | `dlut-login-sites.md` + `dlut-official-sites.md` + `domains/F4` |
+| `speedtest.dlut.edu.cn` | 200 | **拒绝连接** | `dlut-login-sites.md` |
+| `szdx.dlut.edu.cn` | 200 | **超时** | `dlut-login-sites.md` |
+| `tulip.dlut.edu.cn` | 302 | **超时** | `dlut-login-sites.md` + `dlut-official-sites.md` |
+| `xinlixlt.dlut.edu.cn/xlogin/cas` | 302 → SSO | **超时** | `dlut-login-sites.md` |
 
-### 11.5 「不存在」的判定（三通道一致才成立）
+> **其中 7 个（`aigw` / `dutsa` / `dutxg` / `ecardpayment` / `is` / `speedtest` / `szdx`）是
+> 2026-10-04 登录站清单新增后才出现在包内的**，故初版「8 条」未含。
+> 反向案例（**只有 443、无 80，故必须写 https**）：`yjszs.dlut.edu.cn/zsbm`、
+> `tt.dlut.edu.cn`（http 路径实测 000）。
+> **例外（可升级协议）**：`eproof.dlut.edu.cn` 的 `sso/login.jsp` 入口（包内以 HTTP 写法登记）
+> **会 302 升级到 https 并可用**，故**不属于**本节 15 个「仅 HTTP」主机。
 
-| 域名 | 项目中的用途 | D1 | D2 | D3 | TCP | 判定 |
-|---|---|---|---|---|---|---|
-| `xyz.dlut.edu.cn` | **负向示例里的假 URL**（`library` 校验 5 的例子） | 失败 | NXDOMAIN | NXDOMAIN | 关 | **确不存在**（示例用，符合预期） |
-| `law.dlut.edu.cn` | 曾用以论证「法学院无独立站」 | 失败 | NXDOMAIN | NXDOMAIN | 关 | **确不存在** → 「无独立站」成立 |
-| `pjlsm.dlut.edu.cn` | 盘锦·生命科学与药学学院 | 失败 | NXDOMAIN | NXDOMAIN | 关 | **确不存在** → 已并入 `hyxy` |
-| `pjzsjy.dlut.edu.cn` | 盘锦校区招生与就业 | 失败 | SERVFAIL | NXDOMAIN | 关 | **确不存在** → 改用 `panjin` / `zs` |
-| `eee.dlut.edu.cn` | 电气老域名 | 失败 | SERVFAIL | NXDOMAIN | 关 | **确不存在** → 用 `ee` |
-| `smedut.dlut.edu.cn` | 集成电路老域名 | 失败 | NXDOMAIN | NXDOMAIN | 关 | **确不存在** → 用 `ic` |
-| `ssdut.dlut.edu.cn` | 软件学院老域名 | 失败 | NXDOMAIN | NXDOMAIN | 关 | **确不存在** → 用 `ss` |
-| `life.dlut.edu.cn` | 生物工程老域名 | 失败 | NXDOMAIN | NXDOMAIN | 关 | **确不存在** → 用 `biotech` |
+### 11.5 「解析层查不到记录」的判定（2026-10-04 加 D4 权威 NS 复核）
+
+> **⚠️ 判定口径（先读这段）**：本节**只登记「解析层查不到记录」这一实测事实**，
+> **不据此断言「站点不存在」** —— 一个域名查不到，可能是**已迁移到新域名**（本节同时给出后继域名
+> 并逐条实测）、也可能只是**当前解析视图下无记录**。**「不存在」是需要人工复查的判断，不是本节的结论。**
+> 下表「判定」列写的都是**可复现的实测事实**（`NXDOMAIN` / `SERVFAIL`），
+> 处置列写的是**包内应改用哪个域名**。
+
+| 域名 | 项目中的用途 | D1 系统 | D2 AliDNS | D3 DNSPub | **D4 权威 NS** | TCP | 判定（实测事实） | 处置（改用） |
+|---|---|---|---|---|---|---|---|---|
+| `xyz.dlut.edu.cn` | **负向示例里的假 URL**（`library` 校验 5 的例子） | 失败 | NXDOMAIN | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录（示例用，**符合预期**） | 保留为负向示例 |
+| `law.dlut.edu.cn` | 曾用以论证「法学院无独立站」 | 失败 | SERVFAIL | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录 | 法学相关给 `ip.dlut.edu.cn`（实测 200） |
+| `pjlsm.dlut.edu.cn` | 盘锦·生命科学与药学学院 | 失败 | NXDOMAIN | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录 | `hyxy.dlut.edu.cn`（实测 200「化工海洋与生命学院」） |
+| `pjzsjy.dlut.edu.cn` | 盘锦校区招生与就业 | 失败 | SERVFAIL | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录 | `panjin.dlut.edu.cn` / `zs.dlut.edu.cn` |
+| `eee.dlut.edu.cn` | 电气老域名 | 失败 | SERVFAIL | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录（**校方目录页仍挂此旧链**） | `ee.dlut.edu.cn`（实测 200「电气工程学院」） |
+| `smedut.dlut.edu.cn` | 集成电路老域名 | 失败 | NXDOMAIN | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录 | `ic.dlut.edu.cn`（实测 200「集成电路学院」） |
+| `ssdut.dlut.edu.cn` | 软件学院老域名 | 失败 | NXDOMAIN | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录 | `ss.dlut.edu.cn`（实测 200「软件学院」） |
+| `life.dlut.edu.cn` | 生物工程老域名 | 失败 | NXDOMAIN | NXDOMAIN | **NXDOMAIN** | 关 | 无任何解析记录 | `biotech.dlut.edu.cn`（实测 200「生物工程学院」） |
+
+**D4 是什么、为什么它比 D1–D3 强**：`dlut.edu.cn` 的权威 NS 是
+`cedrus.dlut.edu.cn`（202.118.66.6）与 `gingko.dlut.edu.cn`（202.118.66.8），
+SOA 为 `cedrus.dlut.edu.cn. ygh.dlut.edu.cn. 2026092900`。
+**直查权威 NS** 拿到的是**授权应答（authoritative answer）**，不再受公共解析器的缓存与限流影响 ——
+这正是 `law` / `pjzsjy` / `eee` 在 AliDNS 上偶发 `Status=2`（SERVFAIL）的**通道噪声**来源。
+D4 对上述 8 条**全部返回 `Non-existent domain`**，与 D3 一致、与 D2 的抖动不同。
+
+**对照实验（排除「通配解析」造成的假阴性）**：
+
+| 探针 | D4 权威 NS 实测 | 说明 |
+|---|---|---|
+| `zzzz-nope-9931.dlut.edu.cn`（随机假名） | `Non-existent domain` | 与 8 条同结果 → **`dlut.edu.cn` 未开 wildcard**，故 NXDOMAIN 是真否定 |
+| `teach.dlut.edu.cn`（正对照） | `202.118.76.180` | 证明 D4 通道本身工作正常，不是「一律 NXDOMAIN」的假通道 |
+
+**⚠️ 一处「官方死链」（交人工复查）**：校方官方目录
+`www.dlut.edu.cn/xbxy.htm`（「学部学院」）与 `…/xxgk/zzjg.htm`（「组织机构」）
+**至今仍把「电气工程学院」指向 `eee.dlut.edu.cn`（HTTP 老链）**，而该域名四通道一致 NXDOMAIN。
+→ 这是**校方页面未更新**（历史引用），**不是包内错误**，也**不能**反证 `eee` 仍可用。
+故本节措辞一律为「该域名已无解析记录，校方目录仍挂旧链」，**不写**「`eee` 不存在」。
 
 **反例（本轮推翻「已死」认定）**：
 
@@ -432,6 +492,13 @@ PY
 curl -sI http://jxgl.dlut.edu.cn/student/home          # 期望 200
 python -c "import socket;print(socket.getaddrinfo('law.dlut.edu.cn',None))"   # 期望 gaierror
 
+# ②b D4 权威 NS 直查（授权应答，不受缓存 / 限流影响；2026-10-04 加）
+nslookup -type=A law.dlut.edu.cn 202.118.66.6          # 期望 Non-existent domain
+nslookup -type=A eee.dlut.edu.cn 202.118.66.6          # 期望 Non-existent domain
+nslookup -type=A teach.dlut.edu.cn 202.118.66.6        # 期望 202.118.76.180（正对照）
+nslookup -type=A zzzz-nope-9931.dlut.edu.cn 202.118.66.6  # 期望 Non-existent domain（通配对照）
+nslookup -type=NS dlut.edu.cn 202.118.66.6             # 期望 cedrus / gingko
+
 # ③ 三通道 DNS + 端口 + 双协议实抓（D1/D2/D3 + T80/T443 + GET ×3）
 #    ⚠️ 这部分的工具**不在包内**：初版本节写 `python urlcheck.py <仓库根>`，但仓库里
 #    从来没有这个文件（开发期脚本未随包交付）→ 该命令**不可复现**。
@@ -439,7 +506,8 @@ python -c "import socket;print(socket.getaddrinfo('law.dlut.edu.cn',None))"   # 
 ```
 
 > **口径声明**：本节的「可达」= **至少一条通道取到 HTTP 200**；
-> 「不存在」= **D1/D2/D3 三条独立解析通道一致否定**且端口全关。
+> 「解析层查不到记录」= **D1/D2/D3 三条独立公共解析通道一致否定**、**D4 权威 NS 授权级 NXDOMAIN**
+> 且端口全关；本节**不把它表述为「站点不存在」**（见 §11.5 开头口径）。
 > 二者都**不含**「站点内容是否权威、是否需登录」的判断 —— 后者另见 `dlut-site-profiles.md`。
 > **「唯一外链」= 按 ① 归一化后的不同 URL 数**（`http://` 与 `https://` 视为同一条、去尾斜杠），
 > **「出现」= 同一 URL 在包内被引用的总次数**；两数由 `scripts/aligncheck.py` 断言，改链接不同步本节即 FAIL。
