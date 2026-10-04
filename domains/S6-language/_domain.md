@@ -66,7 +66,7 @@
 
 > 以下完整顺序只用于复杂/跨域任务；普通语言练习按「核心使用方式」直接开始一轮短练习。
 
-0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
+0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**（追问口径见 `library/clarity.md` §7）
 1. 1 级库完成**需求明确**（`library/clarity.md`）：先过 §5 例外，未命中的再按关键槽与 `U` 判定
 2. 1 级库完成**域审查**，确认命中 `S6`（`library/domain-review.md`）
 3. 用**库内 skill**（库内 5 个：`lang-drill` · `pronounce-drill` · `ielts-coach` · `academic-english` · `listening-drill`；按需求择一）执行

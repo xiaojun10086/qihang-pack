@@ -61,7 +61,7 @@
 
 ## 执行顺序
 
-0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
+0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**（追问口径见 `library/clarity.md` §7）
 1. 1 级库完成**需求明确**（`library/clarity.md`）：先过 §5 例外，未命中的再按关键槽与 `U` 判定
 2. 1 级库完成**域审查**，确认命中 `R4`（`library/domain-review.md`）
 3. 用**库内 skill**（库内 5 个：`submit-kit` · `rebuttal-structure` · `defense-qa` · `grant-apply` · `patent-draft`；按需求择一）执行

@@ -99,6 +99,22 @@ def inject_dup_row(tree):
     return [p], t
 
 
+def inject_duplicate_step_number(tree):
+    """把 S1 的 `0. **先判红线**` 再补一行 —— 复现曾长期存活的真实缺陷。
+
+    与 inject_dup_row 的差别：那条注入的是**表格行**（B 组「连续重复行」能抓）；
+    这条注入的第二行措辞与首行**不同**（真实缺陷就是这样：两行都编号 0 但文字不一），
+    所以 B 组抓不到，只有 F 组的步骤号结构断言能抓
+    （「先判红线」断言用 re.search，存在即过，对重复行完全无感）。
+    """
+    p = os.path.join(tree, 'domains', 'S1-course-qa', '_domain.md')
+    t = io.open(p, encoding='utf-8').read()
+    for ln in t.splitlines():
+        if re.match(r'^0\.\s*\*\*先判红线\*\*', ln):
+            return [p], t.replace(ln, ln + '\n0. **先判红线**（重复插入的第二步）', 1)
+    return [p], t
+
+
 def inject_build_path(tree):
     p = os.path.join(tree, 'library', 'skill-evolution.md')
     t = io.open(p, encoding='utf-8').read()
@@ -262,6 +278,19 @@ def inject_url_count_drift(tree):
     return [p], t
 
 
+def inject_cross_file_url_count_drift(tree):
+    """把引用方的「148 条外链」改成旧值 138 → aligncheck 应 FAIL（引用方不可漂移）。
+
+    与 inject_url_count_drift 是同一根因的两半：那条改的是**本源文件**的声明，
+    这条改的是**引用方**（official-sites.md）转述的数字。原断言只扫本源文件，
+    所以引用方写旧值能长期存活。
+    """
+    p = os.path.join(tree, 'references', 'dlut-official-sites.md')
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('148 条外链', '138 条外链', 1)
+    return [p], t
+
+
 def inject_delivery_line_wording_drift(tree):
     """把某 skill 的标准交付校验句退回旧措辞「7 项校验」→ aligncheck 应 FAIL（模板句措辞唯一）。"""
     p = first_skill(tree)
@@ -316,6 +345,24 @@ def inject_domain_source_label_drift(tree):
     return [p], io.open(p, encoding='utf-8').read()
 
 
+def inject_oos_overlap(tree):
+    """把裸词「基金」塞回 `out_of_scope_markers` → aligncheck U 应 FAIL。
+
+    这是本仓真实发布过的路由缺陷：越界表声明「优先级最高，压过宽词表」，
+    而「基金」同时是 R4 的合法触发词 → 越界硬停吞掉 R4 的 grant-apply，使其永不可达。
+    """
+    p = os.path.join(tree, 'config.yaml')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], re.sub(r'(out_of_scope_markers:\s*\[)', r'\g<1>基金, ', t, count=1)
+
+
+def inject_oos_skill_md_skew(tree):
+    """只在 SKILL.md §1.5 内联列举里加一个越界词（config.yaml 不动）→ aligncheck U 应 FAIL（两处须同步）。"""
+    p = os.path.join(tree, 'SKILL.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], re.sub(r'(股票 / 彩票 / )', r'\g<1>刷剧 / ', t, count=1)
+
+
 def main():
     base = os.path.join(tempfile.gettempdir(), 'qihang_negtest_%d' % int(__import__('time').time()))
     shutil.copytree(SRC, base, ignore=IGNORE)
@@ -330,6 +377,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
         ('生成器段重复插入（同一行两份）', inject_dup_row,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
+        ('执行顺序步骤号重复（S1 再补一行 `0. 先判红线`）', inject_duplicate_step_number,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck F 步骤号'),
         ('URL 紧贴中文（依据里的链接会被渲染器吞掉）', inject_url_boundary,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck F2'),
         ('外部桥接接线被破坏（降级段退回两档）', inject_bridge_broken,
@@ -362,6 +411,8 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 豁免白名单'),
         ('外链计数漂移（148 条被改回 138 条）', inject_url_count_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链计数'),
+        ('跨文件引用过期（引用方 148 条外链改回 138）', inject_cross_file_url_count_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链引用'),
         ('模板交付句措辞漂移（硬校验 → 校验）', inject_delivery_line_wording_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 模板句唯一'),
         ('子节号引用漂移（output-spec §2.1 → §2.9）', inject_section_ref_dotted_drift,
@@ -372,6 +423,10 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck D2 台账交叉核对'),
         ('仅 _domain.md 一侧改括注（与 SKILL.md 不同源）', inject_domain_source_label_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck D2 两处同源'),
+        ('越界表与接管词表冲突（「基金」塞回越界表）', inject_oos_overlap,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck U 越界表互斥'),
+        ('SKILL.md §1.5 越界词与 config 不同步', inject_oos_skill_md_skew,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck U 越界表同步'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,

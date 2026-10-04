@@ -16,7 +16,7 @@
   python scripts/aligncheck.py .            # 单轮
   python scripts/aligncheck.py . 5          # 连跑 5 轮（校验确定性）
 
-检查项（18 组：A–D、F–Q、S、T）：
+检查项（19 组：A–D、F–Q、S–U）：
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
@@ -25,7 +25,8 @@
   D2 来源标签 ↔ 第三方台账：`**来源**` 口径唯一（自建系 / 改造自 / 方法论思路参考）；
     点名 `owner/repo` ⇒ 须逐条登记于 THIRD_PARTY_NOTICES.md §三（恰好 12 条）；
     `_domain.md` 括注与 SKILL.md 的自建/外部归属须一致
-  F _domain.md 契约：必需小节 / 库内 skill 实体存在 / 「不覆盖→X域」指向存在
+  F _domain.md 契约：必需小节 / 库内 skill 实体存在 / 「不覆盖→X域」指向存在 /
+    执行顺序步骤号 0 起连续无重复
   G 交叉引用：文档里写的路径真实存在；节号引用 `X.md` §N(.M) 须落在目标真实编号内
   H 计数与版本：registry 声明 skill 数 == 实体、版本号全域唯一（含插件清单）
   I commands/*.md：入口可用、引用路径存在
@@ -42,6 +43,9 @@
   S 小节正文非空（空壳标题）：正文完全为空 → FAIL；仅 <8 字 → WARN
   T **输出形态硬契约**：全量输出块零内部名（域代号 / skill 名 / 脚本与库文件名 / 流程词 /
     「红线」）/ 结论前置 / 恰好 1 个【下一步】/ 降级标注只写能力级
+  U 触发门越界表不变式：`out_of_scope_markers` 与接管词表（`learning_markers` / `dlut_markers` /
+    `learning_intents`）**零交集** / 表内无互为子串的冗余项 / SKILL.md §1.5 内联列举 ⊆ 越界表 /
+    「需求主键」「优先级最高」双处声明
 """
 import os, re, sys, json, glob, io, hashlib, collections, subprocess
 
@@ -426,6 +430,16 @@ def run_round(r):
         # 执行顺序必须「先判红线」
         if not re.search(r'0\.\s*\*\*先判红线\*\*', t):
             bad(f, '执行顺序未前置「先判红线」')
+        # 执行顺序步骤号必须「0 起、连续、无重复」。
+        # 防复发：S1 的 `0. **先判红线**` 曾连写两行，而上面这句与 runcheck 的同名断言
+        # 都用 re.search（存在即过），重复行因此长期存活 —— 序号结构本身从未被校验。
+        _ord = re.search(r'^##\s*执行顺序[^\n]*\n(.*?)(?=\n## |\Z)', t, re.S | re.M)
+        _nums = [int(x) for x in re.findall(r'^(\d{1,2})\.\s', _ord.group(1), re.M)] if _ord else []
+        _dup = sorted(set(x for x in _nums if _nums.count(x) > 1))
+        if _dup:
+            bad(f, '执行顺序步骤号重复 %s（同一序号出现多次，列表结构已损坏）' % _dup)
+        elif _nums != list(range(len(_nums))):
+            bad(f, '执行顺序步骤号不连续 %s（应为 0..%d）' % (_nums, len(_nums) - 1))
 
     # ---------- F2 URL 呈现边界（2026-10-03 实测缺陷）----------
     # 触发原因：依据里的 URL 紧贴中文说明时，渲染器会把中文吞进 href → 点开 404。
@@ -1111,6 +1125,26 @@ def run_round(r):
                 bad(_uv, '「DUT 域内外链出现」声明 %s ≠ 实测 %d'
                     % (_m8.group(2), sum(_dut8.values())))
 
+        # 跨文件计数引用：**任何**引用「N 条外链」的活文档都必须等于同一实测值。
+        # 为什么加：`dlut-official-sites.md` 长期引「138 条外链」，而 138 正是本源文件 §11.2
+        # 已明确标注「已被推翻」的初版口径。上面几个断言只扫**本源文件**，守护不到**引用方**，
+        # 于是过期引用在四个校验器全绿的情况下存活 —— 与「唯一外链」那条是同一根因的另一半。
+        # 口径同 §11.2：归一化（http→https、去尾斜杠）后的不同 URL 数。
+        # 只扫 `LIVE_MD`（活文档）：本源文件是历史口径的**合法登记处**（§11.2/§11.3 必须引用旧值），
+        # 且其自身已有更严格断言；校验器源码（*.py/*.sh）含该模式字符串与注入用例字面量，
+        # 纳入扫描会自触。
+        for _f9 in LIVE_MD:
+            if _f9 == _uv:
+                continue
+            try:
+                _t9 = rd(_f9)
+            except Exception:
+                continue
+            for _m9 in re.finditer(r'(\d{1,4})\s*条外链', _t9):
+                if int(_m9.group(1)) != len(_occ):
+                    bad(_f9, '「%s 条外链」引用过期 ≠ §11.2 口径实测 %d'
+                        % (_m9.group(1), len(_occ)))
+
     # 触发门词表同源（config.yaml「词表同源铁律」）：`learning_markers` 必须**逐词等于**
     # 20 域 `## 触发词` 段的并集，且文档里「共 N 词」必须等于该词数。
     # 为什么加：SKILL.md 长期写「共 196 词」（实测 219），而四个校验器全绿 —— 词表规模无人断言。
@@ -1150,6 +1184,67 @@ def run_round(r):
                     if int(_m7.group(1)) != _nlm:
                         bad(_f7, 'learning_markers 词数声明 %s ≠ 实测 %d'
                             % (_m7.group(1), _nlm))
+
+    # ---------- U 触发门：越界表不变式 ----------
+    # 为什么加：「基金」同时进 learning_markers（派生自 R4 `## 触发词`）与 out_of_scope_markers，
+    # 而越界表声明「优先级最高，压过宽词表」→ R4 的 grant-apply 永不可达，而四个校验器全绿。
+    # 越界表是**手工维护的硬停表**，接管词表是**派生表**；硬停必须与派生表零交集，
+    # 否则硬停会静默吞掉合法域路由（多义词归**需求主键 T+O** 判定，不入本表）。
+    def _yaml_words(key):
+        _m = re.search(r'^\s*' + key + r':\s*\[(.*?)\]\s*$', cfg, re.M | re.S)
+        return [x.strip() for x in _m.group(1).split(',') if x.strip()] if _m else None
+
+    _oos = _yaml_words('out_of_scope_markers')
+    if _oos is None:
+        bad('config.yaml', '缺 out_of_scope_markers（越界信号无法校验）')
+    elif not _oos:
+        bad('config.yaml', 'out_of_scope_markers 为空（越界信号失效）')
+    else:
+        if len(set(_oos)) != len(_oos):
+            bad('config.yaml', 'out_of_scope_markers 含重复项')
+        _takeover = (set(_lmw) if _mlm else set()) \
+            | set(_yaml_words('dlut_markers') or []) \
+            | set(_yaml_words('learning_intents') or [])
+        _clash = sorted(set(_oos) & _takeover)
+        if _clash:
+            bad('config.yaml', '越界词与接管词冲突 %d 个（越界优先级最高，会吞掉域路由）: %s'
+                % (len(_clash), '、'.join(_clash)))
+        _dup = sorted({b for a in _oos for b in _oos if a != b and a in b})
+        if _dup:
+            bad('config.yaml', '越界表含冗余子串项（子串匹配下恒被更长项覆盖）: %s'
+                % '、'.join(_dup))
+        _sk = rd('SKILL.md')
+        _s15 = section(_sk, r'^###\s*1\.5\s*越界信号[^\n]*$')
+        if _s15 is None:
+            bad('SKILL.md', '缺 §1.5 越界信号段')
+        else:
+            # 列举形如「电影 / 电视剧 / … / 菜谱 … → 直接按普通助手回答。」
+            _inline, _seen = [], False
+            for _ln in _s15.splitlines():
+                if 'out_of_scope_markers' in _ln:
+                    _seen = True
+                    continue
+                if not _seen:
+                    continue
+                if '→' in _ln:
+                    _inline += _ln.split('→')[0].split('/')
+                    break
+                if '/' in _ln:
+                    _inline += _ln.split('/')
+            _inline = [x.replace('…', '').strip() for x in _inline]
+            _inline = [x for x in _inline if x]
+            if not _inline:
+                bad('SKILL.md', '§1.5 未能解析出内联越界词（列举格式已变）')
+            _ex_inline = sorted(set(_inline) - set(_oos))
+            if _ex_inline:
+                bad('SKILL.md', '§1.5 内联越界词不在 config.yaml 越界表内: %s'
+                    % '、'.join(_ex_inline))
+        # 判据双处声明：单词命中≠接管（主键 T+O）；越界优先级最高
+        for _f8, _t8, _needs in (('config.yaml', cfg, ('需求主键', '优先级最高')),
+                                 ('SKILL.md', _sk, ('归属由主键定', '优先级最高'))):
+            for _n8 in _needs:
+                if _n8 not in _t8:
+                    bad(_f8, '触发门判据缺「%s」（单词命中≠接管 / 越界优先）' % _n8)
 
     # ---------- T 输出形态硬契约（全量输出块零内部名） ----------
     # 与 runcheck.py 的 L3-5 的差别：runcheck 只校验**首块**（正常路径示例），

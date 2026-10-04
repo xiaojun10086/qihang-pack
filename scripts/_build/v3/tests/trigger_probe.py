@@ -3,15 +3,20 @@
 """触发门 + 降级档序 · **真机演练**（build 侧工具，不随包分发）。
 
 为什么要有它：`selfcheck [8d]` 只证明「文本在位」，**证明不了流程真的成立**。
-本脚本把两件事真跑一遍：
-  ① **触发门**：从 `config.yaml` 的 `trigger` 段取标记词，对样例输入判「接管 / 不接管」；
-  ② **档序**：对接管的输入走 档1 同域库内 → 档2 外部桥接（可 live 真检索）→ 档3 自生成，
+本脚本把三件事真跑一遍：
+  ① **触发门**：从 `config.yaml` 的 `trigger` 段取标记词，对样例输入判「接管 / 不接管」。
+     越界信号（`out_of_scope_markers`）**优先级最高，命中即不接管**；token 级探测判不了的样例
+     （多义词，如「面试用」）**如实移交主键 T+O 判定**，**绝不用改写输入的方式伪造结论**；
+  ② **越界表不变式**：越界表与三张接管词表**零交集**、表内无冗余子串项、各域触发词不被硬停吞掉
+     （本项曾缺失 → R4 `grant-apply` 被「基金」硬停吞掉、永不可达而无人报警）；
+  ③ **档序**：对接管的输入走 档1 同域库内 → 档2 外部桥接（可 live 真检索）→ 档3 自生成，
      并**断言档 3 绝不早于档 2**（即"外源检索不成功才能自行生成"）。
 
 用法：
     python scripts/_build/v3/tests/trigger_probe.py [仓库根] [--live]
 """
 import io
+import glob
 import json
 import os
 import re
@@ -29,16 +34,18 @@ CTX = ssl._create_unverified_context()
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 HeadlessChrome/154.0.0.0 Safari/537.36"
 REDLINE = ('F3-wellbeing', 'F5-health')
 
-# 样例输入：[原话, 期望（接管/不接管）]
+# 样例输入：[原话, 期望（接管 / 不接管 / 主键）]
+# 「主键」= token 级探测**判不了**，须由主键 T(任务)+O(对象) 定归属 —— 如实移交，不伪造结论。
 CASES = [
     ('我是大工2026级新生，想规划一下考研', '接管'),
     ('帮我复习一下高数，快考试了', '接管'),
     ('大工图书馆几点开门？', '接管'),
     ('帮我找找有没有现成的文献管理工具', '接管'),
     ('我最近想学 Python，从哪儿开始', '接管'),
-    ('帮我写个冒泡排序（面试用）', '不接管'),
-    ('推荐几部电影看看', '不接管'),
-    ('北京明天天气怎么样', '不接管'),
+    ('帮我写基金申请书，先给个框架', '接管'),      # 回归：曾因越界表含「基金」而永不可达
+    ('帮我写个冒泡排序（面试用）', '主键'),        # 初筛命中「面试」，归属须主键 T+O 判定
+    ('推荐几部电影看看', '不接管'),                # 越界表命中
+    ('北京明天天气怎么样', '不接管'),              # 越界表命中
 ]
 COURSE_ROUTE_CASES = [
     '请帮我规划整门课的学习顺序',
@@ -53,6 +60,11 @@ SELF_ID = re.compile(r'(我是|我就是|咱是|我也是|我们学校|我们大
 
 def rd(p):
     with io.open(os.path.join(ROOT, p), 'r', encoding='utf-8', errors='replace') as fh:
+        return fh.read()
+
+
+def rd_abs(p):
+    with io.open(p, 'r', encoding='utf-8', errors='replace') as fh:
         return fh.read()
 
 
@@ -78,20 +90,28 @@ def main():
     dlut = yaml_list(cfg, 'dlut_markers')
     learn = yaml_list(cfg, 'learning_markers')
     intent = yaml_list(cfg, 'learning_intents')
+    oos = yaml_list(cfg, 'out_of_scope_markers')
     print('真相源 config.yaml trigger：dlut_markers %d 个 ｜ learning_markers %d 个 ｜ learning_intents %d 个'
-          % (len(dlut), len(learn), len(intent)))
+          ' ｜ out_of_scope_markers %d 个'
+          % (len(dlut), len(learn), len(intent), len(oos)))
+    print('=' * 96)
+    route = build_route()
+    print('路由表：由 domains/*/_domain.md 的 `## 触发词` 派生（不再硬编码），共 %d 域' % len(route))
     print('=' * 96)
 
-    ok_rows, bad = [], []
+    ok_rows, bad, defer = [], [], []
     for text, expect in CASES:
-        subject_text = re.sub(r'[（(]面试用[）)]', '', text)
-        hit_d = [m for m in dlut if m in subject_text]
-        hit_l = [m for m in learn if m in subject_text]
-        hit_i = [m for m in intent if m in subject_text]
+        # 越界信号优先级最高：命中即不接管（config.yaml 声明「压过宽词表」）
+        hit_o = [m for m in oos if m in text]
+        hit_d = [m for m in dlut if m in text]
+        hit_l = [m for m in learn if m in text]
+        hit_i = [m for m in intent if m in text]
         hit_s = bool(SELF_ID.search(text))
-        triggered = bool(hit_d or hit_l or hit_i or hit_s)
+        triggered = (not hit_o) and bool(hit_d or hit_l or hit_i or hit_s)
         got = '接管' if triggered else '不接管'
         why = []
+        if hit_o:
+            why.append('越界:' + '/'.join(hit_o[:2]))
         if hit_s:
             why.append('T3自述')
         if hit_d:
@@ -100,15 +120,53 @@ def main():
             why.append('T2词:' + '/'.join(hit_l[:2]))
         if hit_i:
             why.append('T2意图:' + '/'.join(hit_i[:2]))
+        if expect == '主键':
+            # 旧版用 re.sub 把「（面试用）」从输入里删掉，硬凑出「不接管」—— 那是自欺。
+            # 这里如实移交，并断言公开口径已写明，防再次靠改写输入制造绿灯。
+            if hit_o:
+                bad.append((text, '主键移交（越界表不得拦下）', '越界表命中 ' + '/'.join(hit_o)))
+            elif not (hit_l or hit_i):
+                bad.append((text, '主键移交（须有初筛命中）', '无 token 命中，不该进主键判定'))
+            elif '需求主键' not in cfg:
+                bad.append((text, '主键移交（口径须公开）', 'config.yaml 未声明需求主键 T+O'))
+            else:
+                defer.append(text)
+            print('%s %-30s → %-4s  [%s]' % ('⚠️', text[:30], '主键',
+                                            'token 初筛命中 ' + '/'.join((hit_l + hit_i)[:2])
+                                            + '，归属由主键 T+O 定'))
+            ok_rows.append((text, False))   # 真值待主键判定，不参与档序演练
+            continue
         mark = '✅' if got == expect else '❌'
         if got != expect:
             bad.append((text, expect, got))
         print('%s %-30s → %-4s  [%s]' % (mark, text[:30], got, ' ｜ '.join(why) or '三条件均不成立'))
         ok_rows.append((text, triggered))
 
+    # ---- 越界表不变式（真机断言）----
+    # 为什么加：越界表声明「优先级最高，压过宽词表」，而「基金」曾同时进 R4 触发词与越界表
+    # → R4 的 grant-apply 被硬停吞掉、永不可达，当时**没有任何校验器会响**。
+    inv = []
+    for nm, lst in (('learning_markers', learn), ('dlut_markers', dlut),
+                    ('learning_intents', intent)):
+        cl = sorted(set(oos) & set(lst))
+        if cl:
+            inv.append('out_of_scope_markers ∩ %s = %s（越界硬停会吞掉合法域路由）'
+                       % (nm, '、'.join(cl)))
+    dup = sorted({b for a in oos for b in oos if a != b and a in b})
+    if dup:
+        inv.append('越界表含冗余子串项（子串匹配下恒被更长项覆盖）：%s' % '、'.join(dup))
+    for d, kw in route:
+        if kw and not [w for w in kw if w not in oos]:
+            inv.append('域 %s 的全部触发词都在越界表内 → 该域永不可达' % d)
+    print()
+    print('越界表不变式（互斥 / 无冗余 / 各域可达）：%s'
+          % ('✅ 全部成立' if not inv else '❌ %d 项违反' % len(inv)))
+    for x in inv:
+        print('   ❌ %s' % x)
+
     route_bad = []
     for text in COURSE_ROUTE_CASES:
-        got = pick_domain(text, learn, dlut)
+        got = pick_domain(text, route)
         if got != 'S4-exam-prep':
             route_bad.append((text, 'S4-exam-prep', got))
         print('%s %-30s → %s  [课程级路由]'
@@ -122,7 +180,10 @@ def main():
     for text, triggered in ok_rows:
         if not triggered:
             continue
-        dom = pick_domain(text, learn, dlut)
+        dom = pick_domain(text, route)
+        if dom is None:
+            print('  %-28s → 未命中任何域触发词（token 级不可路由）' % text[:28])
+            continue
         skills = local_skills(dom)
         rung, detail = ladder(dom, text, skills)
         print('  %-28s → %s' % (text[:28], detail))
@@ -146,9 +207,16 @@ def main():
 
     print()
     print('=' * 96)
-    print('触发门判定：%d/%d 符合预期' % (len(CASES) - len(bad), len(CASES)))
+    _decided = len(CASES) - len(defer)
+    print('触发门判定：%d/%d 符合预期 ｜ %d 例如实移交主键 T+O 判定'
+          % (_decided - len(bad), _decided, len(defer)))
     for t, e, g in bad:
         print('   ❌ %r 期望 %s 实得 %s' % (t, e, g))
+    for t in defer:
+        print('   ⚠️ %r 由主键 T+O 定归属（token 级探测不适用）' % t)
+    print('越界表不变式：%s' % ('✅ 互斥 / 无冗余 / 各域可达' if not inv else '❌ %d 项违反' % len(inv)))
+    for x in inv:
+        print('   ❌ %s' % x)
     print('课程级路由：%d/%d 命中 S4' % (len(COURSE_ROUTE_CASES) - len(route_bad),
                                       len(COURSE_ROUTE_CASES)))
     for t, e, g in route_bad:
@@ -156,9 +224,10 @@ def main():
     print('档序违规（档 3 早于档 2）：%d 例' % len(order_violation))
     for t, d in order_violation:
         print('   ❌', t, d)
-    print('结论：%s' % ('✅ 触发门、课程级路由与档序均成立'
-                       if not bad and not route_bad and not order_violation else '❌ 有问题'))
-    if bad or route_bad or order_violation:
+    _ok = not bad and not inv and not route_bad and not order_violation
+    print('结论：%s' % ('✅ 触发门、越界表不变式、课程级路由与档序均成立'
+                       if _ok else '❌ 有问题'))
+    if not _ok:
         raise SystemExit(1)
 
 
@@ -189,26 +258,31 @@ def ladder_trail(dom, text, has_local):
     return ' → '.join(steps)
 
 
-# ---- 极简的域路由（演练用；真实运行由 _registry.md 触发词表承担）----
-ROUTE = [
-    ('S4-exam-prep', '考试', '复习', '备考', '整门课', '整本书', '整本教材',
-     '从零学', '从零入门', '系统学'),
-    ('S1-course-qa', '高数', '这道题', '讲解'),
-    ('R1-literature', '文献', '检索', 'paper'),
-    ('R3-research-tools', 'python', '代码', '环境'),
-    ('F7-further-study', '考研', '保研', '留学', '申博'),
-    ('F1-campus-affairs', '图书馆', '教务', '一卡通', '宿舍'),
-    ('F8-career', '简历', '面试', '实习'),
-    ('R6-info-retrieval', '通知', '查一下'),
-]
+# ---- 域路由：由真实 `domains/*/_domain.md` 的 `## 触发词` 派生（不再硬编码 8 域）----
+def build_route():
+    """返回 [(域目录名, [触发词…])]，覆盖全部 20 域。"""
+    route = []
+    for p in sorted(glob.glob(os.path.join(ROOT, 'domains', '*', '_domain.md'))):
+        m = re.search(r'^##\s*触发词[^\n]*\n(.*?)(?=^##\s)', rd_abs(p), re.M | re.S)
+        if not m:
+            continue
+        # 段内反引号也可能包着域代号 / 路径，不是触发词
+        kw = [w for w in re.findall(r'`([^`]+)`', m.group(1))
+              if not re.fullmatch(r'[A-Z]\d', w) and '/' not in w and '.' not in w]
+        if kw:
+            route.append((os.path.basename(os.path.dirname(p)), kw))
+    return route
 
 
-def pick_domain(text, learn, dlut):
+def pick_domain(text, route):
+    """最长匹配优先（更具体的词胜出）；无命中返回 None（token 级不可路由，不编造归属）。"""
     low = text.lower()
-    for d, *kw in ROUTE:
-        if any(k.lower() in low for k in kw):
-            return d
-    return 'S1-course-qa'
+    best, blen = None, 0
+    for dom, kw in route:
+        for k in kw:
+            if len(k) > blen and k.lower() in low:
+                best, blen = dom, len(k)
+    return best
 
 
 def local_skills(dom):

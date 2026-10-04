@@ -47,7 +47,7 @@
 
 ## 执行顺序
 
-0. **先判红线**（见下文 `## ⚠️ 红线`）—— 命中则拒绝并给合规替代。
+0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**（追问口径见 `library/clarity.md` §7）
 1. 清晰、单一的问题直接处理；只有关键信息缺失会改变结果时，才参考 `library/clarity.md` 澄清。复杂任务再按需参照 `library/domain-review.md`。
 2. 按具体任务择一：`advisor-finder`（导师资料）、`campus-search`（校园/一般公开资料）、`notice-track`（通知节点）、`org-lookup`（机构/场馆）。
 3. 事实型输出逐项注明来源、发布日期或访问日期，并区分事实与建议；复杂结果可参考 `library/output-spec.md`。仅在用户要求保存偏好时才参考 `library/skill-evolution.md`，不得自动写入或修改资料。
