@@ -45,10 +45,10 @@ qihang-pack/
 │       └── skills/
 │           └── local/<name>/SKILL.md    ★3 级 · 库内 skill（唯一通道，无需安装）
 ├── references/                  数据与依据
-│   ├── dlut-official-sites.md      DUT 公开站信息库（142 条条目 / 表格行 162）
+│   ├── dlut-official-sites.md      DUT 公开站信息库（142 条条目 / 表格行 162；16 项待人工补）
 │   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
 │   ├── dlut-field-map.md           私密站字段映射表
-│   ├── dlut-url-verification.md    URL 核验台账（16 项待人工补）
+│   ├── dlut-url-verification.md    URL 核验台账（域名可达性 · 外链三通道自查）
 │   ├── dlut-site-profiles.md       18 站画像
 │   ├── browser-matrix.md           浏览器实测矩阵
 │   ├── skill-compliance-audit.md   库内 skill 来源合规自检报告
