@@ -1,7 +1,7 @@
 ---
 name: qihang-task-decompose
 description: 「启航」F2 作息与专注域库内 skill：把大任务拆成 ≤25 分钟可启动动作，配番茄钟执行。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 agent_created: true
 ---

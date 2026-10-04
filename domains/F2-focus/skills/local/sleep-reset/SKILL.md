@@ -1,7 +1,7 @@
 ---
 name: qihang-sleep-reset
 description: 「启航」F2 作息与专注域库内 skill：按可承受步长逐日后移入睡与起床时间，配光照与咖啡因位点。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 

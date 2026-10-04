@@ -1,7 +1,7 @@
 ---
 name: qihang-volunteer-hours
 description: 「启航」F6 军训与志愿域库内 skill：志愿时长/第二课堂要求按月拆解 + 选项目原则 + 记录模板。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 agent_created: true
 ---

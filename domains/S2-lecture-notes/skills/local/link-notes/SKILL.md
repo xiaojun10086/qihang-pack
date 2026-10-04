@@ -1,7 +1,7 @@
 ---
 name: qihang-link-notes
 description: 「启航」S2 课堂与笔记域库内 skill：双链笔记法——用双向链接、标签层级和嵌入引用把讲义、错题、概念连成知识网络；笔记从「文件夹归档」升级为「网状检索」。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 
@@ -96,7 +96,7 @@ license: MIT
 
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+按 `library/output-spec.md` 输出；字段标签不超过 6 个，不限制知识网络的节点、关系或必要说明；
 交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点

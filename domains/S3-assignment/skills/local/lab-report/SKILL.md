@@ -1,7 +1,7 @@
 ---
 name: qihang-lab-report
 description: 「启航」S3 作业与考核域库内 skill：按 IMRAD 给实验报告骨架，分配各节字数，并给出自查清单；正文由学生自己写。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 

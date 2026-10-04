@@ -133,11 +133,23 @@ def inject_missing_course_gate_marker(tree):
     return [p], t[:m.start()] + m.group(1) + ', '.join(words) + m.group(3) + t[m.end():]
 
 
-def inject_identity_drift(tree):
-    """把 INSTALL.md 的身份串改一个字 → selfcheck [8c] 应 FAIL（防身份口径静默漂移）。"""
+def inject_missing_learning_detail_contract(tree):
+    """Remove the learning-detail standard; runcheck must reject the short-answer regression."""
+    p = os.path.join(tree, 'library', 'output-spec.md')
+    t = io.open(p, encoding='utf-8').read()
+    start = t.find('### 1.3.1 学习内容详细模式')
+    end = t.find('\n## 2. 变体', start)
+    if start < 0 or end < 0:
+        return [p], t
+    return [p], t[:start] + t[end:]
+
+
+def inject_identity_lock(tree):
+    """Reintroduce a forced persona declaration; selfcheck [8c] must reject it."""
     p = os.path.join(tree, 'INSTALL.md')
     t = io.open(p, encoding='utf-8').read()
-    t = t.replace('我是连小理智能学伴『启航』', '我是连小理智能助手『启航』', 1)
+    declaration = '我是连小小理' + '智能学伴『启航』'
+    t = t.replace('## 七、安装后行为约定', '## 七、安装后行为约定\n\n' + declaration, 1)
     return [p], t
 
 
@@ -208,12 +220,14 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 三档断言'),
         ('指定检索平台被改成不存在的平台', inject_fake_platform,
          ['@py', 'scripts/extskill.py', '.'], 'extskill 平台登记断言'),
-        ('身份串漂移（INSTALL.md 与 config.yaml 不一致）', inject_identity_drift,
-         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份串一致性'),
+        ('身份声明回归', inject_identity_lock,
+         ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8c] 身份声明删除'),
         ('触发门被移除（SKILL.md 少了触发门小节）', inject_no_gate,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [8d] 触发门'),
         ('整门课词未进入触发门', inject_missing_course_gate_marker,
          ['@py', 'scripts/runcheck.py', '.'], 'runcheck 课程路由完整性'),
+        ('学习详度规则被移除', inject_missing_learning_detail_contract,
+         ['@py', 'scripts/runcheck.py', '.'], 'runcheck 学习内容完整性'),
         ('隔离校验缺失（--profile 可被 daemon 静默忽略）', inject_no_isolation,
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,

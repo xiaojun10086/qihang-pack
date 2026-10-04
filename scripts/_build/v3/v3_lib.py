@@ -132,7 +132,7 @@ def render_skill(ddir, sk):
     A('')
     A('## 输出')
     A('')
-    A('按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；')
+    A('按 `library/output-spec.md` 输出；≤6 限制的是字段标签数，不限制内容点；详细学习请求须覆盖范围并分层讲解。')
     A('交付前须过 `library/output-checklist.md` 的 7 项硬校验。')
     A('')
     A('## DUT 绑定点')

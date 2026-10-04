@@ -1,7 +1,7 @@
 ---
 name: qihang-reading-note
 description: 「启航」S2 课堂与笔记域库内 skill：对论文 / 专著做「主张—证据—疑点」三色标记的段落级精读笔记。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 
@@ -86,7 +86,7 @@ license: MIT
 
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+按 `library/output-spec.md` 输出；用户未要求摘要时，详尽笔记须覆盖材料范围内的重要主张、证据、疑点与来源，不受条目数限制；
 交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点

@@ -1,7 +1,7 @@
 ---
 name: qihang-socratic-qa
 description: 「启航」S1 课程答疑域库内 skill：苏格拉底式追问导学——不直接给答案，用五类渐进提问（澄清 / 深挖 / 连接 / 反例 / 假设）引导用户自己推出结论；卡壳 3 轮自动降级分步讲解。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 
@@ -100,7 +100,7 @@ license: MIT
 
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+按 `library/output-spec.md` 输出；字段标签不超过 6 个，不限制为讲清思路所需的解释层次；
 交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点

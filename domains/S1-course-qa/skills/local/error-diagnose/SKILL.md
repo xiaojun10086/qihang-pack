@@ -1,7 +1,7 @@
 ---
 name: qihang-error-diagnose
 description: 「启航」S1 课程答疑域库内 skill：把错题按概念/方法/计算/审题四类归因，输出错因清单与再练顺序。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 agent_created: true
 ---
@@ -85,7 +85,7 @@ agent_created: true
 
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+按 `library/output-spec.md` 输出；字段标签不超过 6 个，但不删减说明错因所需的证据、步骤和纠正方法；
 交付前须过 `library/output-checklist.md` 的 7 项校验。
 
 ## DUT 绑定点

@@ -1,7 +1,7 @@
 ---
 name: qihang-exam-sprint
 description: 考前冲刺辅导：基于已知考点和剩余时间给出当天能开始的复习安排；只补问会改变计划的关键信息，可附短练习检查掌握度。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 

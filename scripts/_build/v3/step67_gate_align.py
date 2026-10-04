@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------
-# 【v3 生成链 · 第 30 层 · 触发门与域表同源（v3.3.6 → v3.3.7）】
+# 【v3 生成链 · 第 30 层 · 触发门对齐与学习内容详度（v3.3.7 → v3.3.8）】
 #
 # 触发（用户要求「按照相似问题继续自查，这次自查 12 轮以上」）：
 #   新增多轮自查台 `scripts/_build/v3/tests/e2e_rounds.py`（15 轮 / 69 题）→
@@ -36,7 +36,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('-')
                        else os.path.join(HERE, '..', '..', '..'))
-OLD_REV, NEW_REV = '3.3.6', '3.3.7'
+OLD_REV, NEW_REV = '3.3.7', '3.3.8'
 
 # 越界信号：与 DUT、学习、校园生活**均无关**的通用事务（命中即不接管）
 OUT_OF_SCOPE = ['电影', '电视剧', '综艺', '追星', '游戏', '天气', '机票', '火车票', '酒店', '外卖',
@@ -271,15 +271,15 @@ else:
 print('== F) 构建侧层序 ==')
 t = read('scripts/_build/v3/README.md')
 if t:
-    t = t.replace('修订号 → `3.3.6` | 新增层 |', '修订号 → `3.3.7` | 新增层 |')
+    t = t.replace('修订号 → `3.3.6` | 新增层 |', '修订号 → `3.3.8` | 新增层 |')
     write('scripts/_build/v3/README.md', t)
 if t and 'step67_gate_align.py' not in t:
     a = '| 25 | `step66_domain_router.py` |'
     if a in t:
         write('scripts/_build/v3/README.md', t.replace(a,
-              '| 26 | `step67_gate_align.py` | **触发门与域表同源**：`learning_markers` 改为 **20 域触发词并集**（构建期派生）'
+              '| 26 | `step67_gate_align.py` | **触发门同源 + 学习内容详度**：`learning_markers` 改为 20 域触发词并集；学习讲解与笔记覆盖完整、分层组织、来源可追溯'
               '+ `out_of_scope_markers` 越界信号 + `boundary_note`（顺带提及不算）+ SKILL.md §1.5 越界信号'
-              '+ selfcheck [8d] 词表同源断言；修订号 → `3.3.7` | 新增层 |\n' + a, 1))
+              '+ selfcheck [8d] 词表同源断言；修订号 → `3.3.8` | 新增层 |\n' + a, 1))
         print('  [OK]   已登记 step67')
     else:
         print('  [MISS] 层序锚点未命中')

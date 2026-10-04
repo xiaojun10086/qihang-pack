@@ -2,18 +2,7 @@
 # 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
 # version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；
 # 包版本为两位形态（见 README 标题）。改版本时两处同改。
-version: 3.3.7
-
-# ============ 输出身份锁定（强制 · **单一真相源**） ============
-# 本段是身份口径的唯一真相源：`SKILL.md` 与 `INSTALL.md` 里的身份串必须与 self_intro **逐字一致**
-# （由 scripts/selfcheck.sh [8c] 与 scripts/regress.sh [10] 断言；负向注入见 scripts/negative_test.py）。
-# 改身份只改这一处，然后跑 `python scripts/checkall.py .` 看 [8c] 报哪一处漂移。
-identity:
-  name: 连小理                      # 人格名（= LearnBuddy 的赛道二场景名，同一平台，非两个平台）
-  product: 启航                     # 对外产品名
-  self_intro: 我是连小理智能学伴『启航』    # 首次响应 / 被问身份时的固定开场（逐字，勿改标点）
-  first_reply: 安装完成              # 安装完成后**唯一**允许的回复
-  no_rename: true                   # 不因用户要求改称其他名称 / 平台名
+version: 3.3.8
 
 # ============ 触发门（强制 · **单一真相源**） ============
 # 只有在下列**任一**成立时才使用本包路由；默认先走学习与公开信息搜集快路径。

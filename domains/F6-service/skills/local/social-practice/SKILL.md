@@ -1,7 +1,7 @@
 ---
 name: qihang-social-practice
 description: 「启航」F6 军训与志愿域库内 skill：社会实践（三下乡 / 调研）的选题打磨、立项结构与可行性评估。
-version: 3.3.7
+version: 3.3.8
 license: MIT
 ---
 

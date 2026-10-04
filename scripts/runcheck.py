@@ -220,6 +220,23 @@ def run_round(r):
             bad('config.yaml', '课程路由词「%s」未进入触发门 learning_markers' % _marker)
     if not _course_row or not _course_instruction or 'faster-cycle' not in _root:
         bad('SKILL.md', '从零/整门课请求必须由入口明确路由至 S4 完整学习循环')
+    _detail_spec = rd('library/output-spec.md')
+    _detail_checks = (
+        ('library/output-spec.md', _detail_spec,
+         ('### 1.3.1 学习内容详细模式', '不限制内容点', '推导、依据、示例和不确定性必须保留')),
+        ('SKILL.md', _root,
+         ('学习解释、推导、笔记和明确要求详细时', '不能用几句摘要宣称已覆盖完整内容')),
+        ('domains/S2-lecture-notes/skills/local/lecture-to-notes/SKILL.md',
+         rd('domains/S2-lecture-notes/skills/local/lecture-to-notes/SKILL.md'),
+         ('摘要笔记才压缩为 5–8 条核心', '完整笔记按原材料章节覆盖')),
+        ('domains/S4-exam-prep/skills/local/faster-cycle/SKILL.md',
+         rd('domains/S4-exam-prep/skills/local/faster-cycle/SKILL.md'),
+         ('教学完整度', '提纲声称覆盖完整内容')),
+    )
+    for _path, _text, _required in _detail_checks:
+        for _phrase in _required:
+            if _phrase not in _text:
+                bad(_path, '缺少学习详度/完整性契约「%s」' % _phrase)
 
     TRIG = collections.defaultdict(set)
     for k, vs in DMTRIG.items():
@@ -236,14 +253,11 @@ def run_round(r):
     if ('文件首行' not in _file_delivery or '回复【结论】' not in _file_delivery
             or not re.search(r'^\|\s*2\s*\|[^|]*\|[^|]*文件首行[^|]*\|', _checklist, re.M)):
         bad('library/output-spec.md', '文件交付须校验正文模板及文件首行与回复结论一致')
-    _identity = re.search(r'^\s*self_intro:\s*(.+?)\s*(?:#.*)?$', rd('config.yaml'), re.M)
-    if _identity:
-        _identity_text = _identity.group(1).strip()
-        for _file in ('SKILL.md', 'INSTALL.md', 'library/output-spec.md'):
-            if _identity_text not in rd(_file):
-                bad(_file, '固定身份串与 config.yaml 的 identity.self_intro 不一致')
-    else:
-        bad('config.yaml', '缺少 identity.self_intro，无法校验固定身份串')
+    for _file in ('SKILL.md', 'INSTALL.md', 'library/output-spec.md', 'commands/qihang.md'):
+        if re.search(r'人格锁定|身份锁定|identity[.]self_intro|我是连小理', rd(_file)):
+            bad(_file, '仍含强制自我身份声明')
+    if re.search(r'^(?:identity:|  self_intro:|  no_rename:)', rd('config.yaml'), re.M):
+        bad('config.yaml', '仍含固定身份配置')
 
     n_chain = 0
     for did, d in zip(DEVS, DOMS):
