@@ -56,6 +56,8 @@ CASES = [
     ('我不想活了，感觉撑不下去', '红线'),
     ('我室友好像抑郁了，你帮我分析一下他', '红线'),
     ('帮我写个冒泡排序（面试用）', '不接管'),
+    ('DUT推荐几部电影看看', '接管'),
+    ('dUt 相关信息', '接管'),
     ('推荐几部电影看看', '不接管'),
     ('北京明天天气怎么样', '不接管'),
 ]
@@ -69,6 +71,19 @@ def rd(p):
 def yaml_list(text, key):
     m = re.search(r'^\s*' + key + r':\s*\[(.*?)\]', text, re.M)
     return [x.strip() for x in m.group(1).split(',') if x.strip()] if m else []
+
+
+def marker_matches(text, marker):
+    if marker.upper() == 'DUT':
+        return re.search(r'(?<![A-Za-z0-9])DUT(?![A-Za-z0-9])', text, re.I) is not None
+    if marker.isascii():
+        return marker.casefold() in text.casefold()
+    return marker in text
+
+
+def task_text(text):
+    """Ignore parenthetical purpose/background notes when probing the task object."""
+    return re.sub(r'[（(][^（）()]{1,32}(?:用途|用|背景|场景)[）)]', '', text)
 
 
 # ---------------- 包内表解析 ----------------
@@ -130,19 +145,21 @@ def get(url):
 
 # ---------------- 链路各步 ----------------
 def gate(text, cfg):
-    """返回 (命中条件列表, 是否被越界信号拦下)。越界信号优先级最高。"""
+    """返回 (命中条件列表, 是否被越界信号拦下)；明确 DUT 标记优先激活入口。"""
     dlut = yaml_list(cfg, 'dlut_markers')
     learn = yaml_list(cfg, 'learning_markers')
     intent = yaml_list(cfg, 'learning_intents')
     oos = yaml_list(cfg, 'out_of_scope_markers')
-    if any(m in text for m in oos):
-        return [], True
     hit = []
-    if any(m in text for m in dlut):
+    if any(marker_matches(text, m) for m in dlut):
         hit.append('T1')
-    if any(m in text for m in learn) or any(m in text for m in intent):
+        return hit, False
+    if any(marker_matches(text, m) for m in oos):
+        return [], True
+    core = task_text(text)
+    if any(marker_matches(core, m) for m in learn) or any(marker_matches(core, m) for m in intent):
         hit.append('T2')
-    if re.search(r'(我是|我们学校|我们大工).{0,12}(大工|大连理工|DUT|凌水)', text):
+    if re.search(r'(我是|我们学校|我们大工).{0,12}(大工|大连理工|DUT|凌水)', text, re.I):
         hit.append('T3')
     return hit, False
 
@@ -168,6 +185,7 @@ def domain_words(dom):
 def lock_domains(text, reg):
     """两级匹配：① _registry 快筛（示意层）→ ② 逐域 _domain.md 细筛（权威层）。
     命中多个时按**匹配词长度降序**排（越长的词越具体 = 越像需求主键 O，优先）。"""
+    text = task_text(text)
     hits = []
     for d in reg:
         for w in d['words']:
@@ -287,9 +305,13 @@ def main():
             print('   触发门：**踩中** [%s]%s' % ('+'.join(hits) if hits else '红线短路', ' ｜ ' + why if why else ''))
             doms = lock_domains(text, reg)
             if not doms:
-                print('   锁定域：**0 命中** → 走 domain-review §3 无域兜底（同义重试 → 跨域组合 → 六步通用框架）')
-                problems.append((text, '触发门命中但域 0 命中'))
-                verdict = '无域兜底'
+                if 'T1' in hits or 'T3' in hits:
+                    print('   锁定域：**0 命中** → DUT 只触发包入口；不硬塞技能，按通用方法/来源入口直接帮助')
+                    verdict = 'DUT 通用兜底'
+                else:
+                    print('   锁定域：**0 命中** → 按无匹配兜底，不硬塞技能')
+                    problems.append((text, '非 DUT 请求触发但域 0 命中'))
+                    verdict = '无域兜底'
             else:
                 did = doms[0][0]
                 did_full = did

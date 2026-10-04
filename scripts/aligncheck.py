@@ -1268,6 +1268,19 @@ def run_round(r):
             bad('config.yaml', '越界表含冗余子串项（子串匹配下恒被更长项覆盖）: %s'
                 % '、'.join(_dup))
         _sk = rd('SKILL.md')
+        _t1 = set(_yaml_words('dlut_markers') or [])
+        _required_t1 = {'大连理工大学', '大连理工', '大工', 'DUT', 'dlut'}
+        _missing_t1 = sorted(_required_t1 - _t1)
+        if _missing_t1:
+            bad('config.yaml', 'DUT 包入口标记缺少: %s' % '、'.join(_missing_t1))
+        if '即进入本包判定' not in _sk or '不取消 T1' not in _sk:
+            bad('SKILL.md', 'DUT 标记须无条件进入包入口，不能被越界词抵消')
+        if '不覆盖明确 DUT 标记' not in cfg:
+            bad('config.yaml', '越界信号须明确不覆盖 DUT 包入口标记')
+        _dr = rd('library/domain-review.md')
+        for _phrase in ('三层不可混用', '任务目标 + 输入材料/对象 + 所需交付'):
+            if _phrase not in _dr:
+                bad('library/domain-review.md', '三级路由关系缺少「%s」' % _phrase)
         _s15 = section(_sk, r'^###\s*1\.5\s*越界信号[^\n]*$')
         if _s15 is None:
             bad('SKILL.md', '缺 §1.5 越界信号段')

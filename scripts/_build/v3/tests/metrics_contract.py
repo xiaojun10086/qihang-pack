@@ -90,6 +90,32 @@ class MetricsContractTests(unittest.TestCase):
             expected = re.search(r"^version:\s*([\d.]+)\s*$", fh.read(), re.M).group(1)
         self.assertEqual(metrics.REV, expected)
 
+    def test_gate_rejects_non_object_baseline_without_crashing(self):
+        result = metrics.compute([record()])
+        failures, _, _ = metrics.gate(result, [{}])
+        self.assertEqual(len(failures), 1)
+        self.assertIn("基线数据无效", failures[0])
+
+    def test_gate_rejects_incomplete_baseline(self):
+        result = metrics.compute([record()])
+        failures, _, _ = metrics.gate(result, {"n": 1})
+        self.assertEqual(len(failures), 1)
+        self.assertIn("p95_ms", failures[0])
+
+    def test_gate_rejects_baseline_number_outside_float_range(self):
+        result = metrics.compute([record()])
+        baseline = metrics.compute([record()])
+        baseline["p95_ms"] = 10 ** 400
+        failures, _, _ = metrics.gate(result, baseline)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("p95_ms", failures[0])
+
+    def test_gate_accepts_baseline_created_from_metrics(self):
+        sample = [record(), record(exit="deny", redline=1, rl_block=1)]
+        baseline = metrics.compute(sample)
+        failures, _, _ = metrics.gate(metrics.compute(sample), baseline)
+        self.assertEqual(failures, [])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

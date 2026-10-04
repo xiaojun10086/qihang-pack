@@ -65,6 +65,7 @@
       降级率        ≤ 基线 + 3 个百分点
       追问率        ≤ 基线 + 2 个百分点
       turns 均值    ≤ 基线 + 0.2
+      提供的基线必须是有效的 metrics JSON 对象；结构无效时门禁失败。
   回滚阈值（灰度期连续观测）：
       成功率 相对基线 下降 > 2pp ｜ P95 上升 > 30% ｜ 人工接管率 上升 > 3pp ｜ 出现 1 例编造事实
 
@@ -83,6 +84,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import json
+import math
 import os
 import re
 import sys
@@ -179,6 +181,25 @@ def _pct(values, q):
 
 def _avg(values):
     return float(sum(values)) / len(values) if values else 0.0
+
+
+def _validate_baseline(baseline):
+    if not isinstance(baseline, dict):
+        raise MetricsDataError("基线必须是 JSON 对象")
+    if type(baseline.get("n")) is not int or baseline["n"] < 1:
+        raise MetricsDataError("基线 n 必须是正整数")
+    for key in ("p95_ms", "degrade_rate", "ask_rate", "turns_mean"):
+        value = baseline.get(key)
+        if type(value) not in (int, float) or value < 0:
+            raise MetricsDataError("基线字段 %s 必须是有限的非负数" % key)
+        try:
+            finite = math.isfinite(value)
+        except OverflowError:
+            finite = False
+        if not finite:
+            raise MetricsDataError("基线字段 %s 必须是有限的非负数" % key)
+        if key.endswith("_rate") and value > 1:
+            raise MetricsDataError("基线字段 %s 必须在 [0, 1] 范围内" % key)
 
 
 def _validate_record(r, index):
@@ -281,6 +302,11 @@ def compute(recs):
 
 def gate(metrics, baseline=None):
     fails, warns, notes = [], [], []
+    if baseline is not None:
+        try:
+            _validate_baseline(baseline)
+        except MetricsDataError as exc:
+            return ["基线数据无效：%s" % exc], warns, notes
     if not metrics.get("n"):
         return ["无 trace 数据（窗口内 0 条）—— 未采集即视为**未通过门禁**"], [], ["埋点未启用或窗口内无会话"]
     if not metrics.get("eligible"):
@@ -452,6 +478,12 @@ def cmd_check(a):
                 base = json.load(fh)
         except (OSError, ValueError):
             print("metrics: 基线文件不可读，按无基线处理：%s" % a.baseline, file=sys.stderr)
+        else:
+            try:
+                _validate_baseline(base)
+            except MetricsDataError as exc:
+                print("metrics: 基线数据无效：%s" % exc, file=sys.stderr)
+                return 1
 
     _show(m, days=a.days)
     fails, warns, notes = gate(m, base)

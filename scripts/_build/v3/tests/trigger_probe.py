@@ -41,6 +41,9 @@ REDLINE = ('F3-wellbeing', 'F5-health')
 # 「主键」= token 级探测**判不了**，须由主键 T(任务)+O(对象) 定归属 —— 如实移交，不伪造结论。
 CASES = [
     ('我是大工2026级新生，想规划一下考研', '接管'),
+    ('大连理工大学新生咨询一个问题', '接管'),
+    ('dUt 相关信息', '接管'),
+    ('DUT推荐几部电影看看', '接管'),             # T1 入口不能被越界词抵消
     ('帮我复习一下高数，快考试了', '接管'),
     ('大工图书馆几点开门？', '接管'),
     ('帮我找找有没有现成的文献管理工具', '接管'),
@@ -79,6 +82,14 @@ def yaml_list(text, key):
     return [x.strip() for x in m.group(1).split(',') if x.strip()]
 
 
+def marker_matches(text, marker):
+    if marker.upper() == 'DUT':
+        return re.search(r'(?<![A-Za-z0-9])DUT(?![A-Za-z0-9])', text, re.I) is not None
+    if marker.isascii():
+        return marker.casefold() in text.casefold()
+    return marker in text
+
+
 def get(url, timeout=20):
     o = urllib.request.build_opener(urllib.request.HTTPSHandler(context=CTX))
     o.addheaders = [("User-Agent", UA), ("Accept", "application/vnd.github+json")]
@@ -112,15 +123,17 @@ def main():
         # 越界词**只做初筛**；曾把它当最高优先级，于是「室友…打游戏…」这类主键明落 F1、
         # 只因含「游戏」就被硬停的假拦（下面的纯文本不变式查不出这类跨词假拦）。
         dom = pick_domain(text, route)
-        hit_o = [m for m in oos if m in text]
-        hit_d = [m for m in dlut if m in text]
-        hit_l = [m for m in learn if m in text]
-        hit_i = [m for m in intent if m in text]
+        hit_o = [m for m in oos if marker_matches(text, m)]
+        hit_d = [m for m in dlut if marker_matches(text, m)]
+        hit_l = [m for m in learn if marker_matches(text, m)]
+        hit_i = [m for m in intent if marker_matches(text, m)]
         hit_s = bool(SELF_ID.search(text))
         if dom is not None:
             triggered = True
+        elif hit_d or hit_s:
+            triggered = True
         else:
-            triggered = (not hit_o) and bool(hit_d or hit_l or hit_i or hit_s)
+            triggered = (not hit_o) and bool(hit_l or hit_i)
         got = '接管' if triggered else '不接管'
         why = []
         if dom is not None:
