@@ -16,7 +16,7 @@
   python scripts/aligncheck.py .            # 单轮
   python scripts/aligncheck.py . 5          # 连跑 5 轮（校验确定性）
 
-检查项（21 组：A–D、F–Q、S–U、X、Y）：
+检查项（22 组：A–D、F–Q、S–U、X、Y、Z）：
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
@@ -47,9 +47,18 @@
     `learning_intents`）**零交集** / 表内无互为子串的冗余项 / SKILL.md §1.5 内联列举 ⊆ 越界表 /
     「需求主键」「优先级最高」双处声明
   X 学生呈现层：`library/experience.md` 在位（白名单 / 禁止物 / 翻译规则 / 三视图 / 反例 / 起始句型）·
-    1 级清单三处同步 · 输出契约两处指针在位 · 四处入口文案与唯一副本逐条一致 · 组数声明同源
+    1 级清单三处同步 · 输出契约两处指针在位 · 四处入口文案与唯一副本逐条一致
   Y 体验层闭环：澄清门实质歧义驱动（免白复述）· 记忆口径单源（续接固定回话）· 越界仲裁顺序（初筛→终判）·
-    登录交还三步（交还优先于权限叙事）· 体验层自检指标表（零用户数据 / 默认不记录）
+    登录交还三步（交还优先于权限叙事）· 资产一致性指标表（零用户数据 / 默认不记录）
+  Z **契约登记派生校验**（防「同一事实 N 份副本、断言只覆盖实例」）：
+    Z1 组数自派生（代码里几个检查组，文档就必须声明几个 —— 数字不再手写）·
+    Z2 输出字段白名单（输出块里的每个【标签】都必须在 `experience.md` §1 白名单内，且白名单与
+    `output-spec.md` 同源）· Z3 追问变体闭合（声明「追问」的 skill 必须渲染 ≥1 个完整追问变体块，
+    且【还需确认】不得裸写在 fenced 输出块之外；否定式「不追问 / 无需追问 / 拒绝追问」与括注里的
+    提及不算声明）· Z4 域入口卡澄清门句完整性（出现行首标记即须为全句）·
+    Z5 危机转介号码前台可见位（README / INSTALL / experience.md / f3 / f4 / f5）·
+    Z6 域入口卡 skill 名册（卡内「本域 N 个库内 skill」与卡内列出的路径 == 目录实际集合）
+       `CARD_NO_ROSTER` 里的卡一旦补上名册，豁免立即失效并 FAIL（豁免只许收缩）
 """
 import os, re, sys, json, glob, io, hashlib, collections, subprocess
 
@@ -73,6 +82,45 @@ def rd(p):
 # 为什么断言：曾出现「7 项校验」与「7 项硬校验」两版并存（48 / 44 分裂）而全部校验器仍为绿 ——
 # 模板句措辞漂移属校验盲区，只能靠精确断言兜住。
 CANON_DELIVERY_LINE = '交付前须过 `library/output-checklist.md` 的 7 项硬校验。'
+
+# ============================== 契约登记（Z 组用） ==============================
+# 为什么要有这一块：本包绝大多数历史缺陷是**同一事实存在 N 份物理副本，而断言只覆盖其中
+# 一两个实例**（入口文案 5 份、澄清门句 18 份、危机号码 15 份、组数 1 份手写……）。
+# 登记表把「副本位置」本身变成不变式：**表与实体不一致即 FAIL**。
+# 维护口径：新增 / 移动一份副本 → 必须同时改这里的登记项，否则 Z 组会报出未登记；
+# 豁免类登记（`CARD_NO_ROSTER`）只许收缩 —— 豁免不是「先放过」，见该表注释。
+
+# 顶层检查组（字母，无数字后缀）—— 文档里声明的「N 组断言」= len(这个元组)。
+# 数字由代码派生，**不再手写**：曾出现 `_xngroups = 21` 硬编码 + 守卫是 warn()，
+# 结果「文档互相对齐、与代码不一致」也能全绿。
+GROUPS_TOP = ('A', 'B', 'C', 'D', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+              'P', 'Q', 'S', 'T', 'U', 'X', 'Y', 'Z')
+# 子检查组（同一顶层组的补充断言）—— 计入代码实体，但不计入「N 组」的对外口径。
+GROUPS_SUB = ('C2', 'D2', 'F2', 'G2', 'L2', 'L3')
+
+# 域入口卡的「需求明确」全句：18 张卡逐字共用。卡里出现行首标记时必须是**全句**，
+# 防「只改一张卡」造出第 19 种措辞（`qihang-dlut/s1/r6` 是刻意不同的三种入口，不含本标记）。
+CANON_SLOT_LINE = ('1. **需求明确**：读 `library/clarity.md` 拆 6 槽位，算 U；'
+                   '**先过 §5 的 6 条「不追问例外」（优先级 4 红线 > 6 通用知识型 > 1 校情横切 '
+                   '> 2 关键槽齐全 > 5 紧急豁免 > 3 显式要求）**；未命中例外且关键槽 `O/T/D` 缺失 / '
+                   '歧义（`cᵢ = 0.5`）→ 才追问。')
+
+# 危机转介号码的**前台可见位**登记：学生不必先打开域文件就能读到号码。
+# 为什么：号码此前只在 SKILL.md / 两个域文件 / 9 个 skill 里 —— **首页与安装页零出现**，
+# 而 F3 卡只写「转介专业资源」不给号码（等于让处在危机中的学生自己去搜）。
+CRISIS_REQUIRED = {
+    'README.md': ('12356', '010-82951332', '96110'),
+    'INSTALL.md': ('12356', '96110'),
+    'library/experience.md': ('12356', '96110'),
+    'commands/qihang-f3.md': ('12356', '010-82951332'),
+    'commands/qihang-f4.md': ('96110',),
+    'commands/qihang-f5.md': ('12356',),
+}
+
+# 域入口卡的 skill 名册**豁免**（只许收缩）：`qihang-s1.md` 是刻意不列名册的入口卡 ——
+# 它面向「单点提问」，正文明确写「无需强制复述、填齐 6 个槽位」，因而不给「本域 N 个 skill」
+# 的名册与首选。其余 17 张卡必须与 `domains/<D>/skills/local/` 的实际目录逐名一致。
+CARD_NO_ROSTER = ('commands/qihang-s1.md',)
 
 # ---------- 版本号：**单一真相源 = config.yaml**（v3.2.5 起，勿再写死字面量）----------
 # 为什么改：修订号字面量曾硬编码在 101 个文件 / 120 处，其中本文件 10 处；
@@ -159,6 +207,24 @@ def section(text, title_re):
 def output_blocks(t):
     """取出 SKILL.md 里全部 `**输出**` 代码块。"""
     return re.findall(r'\*\*输出\*\*\s*\n\s*\n\s*```\s*\n(.*?)```', t, re.S)
+
+
+def block_labels(b):
+    """输出块里的字段标签序列（首行起逐行 `【X】`）。"""
+    return re.findall(r'^【([^】]+)】', b, re.M)
+
+
+def has_ask_variant(t):
+    """该文件是否至少有一个**完整追问变体块**：首节【还需确认】且全块不含【结论】。
+
+    口径来源 = `library/output-spec.md` §2：「首节必须是【还需确认】，且不得同时出现【结论】」。
+    """
+    for b in output_blocks(t):
+        labels = block_labels(b)
+        if labels and '还需确认' in labels[0] and '结论' not in labels:
+            return True
+    return False
+
 
 def run_round(r):
     del FIND[:]
@@ -839,7 +905,7 @@ def run_round(r):
         if len(_fs) > 1:
             bad('（全域）', '库内 skill 目录名跨域重复「%s」: %s' % (_nm, _fs))
 
-    # S 小节正文非空（防空壳标题：只有标题、正文缺失 —— 读者无法据以执行）
+    # ---------- S 小节正文非空（防空壳标题：只有标题、正文缺失 —— 读者无法据以执行）----------
     # 两个例外不算空壳：① 容器标题（下面直接跟更深一级子节，如 ## 2 → ### 2.1）；
     #                   ② 代码块里的示例标题（非真实小节），因此先屏蔽 ``` 围栏区间。
     for _f in [x for x in MD if x.startswith('library/') or x.endswith('/_domain.md')]:
@@ -1396,12 +1462,6 @@ def run_round(r):
             if _xmiss:
                 bad(_xf, '%s 的起始句型与唯一副本不一致（缺 %s）' % (_xlbl, ' / '.join(_xmiss)))
 
-        # 组数声明同源（防止新增组后文档计数漂移）
-        _xngroups = 21
-        if ('%d 组断言' % _xngroups) not in rd('README.md') or \
-           ('%d 组断言' % _xngroups) not in rd('INSTALL.md'):
-            warn('README.md', 'aligncheck 组数声明与实现不一致（期望「%d 组断言」）' % _xngroups)
-
     # ---------- Y 体验层闭环（B2/B3/C1/C2/C3）----------
     # 体验层的五条规则各自「只有一个副本 + 至少一处断言」，防止再次退化成零断言层。
     _cf = rd('config.yaml')
@@ -1459,18 +1519,146 @@ def run_round(r):
         bad('SKILL.md', '硬规则未声明「看完之后的交还」')
 
     # [Y5] C3 体验层自检指标：5 项静态指标 + 零数据承诺 + 断言源交叉在位
-    _y5 = section(_xt, r'^##\s*7[.、]?\s*体验层自检指标')
+    _y5 = section(_xt, r'^##\s*7[.、]?\s*资产一致性指标')
     if not _y5:
-        bad(XPATH, '缺少 §7「体验层自检指标」')
+        bad(XPATH, '缺少 §7「资产一致性指标」')
     for _m in ('呈现层零内部名', '入口文案单源', '澄清门歧义驱动', '越界仲裁单点', '交还与记忆口径'):
         if _m not in _y5:
             bad(XPATH, '§7 指标表缺项：%s' % _m)
     if '零用户数据' not in _y5 or '默认不记录' not in _y5:
         bad(XPATH, '§7 未声明「零用户数据 / 默认不记录」')
+    # §7 不得自称「体验度量」：本组只证资产自相一致，真实体验须有会话数据（见 e2e-scenarios.md）
+    if '本组不是体验度量' not in _y5 or 'scripts/metrics.py' not in _y5:
+        bad(XPATH, '§7 未声明「本组不是体验度量」或未指向 scripts/metrics.py')
     _y5src = rd('scripts/aligncheck.py') + rd('scripts/regress.sh')
     for _k in ('输出块泄漏内部名', '的起始句型与唯一副本不一致', '实质歧义', '仲裁顺序', '续接固定回话'):
         if _k not in _y5src:
             bad(XPATH, '§7 指标断言的断言源不成立（缺 %s）' % _k)
+
+    # ---------- Z 契约登记派生校验（防「同一事实 N 份副本、断言只覆盖实例」）----------
+    # 本组把「副本位置」本身变成不变式：登记表（见文件头「契约登记」块）= 契约，
+    # 表与实体不一致即 FAIL。新增 / 移动一份副本时必须同步登记表，否则本组报「未登记」。
+    _zsrc = rd('scripts/aligncheck.py')
+
+    # [Z1] 组数自派生：代码里实际有几个检查组，文档就必须声明几个 —— 数字不再手写。
+    # 为什么：此前 `_xngroups = 21` 是硬编码，且守卫是 warn()（文档互相对齐、与代码不一致也全绿）。
+    _zgrp = set(re.findall(r'^[ \t]*#\s*-{4,}\s*([A-Z][A-Z0-9]?)\b', _zsrc, re.M))
+    _ztop = {g for g in _zgrp if not g[-1].isdigit()}
+    _zsub = _zgrp - _ztop
+    if _ztop != set(GROUPS_TOP):
+        bad('scripts/aligncheck.py', 'Z1 顶层检查组与登记表不一致：实测 %s ｜ 登记 %s'
+            % ('、'.join(sorted(_ztop)), '、'.join(sorted(GROUPS_TOP))))
+    if _zsub != set(GROUPS_SUB):
+        bad('scripts/aligncheck.py', 'Z1 子检查组与登记表不一致：实测 %s ｜ 登记 %s'
+            % ('、'.join(sorted(_zsub)), '、'.join(sorted(GROUPS_SUB))))
+    _zn = len(GROUPS_TOP)
+    for _zf in ('README.md', 'INSTALL.md'):
+        if ('%d 组断言' % _zn) not in rd(_zf):
+            bad(_zf, 'Z1 aligncheck 组数声明应为「%d 组断言」（由代码派生，勿手写）' % _zn)
+    if ('检查项（%d 组：' % _zn) not in _zsrc:
+        bad('scripts/aligncheck.py', 'Z1 模块 docstring 组数声明应为「%d 组」（由代码派生）' % _zn)
+
+    # [Z2] 输出字段白名单：输出块里出现的每个【标签】都必须在白名单内；
+    # 白名单真相源 = `library/experience.md` §1 第 2 条（唯一副本），且须与 output-spec.md 同源。
+    # 为什么：此前没有任何断言检查「块里出现的字段名是否在白名单内」—— 自造字段标签可零成本混入。
+    _z1sec = section(rd(XPATH), r'^##\s*1[.、]?\s*前台白名单') or ''
+    _zm = re.search(r'输出字段标签[^\n]*\n\s*(.+)', _z1sec)
+    _zwl = set(re.findall(r'`([^`]+)`', _zm.group(1))) if _zm else set()
+    if len(_zwl) < 8:
+        bad(XPATH, 'Z2 输出字段白名单解析失败（实测 %d 项，应 ≥8）' % len(_zwl))
+    _zos = rd('library/output-spec.md')
+    _zmiss = sorted(w for w in _zwl if w not in _zos)
+    if _zmiss:
+        bad(XPATH, 'Z2 白名单字段 %s 未在 library/output-spec.md 出现（两份副本已漂移）'
+            % '、'.join(_zmiss))
+    for _zf in LOCAL:
+        for _zb in output_blocks(rd(_zf)):
+            for _zl in block_labels(_zb):
+                if _zl not in _zwl:
+                    bad(_zf, 'Z2 输出块字段【%s】不在白名单内（白名单 = %s）'
+                        % (_zl, '、'.join(sorted(_zwl))))
+
+    # [Z3] 追问变体闭合：**声明了追问路径**的 skill 必须渲染 ≥1 个完整追问变体块，且
+    # 【还需确认】不得出现在 fenced 输出块之外。
+    # 为什么：O6 / T 组只在**块已经以【还需确认】开头**时才校验该块 —— 于是「声明追问却只演示
+    # 先给结论」可以零成本通过全部门禁，模型学到的正是被 output-spec §2 明令禁止的形态；
+    # 而「裸写一行【还需确认】」连块都不算，T / Z2 都看不到它。
+    # 声明判定必须排除否定式与括注：`不追问 / 无需追问 / 拒绝追问 / 不再追问` 都是**不追问**，
+    # 而 `（追问模式的前提是用户自愿自推）` 只是提到「追问」二字、并非声明追问路径。
+    # 首版用 `'追问' in v` 把 35 个「不追问」误判成缺口，登记表被灌成 35 项假缺口
+    # （假缺口 = 断言在测自己的正则，不是在测交付物）。
+    _zneg = re.compile(r'(?:不|无需|不需|不必|拒绝|免于|不再|避免)[^，。；、｜|）)]{0,4}追问')
+    _zdecl = []
+    _zbare = []
+    for _zf in LOCAL:
+        _zt = rd(_zf)
+        for _zl in re.findall(r'\*\*澄清判定\*\*[：:]\s*(.+)', _zt):
+            _zl = re.sub(r'（[^）]*）|\([^)]*\)', '', _zl)
+            _zl = _zneg.sub('', _zl.replace('*', '').replace('`', '').replace(' ', ''))
+            if '追问' in _zl:
+                _zdecl.append(_zf)
+                break
+        _zo = _zt
+        for _zbk in output_blocks(_zt):
+            _zo = _zo.replace(_zbk, '')
+        if '【还需确认】' in _zo:
+            _zbare.append(_zf)
+    if _zbare:
+        bad('（全域）', 'Z3 【还需确认】出现在 fenced 输出块之外（裸写形态不被任何断言看到）: %s'
+            % '、'.join(_zbare))
+    _zgap = sorted(_zf for _zf in _zdecl if not has_ask_variant(rd(_zf)))
+    if _zgap:
+        bad('（全域）', 'Z3 声明追问但无追问变体块 %d 个（示例须补一个以【还需确认】开头、'
+                        '不含【结论】的输出块）: %s' % (len(_zgap), '、'.join(_zgap)))
+
+    # [Z4] 域入口卡的澄清门句完整性：卡里出现行首标记即须为 CANON_SLOT_LINE 全句。
+    # 为什么：18 张卡逐字共用同一句，任何「只改一张卡」的局部编辑都会静默造出第 19 种措辞。
+    for _zf in sorted(glob.glob('commands/qihang-*.md')):
+        _zt = rd(_zf)
+        if '1. **需求明确**' in _zt and CANON_SLOT_LINE not in _zt:
+            bad(_zf.replace('\\', '/'), 'Z4 澄清门步骤句被截断/改写（须与 CANON_SLOT_LINE 逐字一致）')
+
+    # [Z5] 危机转介号码前台可见位：学生不必先打开域文件就能读到号码。
+    # 为什么：号码此前只在 SKILL.md / 两个域文件 / 9 个 skill 内 —— 首页与安装页零出现。
+    for _zf in sorted(CRISIS_REQUIRED):
+        _zt = rd(_zf)
+        _zmn = [n for n in CRISIS_REQUIRED[_zf] if n not in _zt]
+        if _zmn:
+            bad(_zf, 'Z5 危机转介号码 %s 未出现在前台位置（见 CRISIS_REQUIRED 登记）'
+                % '、'.join(_zmn))
+
+    # [Z6] 域入口卡的 skill 名册：卡里声称的「本域 N 个库内 skill」与卡内列出的路径必须等于
+    # `domains/<D>/skills/local/` 的**实际目录集合**。
+    # 为什么：卡是人工检索入口（含「首选」指引），名册漂移会让维护者照着卡去找一个已删除的
+    # skill、或漏掉新增的 skill —— 而 M 组只逐字比对卡与域文件的第 4/6 步，名册无人断言。
+    for _zf in sorted(CARD_NO_ROSTER):
+        _zt = rd(_zf)
+        if re.search(r'本域\s*\d+\s*个库内 skill', _zt) or \
+                re.search(r'domains/[\w-]+/skills/local/[\w-]+/SKILL\.md', _zt):
+            bad(_zf, 'Z6 该卡已带 skill 名册，请从 CARD_NO_ROSTER 移除豁免（豁免只许收缩）')
+    for _zf in sorted(glob.glob('commands/qihang-*.md')):
+        _zf = _zf.replace('\\', '/')
+        if _zf in CARD_NO_ROSTER:
+            continue
+        _zt = rd(_zf)
+        _zd = sorted(set(re.findall(r'domains/([\w-]+)/_domain\.md', _zt)))
+        if not _zd:
+            continue
+        if len(_zd) != 1:
+            bad(_zf, 'Z6 入口卡引用了 %d 个域（%s），无法核定 skill 名册' % (len(_zd), '、'.join(_zd)))
+            continue
+        _zdirs = sorted(os.path.basename(os.path.dirname(_zx))
+                        for _zx in glob.glob('domains/%s/skills/local/*/SKILL.md' % _zd[0]))
+        _zlisted = sorted(set(re.findall(r'domains/%s/skills/local/([\w-]+)/SKILL\.md' % _zd[0], _zt)))
+        _zcnt = re.findall(r'本域\s*(\d+)\s*个库内 skill', _zt)
+        if len(_zcnt) != 1:
+            bad(_zf, 'Z6 入口卡未声明「本域 N 个库内 skill」（实测 %d 处）' % len(_zcnt))
+        elif int(_zcnt[0]) != len(_zdirs):
+            bad(_zf, 'Z6 声明「本域 %s 个库内 skill」，实际 %d 个' % (_zcnt[0], len(_zdirs)))
+        if _zlisted != _zdirs:
+            bad(_zf, 'Z6 入口卡 skill 名册与实际目录不一致：漏 %s ｜ 多 %s'
+                % ('、'.join(sorted(set(_zdirs) - set(_zlisted))) or '无',
+                   '、'.join(sorted(set(_zlisted) - set(_zdirs))) or '无'))
 
     # ---------- 汇总 ----------
     nf = sum(1 for x in FIND if x[0] == 'FAIL')

@@ -7,16 +7,20 @@
 
 用法：
     python scripts/checkall.py [树根]              # 全跑（regress 1 轮）
-    python scripts/checkall.py . --quick          # 只跑 selfcheck / aligncheck / runcheck（高频迭代用）
+    python scripts/checkall.py . --quick          # 只跑 selfcheck / aligncheck / runcheck / extskill / metrics（高频迭代用）
     python scripts/checkall.py . --rounds 3       # regress 与两个 py 校验器连跑 3 轮
     python scripts/checkall.py . --negative       # 追加负向自测（断言非空转；较慢）
     python scripts/checkall.py . --limit 600      # 时间预算（秒）；超出只记 WARN，不判 FAIL
 
 判据：全部 PASS → rc 0；任一 FAIL → rc 1。
+**例外**：`metrics` 行是**建议性（advisory）**—— 只报告运行时指标状态，不参与 PASS/FAIL 判定
+（`metrics.py check` 需要一份已冻结的基线，全新环境必然没有；把它判 FAIL 等于把「没有历史数据」
+误报成「质量不达标」）。它只要求自身不崩（rc 0），并且**必须把「无数据」这个事实打印出来** ——
+真实体验证据的缺失不该静默。首次冻结基线的做法见 `scripts/metrics.py` 头部。
 时间只**报告**与提示（超基线记 WARN，不判 FAIL）—— 本机在高负载下会偶发 rc=127 抖动，硬失败会制造假故障。
 
 时间基线（本机实测，2026-10-03）：selfcheck ~27s ｜ audit ~46s ｜ aligncheck ~0.6s ｜ runcheck ~0.3s ｜
-regress ~44s ｜ negative ~3s（2026-10-04 起含「零注入交付树基线」，多跑一遍 checkall → ~30s）｜
+regress ~44s ｜ metrics ~0.1s ｜ negative ~3s（2026-10-04 起含「零注入交付树基线」，多跑一遍 checkall → ~30s）｜
 **--quick 全跑 ~28s ／ full+negative ~121s**。基线只作「速度回归」参照。
 """
 import os, re, sys, time, shutil, subprocess
@@ -70,15 +74,22 @@ def resolve(cmd):
 # 末位数字 = **FAIL 计数的分组序号**（`K` 列表的 `fgrp`）：
 #   计数次序（从 0 开始）；selfcheck/audit 的 FAIL 在最后，aligncheck/runcheck/regress 在最前。
 CHECKS = [
-    ('selfcheck', ['@bash', 'scripts/selfcheck.sh'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '结构 / 计数 / 交叉引用', 2),
-    ('audit', ['@bash', 'scripts/audit.sh'], r'结果:\s*✅\s*(\d+)\s*通过\s*｜\s*⚠️?\s*(\d+)\s*警告\s*｜\s*❌\s*(\d+)\s*失败', '安全 / 合规 / 门禁', 2),
-    ('aligncheck', ['@py', 'scripts/aligncheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '全量文件级对齐', 0),
-    ('runcheck', ['@py', 'scripts/runcheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '静态路由 / 示例 / 输出契约', 0),
-    ('extskill', ['@py', 'scripts/extskill.py', '.'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '外部 skill 桥接（接线 + 登记 + 许可）', 2),
-    ('regress', ['@bash', 'scripts/regress.sh', ROUNDS], r'累计 FAIL\s*=\s*(\d+)', '行为回归（澄清门 / 门禁 / 输出标准）', 0),
+    ('selfcheck', ['@bash', 'scripts/selfcheck.sh'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '结构 / 计数 / 交叉引用', 2, False),
+    ('audit', ['@bash', 'scripts/audit.sh'], r'结果:\s*✅\s*(\d+)\s*通过\s*｜\s*⚠️?\s*(\d+)\s*警告\s*｜\s*❌\s*(\d+)\s*失败', '安全 / 合规 / 门禁', 2, False),
+    ('aligncheck', ['@py', 'scripts/aligncheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '全量文件级对齐', 0, False),
+    ('runcheck', ['@py', 'scripts/runcheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '静态路由 / 示例 / 输出契约', 0, False),
+    ('extskill', ['@py', 'scripts/extskill.py', '.'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '外部 skill 桥接（接线 + 登记 + 许可）', 2, False),
+    ('regress', ['@bash', 'scripts/regress.sh', ROUNDS], r'累计 FAIL\s*=\s*(\d+)', '行为回归（澄清门 / 门禁 / 输出标准）', 0, False),
+    # metrics 是**建议性（advisory）**行：不参与 PASS/FAIL，只要求自身不崩 + 打印出状态。
+    # 为什么加：此前 `scripts/metrics.py` 从未被任何入口调用 —— 死代码，坏了也没人知道；
+    # 且「真实体验证据 = 无」这个事实必须显式出现在自检摘要里，而不是静默缺失。
+    # 为什么不是门禁：`check` 需要已冻结基线（见 metrics.py 头部），全新环境/CI 上必然没有。
+    ('metrics', ['@py', 'scripts/metrics.py', 'report'], r'(?m)「启航」指标报告[：\s｜]+(.*)$',
+     '运行时指标（建议性 · 无数据 = 无真实体验证据）', 0, True),
 ]
 
-BASELINE = {'selfcheck': 35.0, 'audit': 55.0, 'aligncheck': 5.0, 'runcheck': 5.0, 'regress': 60.0}
+BASELINE = {'selfcheck': 35.0, 'audit': 55.0, 'aligncheck': 5.0, 'runcheck': 5.0,
+            'regress': 60.0, 'metrics': 5.0}
 
 print('自检单入口 · 目标树：%s' % ROOT)
 print('模式：%s ｜ regress 轮数 %s ｜ 时间预算 %.0fs' % ('quick' if QUICK else 'full', ROUNDS, LIMIT))
@@ -88,7 +99,7 @@ env['PYTHONIOENCODING'] = 'utf-8'
 
 rows, failed, warned, skipped = [], [], [], []
 t_all = time.time()
-for name, cmd, pat, what, fgrp in CHECKS:
+for name, cmd, pat, what, fgrp, advisory in CHECKS:
     if QUICK and name in ('audit', 'regress'):
         print('-- %-11s 跳过（--quick）' % name)
         continue
@@ -111,7 +122,10 @@ for name, cmd, pat, what, fgrp in CHECKS:
         note = ''
     dt = time.time() - t0
     m = re.search(pat, out)
-    if m:
+    if advisory:
+        bad = 0                      # 建议性：不参与 PASS/FAIL，只要求自身不崩（rc == 0）
+        detail = (m.group(1).strip() if m else '无输出')[:52]
+    elif m:
         nums = [int(x) for x in m.groups()]
         bad = nums[fgrp]
         detail = ' / '.join(str(x) for x in nums)
