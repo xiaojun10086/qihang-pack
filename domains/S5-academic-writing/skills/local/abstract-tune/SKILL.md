@@ -121,4 +121,4 @@ license: MIT
 |---|---|
 | 摘要结构诊断与打磨 | `abstract-tune` |
 | 整篇论文骨架 | `paper-outline` |
-| 英文摘要语言问题 | `cite-normalize` |
+| 英文摘要语言问题 | `academic-english` |

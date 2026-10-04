@@ -289,6 +289,13 @@ def inject_marker_word_dropped(tree):
     return [p], re.sub(r'(, 作文批改)(\])', r'\2', t, count=1)
 
 
+def inject_dlut_marker_dropped(tree):
+    """从 dlut_markers 删除校名入口词 → aligncheck 应 FAIL（宽入口标记契约）。"""
+    p = os.path.join(tree, 'config.yaml')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], re.sub(r'(dlut_markers:\s*\[[^\]]*)大连理工大学,\s*', r'\1', t, count=1)
+
+
 def inject_platform_line_removed(tree):
     """删掉某域「指定检索平台」行 → extskill 覆盖率断言应 FAIL（防域被静默跳过）。"""
     p = os.path.join(tree, 'domains', 'R3-research-tools', '_domain.md')
@@ -453,6 +460,13 @@ def inject_experience_no_metrics(tree):
     return [p], (t[:i] if i >= 0 else t)
 
 
+def inject_silent_checker(tree):
+    """让一个检查器无输出地返回成功；checkall 必须拒绝缺少结果摘要的检查。"""
+    p = os.path.join(tree, 'scripts', 'extskill.py')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], 'import sys\nsys.exit(0)\n' + t
+
+
 def inject_entry_phrase_drift(tree):
     """改掉 README.md 的起始句型（与唯一副本分叉）→ aligncheck X 组应 FAIL。
 
@@ -523,6 +537,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 1 级清单'),
         ('learning_markers 漏掉域触发词', inject_marker_word_dropped,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 词表同源'),
+        ('DUT 包入口漏掉校名标记', inject_dlut_marker_dropped,
+         ['@py', 'scripts/aligncheck.py', '.'], 'DUT 包入口标记缺少'),
         ('某域「指定检索平台」行被删', inject_platform_line_removed,
          ['@py', 'scripts/extskill.py', '.'], 'extskill 平台覆盖率'),
         ('豁免声明被删（R6 无声明放行）', inject_exempt_decl_removed,
@@ -559,6 +575,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 越界仲裁顺序'),
         ('体验层自检指标被删除（C3）', inject_experience_no_metrics,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 体验层自检指标'),
+        ('检查器无摘要但返回成功', inject_silent_checker,
+         ['@py', 'scripts/checkall.py', '.', '--quick'], 'checkall 结果行必需'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,
