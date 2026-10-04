@@ -5,8 +5,11 @@
 为什么要有它：`selfcheck [8d]` 只证明「文本在位」，**证明不了流程真的成立**。
 本脚本把三件事真跑一遍：
   ① **触发门**：从 `config.yaml` 的 `trigger` 段取标记词，对样例输入判「接管 / 不接管」。
-     越界信号（`out_of_scope_markers`）**优先级最高，命中即不接管**；token 级探测判不了的样例
-     （多义词，如「面试用」）**如实移交主键 T+O 判定**，**绝不用改写输入的方式伪造结论**；
+     **严格按 `config.yaml` 的 `arbitration` 顺序**：需求主键 T+O 能锁到 20 域之一 → 接管
+     （越界词只是用途或背景）；主键锁不到 → 再看越界词，命中则不接管；都不成立 → 不接管。
+     越界信号（`out_of_scope_markers`）**只做初筛，不具终判效力**，不得放在主键之前；
+     token 级探测判不了的样例（多义词，如「面试用」）**如实移交主键 T+O 判定**，
+     **绝不用改写输入的方式伪造结论**；
   ② **越界表不变式**：越界表与三张接管词表**零交集**、表内无冗余子串项、各域触发词不被硬停吞掉
      （本项曾缺失 → R4 `grant-apply` 被「基金」硬停吞掉、永不可达而无人报警）；
   ③ **档序**：对接管的输入走 档1 同域库内 → 档2 外部桥接（可 live 真检索）→ 档3 自生成，
@@ -44,8 +47,9 @@ CASES = [
     ('我最近想学 Python，从哪儿开始', '接管'),
     ('帮我写基金申请书，先给个框架', '接管'),      # 回归：曾因越界表含「基金」而永不可达
     ('帮我写个冒泡排序（面试用）', '主键'),        # 初筛命中「面试」，归属须主键 T+O 判定
-    ('推荐几部电影看看', '不接管'),                # 越界表命中
-    ('北京明天天气怎么样', '不接管'),              # 越界表命中
+    ('推荐几部电影看看', '不接管'),                # 越界表命中（且主键落不到任何域）
+    ('北京明天天气怎么样', '不接管'),              # 越界表命中（且主键落不到任何域）
+    ('室友天天打游戏，宿舍关系很僵，帮我出个沟通方案', '接管'),  # 回归：含越界词「游戏」但主键明落 F1，不得硬停
 ]
 COURSE_ROUTE_CASES = [
     '请帮我规划整门课的学习顺序',
@@ -101,17 +105,28 @@ def main():
 
     ok_rows, bad, defer = [], [], []
     for text, expect in CASES:
-        # 越界信号优先级最高：命中即不接管（config.yaml 声明「压过宽词表」）
+        # 仲裁顺序（config.yaml.arbitration，**顺序不可交换**）：
+        #   ① 需求主键 T+O 落在 20 域之一 → 接管（越界词只是用途或背景）
+        #   ② 主键落不到任何域 → 再看是否命中越界词 → 命中则不接管
+        #   ③ 都不成立 → 不接管
+        # 越界词**只做初筛**；曾把它当最高优先级，于是「室友…打游戏…」这类主键明落 F1、
+        # 只因含「游戏」就被硬停的假拦（下面的纯文本不变式查不出这类跨词假拦）。
+        dom = pick_domain(text, route)
         hit_o = [m for m in oos if m in text]
         hit_d = [m for m in dlut if m in text]
         hit_l = [m for m in learn if m in text]
         hit_i = [m for m in intent if m in text]
         hit_s = bool(SELF_ID.search(text))
-        triggered = (not hit_o) and bool(hit_d or hit_l or hit_i or hit_s)
+        if dom is not None:
+            triggered = True
+        else:
+            triggered = (not hit_o) and bool(hit_d or hit_l or hit_i or hit_s)
         got = '接管' if triggered else '不接管'
         why = []
+        if dom is not None:
+            why.append('主键域:' + dom)
         if hit_o:
-            why.append('越界:' + '/'.join(hit_o[:2]))
+            why.append(('越界(仅初筛)' if dom is not None else '越界') + ':' + '/'.join(hit_o[:2]))
         if hit_s:
             why.append('T3自述')
         if hit_d:
@@ -143,8 +158,10 @@ def main():
         ok_rows.append((text, triggered))
 
     # ---- 越界表不变式（真机断言）----
-    # 为什么加：越界表声明「优先级最高，压过宽词表」，而「基金」曾同时进 R4 触发词与越界表
-    # → R4 的 grant-apply 被硬停吞掉、永不可达，当时**没有任何校验器会响**。
+    # 为什么加：越界表若与接管词表有交集，主键已锁定域的输入仍会被硬停吞掉；「基金」曾同时
+    # 进 R4 触发词与越界表 → R4 的 grant-apply 永不可达，当时**没有任何校验器会响**。
+    # 覆盖边界：本项只查「同一个词既在越界表又在触发词表」；**跨词**假拦（输入里同时出现域
+    # 触发词与无关越界词，如「室友…打游戏…」）由上面的主键优先仲裁兜住，不在本项覆盖范围。
     inv = []
     for nm, lst in (('learning_markers', learn), ('dlut_markers', dlut),
                     ('learning_intents', intent)):
