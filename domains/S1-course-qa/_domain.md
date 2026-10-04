@@ -58,8 +58,7 @@
 
 ## 执行顺序
 
-0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝并给合规替代**，**不追问**
-0. **先判红线**（见下文 `## ⚠️ 红线`）—— 命中则拒绝代做并给学习替代。
+0. **先判红线**（见下文 `## ⚠️ 红线` 节）—— 命中则**拒绝代做并给合规学习替代**，**不追问**
 1. 清晰单点问题直接处理；复杂或有歧义时才参照 `library/clarity.md` 与 `library/domain-review.md`。
 2. 按任务择一：`explain-stepwise`（概念/解题）、`error-diagnose`（错因）、`socratic-qa`（互动引导）、`prereq-bridge`（先修断层）、`concept-contrast`（概念辨析）。
 3. 直接讲清当前问题；需要结构化产出时参考 `library/output-spec.md`。只在用户要求保存偏好或长期记录时参考 `library/skill-evolution.md` / `library/memory.md`。
