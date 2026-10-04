@@ -13,9 +13,9 @@ cd "$ROOT" || exit 1
 # 开发树特有内容**不随包分发**，不得参与「产品文档交叉引用 / 阈值一致性」判定。
 # 判据必须两边等价：交付副本既无 .learnbuddy / .git，也无生成器链 scripts/_build。
 # 若源仓库把它们算进来，就会出现「副本全绿、源仓库假阳性 FAIL」的口径漂移。
-#   _EXDIR = 开发树 / IDE / 记忆目录（含生成器链 scripts/_build）
+#   _EXDIR = 开发树 / IDE / 记忆目录（含生成器链 scripts/_build、CI 工作流 .github）
 #   _EXDEV = .gitignore 明列「未随包分发」的过程文档（评审 / 审计 / 验收 / 需求书）
-_EXDIR="--exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea --exclude-dir=_build"
+_EXDIR="--exclude-dir=.learnbuddy --exclude-dir=.git --exclude-dir=.idea --exclude-dir=_build --exclude-dir=.github"
 _EXDEV=""
 for _g in $(grep -E '^references/.*[.]md$' .gitignore 2>/dev/null); do
   _EXDEV="$_EXDEV --exclude=$(basename "$_g")"

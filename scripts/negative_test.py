@@ -5,7 +5,7 @@
 为什么要有它：自检全绿只证明「断言集通过」，不证明「断言集有效」。开发期多次出现
 「注入缺陷后校验器毫无反应」（断言恒真）= 最危险的一类错。本脚本把多类注入固化成常驻测试。
 
-在**临时树**上跑（按交付口径复制：排除 .git / _build / .learnbuddy / __pycache__ / .idea），
+在**临时树**上跑（按交付口径复制：排除 .git / _build / .learnbuddy / __pycache__ / .idea / .github），
 逐类注入 → 跑对应校验器 → 断言**必须 FAIL** → 打印捕获率。真实树**只读**，不写任何文件。
 
 用法：python scripts/negative_test.py [源树] [--with-regress]
@@ -25,7 +25,7 @@ ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 SRC = os.path.abspath(ARG[0]) if ARG else os.path.abspath(os.path.join(HERE, '..'))
 WITH_REGRESS = '--with-regress' in sys.argv
 PY = sys.executable or 'python'
-IGNORE = shutil.ignore_patterns('.git', '_build', '.learnbuddy', '__pycache__', '.idea')
+IGNORE = shutil.ignore_patterns('.git', '_build', '.learnbuddy', '__pycache__', '.idea', '.github')
 
 
 def bash_bin():

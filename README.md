@@ -42,7 +42,12 @@ qihang-pack/
 │   ├── login-policy.md       登录选择原则（A/B/C 三档）
 │   ├── clarity.md            职责1：需求明确（6 槽位 + 澄清门）
 │   ├── domain-review.md      职责2：域审查（锁定/越界/跨域/无域兜底）
+│   ├── domain-review-cases.md  配套：越界用例（含反例）
 │   ├── output-spec.md        职责3：输出规范（模板 + 简略原则）
+│   ├── output-checklist.md   配套：7 项硬校验
+│   ├── memory.md             学习档案：四类内容 + 分层落点 + 敏感域红线
+│   ├── skill-evolution.md    习惯自迭代（只改可改段的非结构性迭代）
+│   ├── external-bridge.md    外部桥接（库内与同域降级都接不住时的桥接档）
 │   ├── general-fallback.md   职责4：通用兜底框架（零 skill 命中也出结果）
 │   └── experience.md         学生呈现层（前台白名单 / 禁止物 / 翻译规则 / 起始句型唯一副本）
 ├── domains/                  ★2 级 · 域（20 个）
@@ -164,7 +169,7 @@ bash scripts/qihang.sh new-term   # 换学期重置
 | 类型 | 文件 | 融入方式 |
 |---|---|---|
 | 公开站 | `references/dlut-official-sites.md` | **142 条**条目（表格行 162），20 个域的 `_domain.md` 各自标注绑定点 |
-| 私密站 | `references/dlut-login-sites.md` | 19 个需登录站点，**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
+| 私密站 | `references/dlut-login-sites.md` | 38 个需登录站点（§1 主表 19 + §1.1 补充 19），**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
 | 校内信息搜集 | `domains/R6-info-retrieval/` | 导师/教师公开资料（`faculty.dlut.edu.cn`、`gs.dlut.edu.cn`）+ 公开信息检索与路由 |
 
 **私密站安全边界**：访问脚本只打开用户可见的本机浏览器，不采集或输出网页内容；使用随机会话和一次性 Profile，退出后清理，不关闭用户的其他浏览器会话。用户自行查看页面，并可选择只分享回答必需的信息。L3 级（缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细）**一律不读取**。

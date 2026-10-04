@@ -47,6 +47,12 @@ EXCL = [
     #   而 `*.sh` 带 `\r` 在 bash 下直接 `$'\r': command not found` → 交付包功能损坏。
     #   → 结论：**信息面风险（低）不值得换功能风险（高）**，`.gitattributes` 保留分发。
     '.gitignore',
+    # 2026-10-04：CI 工作流目录 —— 与 `.gitignore` 同口径，**只服务开发期门禁**：
+    #   它要求 GitHub Actions runner（ubuntu-latest + Python 3.10），对拿到 zip / clone 的
+    #   新生毫无作用；留在交付树只会多一个「这是什么东西」的疑问，且让交付数从 177 变 178。
+    #   配套改动：`scripts/aligncheck.py` 的 `DELIV_EXCLUDE_DIRS`、`negative_test.py` 的 `IGNORE`、
+    #   `selfcheck.sh` 的 `_EXDIR` 三处同步排除（四处同口径，改一处必须改四处）。
+    '.github',
 ]
 
 APPLY = '--apply' in sys.argv
@@ -57,7 +63,7 @@ VDIR = None
 if '--verify-dir' in sys.argv:
     VDIR = sys.argv[sys.argv.index('--verify-dir') + 1]
 ALLOW_DELETE = '--allow-delete' in sys.argv
-# 交付文件数下界（当前 173）。低于它几乎必然意味着 **main 树被误删过**，而不是「本版真的删了东西」。
+# 交付文件数下界（当前 177）。低于它几乎必然意味着 **main 树被误删过**，而不是「本版真的删了东西」。
 MIN_FILES = 150
 
 

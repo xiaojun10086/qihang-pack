@@ -1,0 +1,28 @@
+# 仓库侧 CI：与本地 `python scripts/checkall.py .` **完全同口径**，不自造第二套判据。
+#
+# 为什么要有它：本包的全部质量门禁（selfcheck / audit / aligncheck / runcheck / extskill /
+# regress）此前**只在开发者本机手动跑**，`.git/hooks/` 又只装在本地 —— 新克隆者没有任何门禁，
+# 「靠自觉」是唯一的保障。CI 把同一套断言搬到每次 push / PR 上。
+#
+# 本目录（`.github/`）属**开发侧元数据**，不进 release 交付树；
+# `scripts/aligncheck.py` 的交付集口径已按 `.gitignore` 同口径排除它（见该文件「交付树文件总数」段）。
+name: 自检
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checkall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      # 取 release 分支，让 aligncheck 的「交付集 == release ref」交叉核验在 CI 上也真正生效。
+      # 取不到时该断言自动跳过（aligncheck 内已按 returncode 守卫），不影响其余检查项。
+      - name: 取 release 分支（供交付集交叉核验）
+        run: git fetch --depth=1 origin release:refs/heads/release || true
+      - name: 全量自检
+        run: python scripts/checkall.py .
