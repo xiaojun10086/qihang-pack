@@ -46,7 +46,7 @@ cmd_status() {
   echo "[1级] skill 库"
   for f in library/README.md library/clarity.md library/domain-review.md library/output-spec.md \
            library/memory.md library/login-policy.md library/domain-review-cases.md library/output-checklist.md \
-           library/skill-evolution.md; do
+           library/skill-evolution.md library/external-bridge.md library/general-fallback.md; do
     [ -f "$ROOT/$f" ] && printf '  ✓ %s\n' "$f" || printf '  ✗ %s\n' "$f"
   done
   echo "[2级] 域（库内唯一通道）"
