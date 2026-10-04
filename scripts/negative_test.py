@@ -453,7 +453,7 @@ def inject_oos_priority_supreme(tree):
 
 
 def inject_experience_no_metrics(tree):
-    """C3 回归：§7 资产一致性指标被删除（体验层重新退化为零指标层）。"""
+    """Y5 回归：§7 资产一致性指标被删除（体验层重新退化为零指标层）。"""
     p = os.path.join(tree, 'library', 'experience.md')
     t = io.open(p, encoding='utf-8').read()
     i = t.find('## 7. 资产一致性指标')
@@ -674,7 +674,7 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 登录交还三步'),
         ('越界表改回优先级最高（C1）', inject_oos_priority_supreme,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 越界仲裁顺序'),
-        ('资产一致性指标被删除（C3）', inject_experience_no_metrics,
+        ('资产一致性指标被删除（§7）', inject_experience_no_metrics,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 资产一致性指标'),
         ('检查器无摘要但返回成功', inject_silent_checker,
          ['@py', 'scripts/checkall.py', '.', '--quick'], 'checkall 结果行必需'),
