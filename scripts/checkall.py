@@ -116,7 +116,7 @@ for name, cmd, pat, what, fgrp in CHECKS:
         bad = nums[fgrp]
         detail = ' / '.join(str(x) for x in nums)
     else:
-        bad = 0 if rc == 0 else 1
+        bad = 1
         detail = '未匹配到结果行（rc=%d）' % rc
     ok = (rc == 0 and bad == 0)
     rows.append((name, what, ok, dt, detail, note))

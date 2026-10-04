@@ -453,6 +453,13 @@ def inject_experience_no_metrics(tree):
     return [p], (t[:i] if i >= 0 else t)
 
 
+def inject_silent_checker(tree):
+    """让一个检查器无输出地返回成功；checkall 必须拒绝缺少结果摘要的检查。"""
+    p = os.path.join(tree, 'scripts', 'extskill.py')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], 'import sys\nsys.exit(0)\n' + t
+
+
 def inject_entry_phrase_drift(tree):
     """改掉 README.md 的起始句型（与唯一副本分叉）→ aligncheck X 组应 FAIL。
 
@@ -559,6 +566,8 @@ def main():
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 越界仲裁顺序'),
         ('体验层自检指标被删除（C3）', inject_experience_no_metrics,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck Y 体验层自检指标'),
+        ('检查器无摘要但返回成功', inject_silent_checker,
+         ['@py', 'scripts/checkall.py', '.', '--quick'], 'checkall 结果行必需'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,
