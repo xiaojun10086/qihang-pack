@@ -102,6 +102,8 @@ license: MIT
 
 每条事实带来源与时效；简单查询直接简答。复杂清单可参考 `library/output-spec.md` 与 `library/output-checklist.md`，不强制填满所有字段。
 
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
+
 ## DUT 绑定点
 
 - 信息公开网 https://info.dlut.edu.cn/ （✅）

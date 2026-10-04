@@ -89,6 +89,8 @@ license: MIT
 
 短练习直接给任务与反馈；较长训练计划可参考 `library/output-spec.md`，不强制填满所有字段。
 
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
+
 ## DUT 绑定点
 
 - 外国语学院 https://fld.dlut.edu.cn/

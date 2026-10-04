@@ -86,7 +86,7 @@ agent_created: true
 ## 输出
 
 按 `library/output-spec.md` 输出；字段标签不超过 6 个，但不删减说明错因所需的证据、步骤和纠正方法；
-交付前须过 `library/output-checklist.md` 的 7 项校验。
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点
 

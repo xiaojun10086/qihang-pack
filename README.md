@@ -63,6 +63,11 @@ qihang-pack/
     ├── regress.sh               行为回归（澄清门算例 / 门禁矩阵）
     ├── aligncheck.py            全量文件级对齐审计（18 组断言）
     ├── runcheck.py              结构 / 示例 / 输出契约静态检查（不调用模型或目标平台）
+    ├── extskill.py              外部 skill 桥接静态自检（来源与许可门禁）
+    ├── negative_test.py         负向自测（注入缺陷，断言必须 FAIL）
+    ├── checkall.py              自检单入口（固定顺序 + 逐项计时 + 摘要）
+    ├── metrics.py               指标埋点口径与发布门禁（唯一真相源）
+    ├── dlut-read.sh             DUT 私密站只读访问辅助（方案 A 受控浏览器）
     └── qihang.sh                管理脚本
 ```
 

@@ -25,7 +25,7 @@
 | 分支 | 角色 | 内容 |
 |---|---|---|
 | `main` | **开发树**（唯一真相源） | 全部内容：含生成器 `scripts/_build/`、记忆 `.learnbuddy/`、过程文档 |
-| `release` | **纯净交付树（直接分发给用户）** | `main` 的跟踪树 − `scripts/_build/**` − `.learnbuddy/**` = **173 文件** |
+| `release` | **纯净交付树（直接分发给用户）** | `main` 的跟踪树 − `scripts/_build/**` − `.learnbuddy/**` = **176 文件** |
 
 ```bash
 python scripts/_build/v3/release/release_branch.py            # 只比对（默认，零副作用）
@@ -42,7 +42,7 @@ git push origin main release                                  # 发布
 - ⚠️ **别用 `git diff release..main` 判断「要不要同步」**：它永远会列出 `.learnbuddy/**` 与 `scripts/_build/**`
   （那正是排除项），看着像「积压一大堆」，其实与交付无关。**只看工具的「差异项 = 0 / N」。**
 - **`--apply` 的「防误删闸」**（2026-10-03 实测事故换来）：
-  · 交付文件数 < **150**（当前 173）→ 中止（几乎必然是 main 树被误删）
+  · 交付文件数 < **150**（当前 176）→ 中止（几乎必然是 main 树被误删）
   · 差异里出现任何 **D（删除）** → 中止，并提示如何在 main 上修回；确要删除须加 `--allow-delete`
   · 只比对模式同样提示但不改动；`--apply` 被拦时返回 **rc=2**
   · **为什么需要它**：worktree 里少了文件（如刚 `git checkout release` 过、或写入被中断）时，
