@@ -782,13 +782,17 @@ def run_round(r):
             warn(f, '未声明降级标注 [已降级]')
         # O6 示例输出按 output-spec 校验（**变体无关**，只查规格真约束）
         # 口径真相源 = library/output-spec.md §0–§2，与 runcheck.py 的 L3-5 同源。
-        ob = re.search(r'\*\*输出\*\*\n\n```\n(.*?)```', t, re.S)
-        if not ob:
+        # 扫**全部**输出块（含边界 / 降级 / 拒绝示例），避免第 2 个及以后的示例漏检。
+        obs = re.findall(r'\*\*输出\*\*\n\n```\n(.*?)```', t, re.S)
+        if not obs:
             bad(f, '示例缺「输出」代码块')
-        else:
-            o = ob.group(1)
+        for o in obs:
             labels = re.findall(r'^【([^】]+)】', o, re.M)
-            if '结论' not in labels:
+            # 追问变体（output-spec §2 硬约束）：首节【还需确认】，且不得同时出现【结论】。
+            if labels and '还需确认' in labels[0]:
+                if '结论' in labels:
+                    bad(f, '追问变体不得同时出现【结论】（首节【%s】）' % labels[0])
+            elif '结论' not in labels:
                 bad(f, '示例输出缺【结论】（结论未前置）')
             if '下一步' not in labels:
                 bad(f, '示例输出缺【下一步】（应只给 1 个动作）')
@@ -1315,7 +1319,11 @@ def run_round(r):
             if lk:
                 bad(f, '输出块泄漏内部名 %d 处: %s' % (len(lk), '、'.join(lk[:6])))
             labels = re.findall(r'^【([^】]+)】', o, re.M)
-            if labels and labels[0] != '结论' and '还需确认' not in labels[0]:
+            if labels and '还需确认' in labels[0]:
+                # 追问变体（output-spec §2）：首节【还需确认】合法，但不得同时出现【结论】。
+                if '结论' in labels:
+                    bad(f, '追问变体不得同时出现【结论】（首节【%s】）' % labels[0])
+            elif labels and labels[0] != '结论':
                 bad(f, '输出块未「结论前置」（首节为【%s】）' % labels[0])
             if len([x for x in labels if '下一步' in x]) != 1:
                 bad(f, '输出块【下一步】应恰好 1 个，实为 %d 个'
