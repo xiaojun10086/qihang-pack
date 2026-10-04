@@ -99,7 +99,7 @@ license: MIT
 ## 输出
 
 按 `library/output-spec.md` 输出；≤6 限制的是字段标签数，不限制学习内容、章节要点、推导步骤或例题；
-交付前须过 `library/output-checklist.md` 的 7 项校验。
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点
 

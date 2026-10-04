@@ -88,6 +88,8 @@ license: MIT
 
 短请求先给今天可做的复习动作；较完整的计划可参考 `library/output-spec.md`，不强制补齐所有字段。
 
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
+
 ## DUT 绑定点
 
 - 教学运行保障中心 https://jxyxbzzx.dlut.edu.cn/ （考试安排）

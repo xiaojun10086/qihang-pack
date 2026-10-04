@@ -91,7 +91,7 @@ agent_created: true
 ## 输出
 
 按 `library/output-spec.md` 输出；≤6 限制的是字段标签数，不限制归一后的小节、例题或必要内容；
-交付前须过 `library/output-checklist.md` 的 7 项校验。
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点
 

@@ -97,7 +97,7 @@ license: MIT
 ## 输出
 
 按 `library/output-spec.md` 输出；字段标签不超过 6 个，不限制知识网络的节点、关系或必要说明；
-交付前须过 `library/output-checklist.md` 的 7 项校验。
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点
 

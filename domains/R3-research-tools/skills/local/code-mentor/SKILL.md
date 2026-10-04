@@ -99,7 +99,7 @@ license: MIT
 ## 输出
 
 按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
-交付前须过 `library/output-checklist.md` 的 7 项校验。
+交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点
 

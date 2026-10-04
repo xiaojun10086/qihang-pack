@@ -20,9 +20,10 @@
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
-  D SKILL.md 契约：frontmatter / 归属域 / 必需小节 / 步骤数 / 示例三要素 / 输出字段
+  D SKILL.md 契约：frontmatter / 归属域 / 必需小节 / 步骤数 / 示例三要素 / 输出字段 /
+    输出段须含库内规范引用 + 标准交付校验句（措辞唯一）
   F _domain.md 契约：必需小节 / 库内 skill 实体存在 / 「不覆盖→X域」指向存在
-  G 交叉引用：文档里写的路径真实存在
+  G 交叉引用：文档里写的路径真实存在；节号引用 `X.md` §N(.M) 须落在目标真实编号内
   H 计数与版本：registry 声明 skill 数 == 实体、版本号全域唯一（含插件清单）
   I commands/*.md：入口可用、引用路径存在
   J .codebuddy-plugin/plugin.json：JSON 合法、版本一致
@@ -55,6 +56,12 @@ def warn(f, m): FIND.append(('WARN', f, m))
 def rd(p):
     with open(p, 'r', encoding='utf-8', errors='replace') as fh:
         return fh.read()
+
+# 库内 skill「## 输出」段的标准交付校验句 —— **唯一权威表述**。
+# 真相源：`library/output-spec.md` §4「交付前校验（强制）」+ `library/output-checklist.md` §一。
+# 为什么断言：曾出现「7 项校验」与「7 项硬校验」两版并存（48 / 44 分裂）而全部校验器仍为绿 ——
+# 模板句措辞漂移属校验盲区，只能靠精确断言兜住。
+CANON_DELIVERY_LINE = '交付前须过 `library/output-checklist.md` 的 7 项硬校验。'
 
 # ---------- 版本号：**单一真相源 = config.yaml**（v3.2.5 起，勿再写死字面量）----------
 # 为什么改：修订号字面量曾硬编码在 101 个文件 / 120 处，其中本文件 10 处；
@@ -323,7 +330,10 @@ def run_round(r):
                 bad(f, '归属域写 %s，实际属 %s' % (m.group(1), did))
             for ref in ('library/output-spec.md', 'library/output-checklist.md'):
                 if ref not in t:
-                    warn(f, '未引用 %s' % ref)
+                    bad(f, '未引用 %s' % ref)
+            if t.count(CANON_DELIVERY_LINE) != 1:
+                bad(f, '标准交付校验句出现 %d 次（应恰好 1 次）：%s'
+                    % (t.count(CANON_DELIVERY_LINE), CANON_DELIVERY_LINE))
 
     # ---------- F _domain.md 契约 ----------
     for f in DOMAIN:
@@ -391,12 +401,14 @@ def run_round(r):
                 if not alive:
                     bad(f, '失效引用 → %s' % p)
 
-    # ---------- G2 节号引用（`X.md` §N）必须指向目标文件真实存在的编号小节 ----------
+    # ---------- G2 节号引用（`X.md` §N / §N.M）必须指向目标文件真实存在的编号小节 ----------
     # 防复发：output-spec.md 曾写 `output-checklist.md` §6，而该文件只有 §一/二/三 +
     # 「7 项通用硬校验」的第 6 项 —— 节号漂移不会被路径检查捕获（文件确实存在）。
-    # 口径保守：仅当目标文件确实含「## N.」形式的编号标题时才校验；用 §一/§二 这类
+    # 口径保守：仅当目标文件确实含「## N.」或「### N.M」形式的编号标题时才校验；用 §一/§二 这类
     # 中文编号指向中文节的不做名校验（不同文件编号风格不统一，易假阳性）。
-    _secpat = re.compile(r'`([\w./-]+\.md)`\s*§\s*(\d+)')
+    # ⚠️ 2026-10-03 修正断言空转：原正则只取 `\d+`，`§3.6` 被截成 `3` —— 3 存在即永不报警；
+    #    且 `heads` 只扫 `##`，`### 1.3` 这类三级小节从未进入允许集。现两级都收。
+    _secpat = re.compile(r'`([\w./-]+\.md)`\s*§\s*(\d+(?:\.\d+)*)')
     for f in MD:
         for m in _secpat.finditer(rd(f)):
             tgt = m.group(1)
@@ -404,10 +416,12 @@ def run_round(r):
             real = next((c for c in cand if os.path.exists(c)), None)
             if not real:
                 continue
-            heads = re.findall(r'^##\s+(\d+)\.', rd(real), re.M)
+            # H2 写「## N. 标题」，H3/H4 写「### N.M 标题」—— 尾点只属顶层编号，故 `\.?` 可选。
+            heads = re.findall(r'^#{2,4}\s+(\d+(?:\.\d+)*)(?:\.|\s|$)', rd(real), re.M)
             if heads and m.group(2) not in heads:
+                _hs = sorted(set(heads), key=lambda s: [int(x) for x in s.split('.')])
                 bad(f, '节号引用 `%s` §%s 越界（该文件仅有 §%s）'
-                    % (tgt, m.group(2), '/§'.join(heads)))
+                    % (tgt, m.group(2), '/§'.join(_hs)))
 
     # ---------- H 计数与版本 ----------
     reg = rd('domains/_registry.md')

@@ -262,6 +262,20 @@ def inject_url_count_drift(tree):
     return [p], t
 
 
+def inject_delivery_line_wording_drift(tree):
+    """把某 skill 的标准交付校验句退回旧措辞「7 项校验」→ aligncheck 应 FAIL（模板句措辞唯一）。"""
+    p = first_skill(tree)
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('` 的 7 项硬校验。', '` 的 7 项校验。', 1)
+
+
+def inject_section_ref_dotted_drift(tree):
+    """把 `output-spec.md` §2.1 改成不存在的 §2.9 → aligncheck 应 FAIL（节号引用须含子节号）。"""
+    p = os.path.join(tree, 'library', 'output-checklist.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('`output-spec.md` §2.1', '`output-spec.md` §2.9', 1)
+
+
 def main():
     base = os.path.join(tempfile.gettempdir(), 'qihang_negtest_%d' % int(__import__('time').time()))
     shutil.copytree(SRC, base, ignore=IGNORE)
@@ -308,6 +322,10 @@ def main():
          ['@py', 'scripts/extskill.py', '.'], 'extskill 豁免白名单'),
         ('外链计数漂移（148 条被改回 138 条）', inject_url_count_drift,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链计数'),
+        ('模板交付句措辞漂移（硬校验 → 校验）', inject_delivery_line_wording_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 模板句唯一'),
+        ('子节号引用漂移（output-spec §2.1 → §2.9）', inject_section_ref_dotted_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 节号引用'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,
