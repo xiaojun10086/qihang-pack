@@ -1,7 +1,7 @@
 ---
 name: qihang-mock-paper
 description: 「启航」S4 备考与记忆域库内 skill：按真题结构自组模拟卷，错题归因后变式再练。
-version: 3.3.7
+version: 3.3.9
 license: MIT
 ---
 
@@ -86,7 +86,7 @@ license: MIT
 
 ## 输出
 
-按 `library/output-spec.md` 模板输出，默认 ≤ 6 条要点；
+按 `library/output-spec.md` 输出；字段标签不超过 6 个，不限制模拟题数量、解析步骤或错题回炉说明；
 交付前须过 `library/output-checklist.md` 的 7 项硬校验。
 
 ## DUT 绑定点

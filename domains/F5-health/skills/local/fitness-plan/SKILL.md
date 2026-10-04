@@ -1,7 +1,7 @@
 ---
 name: qihang-fitness-plan
 description: 「启航」F5 健康与运动域库内 skill：结合体测项目与校园场馆给锻炼计划与达标训练要点。
-version: 3.3.7
+version: 3.3.9
 license: MIT
 ---
 

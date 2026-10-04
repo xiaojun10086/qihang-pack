@@ -317,50 +317,25 @@ else
   ok "发布副本：无 .gitignore（过程文档已在导出阶段剔除）"
 fi
 
-# ---------- 8c. 输出身份锁定（连小理） ----------
-# 单列的理由（自检发现）：身份锁定原先只写在 SKILL.md / INSTALL.md 正文里，**没有任何断言**，
-#   且身份串硬编码在两处 → 与「版本号字面量散落」是同一类风险。
-# 现改为：config.yaml 的 identity.self_intro 是**唯一真相源**，三处必须逐字一致。
-echo "[8c] 输出身份锁定（连小理）"
-_id_src=$(grep -m1 '^  self_intro:' config.yaml 2>/dev/null \
-          | sed 's/^  self_intro:[[:space:]]*//; s/[[:space:]]*#.*$//' | tr -d '\r')
-if [ -z "$_id_src" ]; then
-  bad "config.yaml 缺 identity.self_intro（身份串无单一真相源）"
+# ---------- 8c. 不强制自我身份 ----------
+echo "[8c] 不强制自我身份"
+if grep -qE '^identity:|^[[:space:]]+self_intro:|^[[:space:]]+no_rename:' config.yaml 2>/dev/null; then
+  bad "config.yaml 仍包含固定身份配置"
 else
-  ok "身份串真相源在位：$_id_src"
-  for _f in SKILL.md INSTALL.md; do
-    if [ -f "$_f" ] && grep -qF "$_id_src" "$_f" 2>/dev/null; then
-      ok "$_f 身份串与真相源逐字一致"
-    else
-      bad "$_f 的身份串与 config.yaml 不一致（漂移）"
-    fi
-  done
+  ok "config.yaml 不含固定身份配置"
 fi
-# ⚠️ 上一版只做了 `grep -qF`（「命中一处即通过」）—— **被负向自检抓出空转**：
-#    INSTALL.md 有**两处**身份串，注入时改坏其中一处，另一处仍命中 → 断言照常 OK。
-#    改为「**每一处**都必须逐字等于真相源」：前缀出现次数必须与完整串出现次数相等。
-for _f in SKILL.md INSTALL.md; do
-  [ -f "$_f" ] || continue
-  _all=$(grep -oF '我是连小理' "$_f" 2>/dev/null | wc -l | tr -d ' ')
-  _exact=$(grep -oF "$_id_src" "$_f" 2>/dev/null | wc -l | tr -d ' ')
-  if [ "${_all:-0}" -eq 0 ]; then
-    bad "$_f 完全不含身份串（应为 ≥1 处）"
-  elif [ "${_all:-0}" -ne "${_exact:-0}" ]; then
-    bad "$_f 存在 $_all 处「我是连小理」但仅 $_exact 处与真相源逐字一致（有变体漂移）"
+for _f in SKILL.md INSTALL.md library/output-spec.md commands/qihang.md; do
+  if grep -qE '人格锁定|身份锁定|identity[.]self_intro|我是连小理' "$_f" 2>/dev/null; then
+    bad "$_f 仍包含强制自我身份声明"
   else
-    ok "$_f 的 $_all 处身份串全部逐字一致"
+    ok "$_f 不含强制自我身份声明"
   fi
 done
-for _k in '^identity:' '^  first_reply:' '^  no_rename:'; do
-  if grep -q "$_k" config.yaml 2>/dev/null; then ok "config.yaml 含 $_k"
-  else bad "config.yaml 缺 $_k（身份口径不完整）"; fi
-done
-if grep -qF '输出身份' library/output-spec.md 2>/dev/null; then
-  ok "output-spec 已声明「输出身份」条款"
-else bad "output-spec 缺「输出身份」条款（身份在输出里无位置约定）"; fi
-if grep -qF '身份锁定' commands/qihang.md 2>/dev/null; then
-  ok "库入口卡已接入身份锁定"
-else bad "commands/qihang.md 未接入身份锁定（只加载入口卡时会漏）"; fi
+if grep -qF '只回复一句「安装完成」' SKILL.md 2>/dev/null; then
+  ok "SKILL.md 保留安装后简短确认约定"
+else
+  bad "SKILL.md 缺少安装后行为约定"
+fi
 
 # ---------- 8d. 触发门与核心快路径 ----------
 # 核心请求直接走学习/公开信息快路径；外部桥接、复杂澄清和扩展域均按需使用。
