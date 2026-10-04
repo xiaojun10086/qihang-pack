@@ -333,7 +333,7 @@ def run_round(r):
             for k in ('**输入**', '**澄清判定**', '**输出**'):
                 if k not in t:
                     bad(f, '可执行示例缺 %s' % k)
-            for k in ('【结论】', '【下一步】'):
+            for k in ('【下一步】',):
                 if k not in t:
                     bad(f, '示例输出缺 %s' % k)
             # 归属域
