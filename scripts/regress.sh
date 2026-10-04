@@ -260,10 +260,21 @@ while [ "$r" -le "$ROUNDS" ]; do
   for _t in 确定档 复述档 追问档; do
     if grep -q "$_t" "$_cl" 2>/dev/null; then _ok "三档已定义：$_t"; else _fail "三档缺：$_t"; fi
   done
-  # 复述档三条硬规格
+  # 复述档四条硬规格（第 1 条 = 存在实质歧义，决定性条件）
   for _t in '一句话' '不得新增' '【结论】首行的前置短句'; do
     if grep -qF "$_t" "$_cl" 2>/dev/null; then _ok "复述规格已声明：$_t"; else _fail "复述规格缺：$_t"; fi
   done
+  # 实质歧义驱动：无实质歧义即免复述（防「关键槽齐全还白复述一遍」）
+  if grep -qF '实质歧义' "$_cl" 2>/dev/null; then _ok "复述档 = 实质歧义驱动"; else _fail "未声明实质歧义驱动（复述会退化为白复述）"; fi
+  if grep -qF '免复述' "$_cl" 2>/dev/null; then _ok "已声明无实质歧义 → 免复述"; else _fail "缺「无实质歧义 → 免复述」降级路径"; fi
+  if grep -qF '复述档的四条硬规格' "$_cl" 2>/dev/null; then _ok "复述规格已升级为四条"; else _fail "复述规格未升级为四条（歧义判据不在首位）"; fi
+  # 越界表只做初筛，终判看需求主键 T+O（防「单词命中即不接管」）
+  if grep -qF 'arbitration:' config.yaml 2>/dev/null; then _ok "config.yaml 声明越界仲裁顺序"; else _fail "缺 trigger.arbitration（越界表被当成终判）"; fi
+  if grep -qF '优先级最高' config.yaml 2>/dev/null; then _fail "config.yaml 仍残留「优先级最高」（越界表压过主键）"; else _ok "config.yaml 已撤下「优先级最高」"; fi
+  if grep -qF '初筛' library/domain-review.md 2>/dev/null; then _ok "domain-review 已声明越界 = 初筛"; else _fail "domain-review 未声明初筛语义"; fi
+  # 记忆口径单源：续接固定回话只在 memory.md 存一份
+  if grep -qF '续接固定回话' library/memory.md 2>/dev/null; then _ok "memory.md 有「续接固定回话」唯一副本"; else _fail "缺「续接固定回话」（记忆口径分裂）"; fi
+  if grep -qF '不得假称记得' library/memory.md 2>/dev/null; then _ok "续接回话不得假称记得"; else _fail "缺「不得假称记得」硬约束"; fi
   # 红线优先于本门 + 例外 6 视为达标（防「为了确认而削弱合规」与「假复述」）
   grep -qF '红线优先于本门' "$_cl" 2>/dev/null && _ok "红线优先于需求确定门" || _fail "未声明红线优先于本门"
   grep -qF '视为 `C` 达标' "$_cl" 2>/dev/null && _ok "例外 6 视为 C 达标（免复述）" || _fail "未声明例外 6 免复述"

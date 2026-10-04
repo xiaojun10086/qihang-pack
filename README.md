@@ -68,7 +68,7 @@ qihang-pack/
     ├── selfcheck.sh             结构与计数自检
     ├── audit.sh                 安全审计 + L3 门禁实测
     ├── regress.sh               行为回归（澄清门算例 / 门禁矩阵）
-    ├── aligncheck.py            全量文件级对齐审计（20 组断言）
+    ├── aligncheck.py            全量文件级对齐审计（21 组断言）
     ├── runcheck.py              结构 / 示例 / 输出契约静态检查（不调用模型或目标平台）
     ├── extskill.py              外部 skill 桥接静态自检（来源与许可门禁）
     ├── negative_test.py         负向自测（注入缺陷，断言必须 FAIL）

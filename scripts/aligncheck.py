@@ -16,7 +16,7 @@
   python scripts/aligncheck.py .            # 单轮
   python scripts/aligncheck.py . 5          # 连跑 5 轮（校验确定性）
 
-检查项（20 组：A–D、F–Q、S–U、X）：
+检查项（21 组：A–D、F–Q、S–U、X、Y）：
   A 文件清单 / 可读性 / 空文件 / 编码 / BOM / 行尾
   B **重复内容检测**（连续重复行、重复小节、重复表格行 —— 抓生成器重复插入）
   C config.yaml：YAML 结构、列表无重复项、阈值与权重与文档一致
@@ -46,7 +46,11 @@
   U 触发门越界表不变式：`out_of_scope_markers` 与接管词表（`learning_markers` / `dlut_markers` /
     `learning_intents`）**零交集** / 表内无互为子串的冗余项 / SKILL.md §1.5 内联列举 ⊆ 越界表 /
     「需求主键」「优先级最高」双处声明
-  X 学生呈现层：`library/experience.md` 在位（白名单 / 禁止物 / 翻译规则 / 三视图 / 反例 / 起始句型）·\n    1 级清单三处同步 · 输出契约两处指针在位 · 四处入口文案与唯一副本逐条一致 · 组数声明同源\n"""
+  X 学生呈现层：`library/experience.md` 在位（白名单 / 禁止物 / 翻译规则 / 三视图 / 反例 / 起始句型）·
+    1 级清单三处同步 · 输出契约两处指针在位 · 四处入口文案与唯一副本逐条一致 · 组数声明同源
+  Y 体验层闭环：澄清门实质歧义驱动（免白复述）· 记忆口径单源（续接固定回话）· 越界仲裁顺序（初筛→终判）·
+    登录交还三步（交还优先于权限叙事）· 体验层自检指标表（零用户数据 / 默认不记录）
+"""
 import os, re, sys, json, glob, io, hashlib, collections, subprocess
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -1207,7 +1211,7 @@ def run_round(r):
             | set(_yaml_words('learning_intents') or [])
         _clash = sorted(set(_oos) & _takeover)
         if _clash:
-            bad('config.yaml', '越界词与接管词冲突 %d 个（越界优先级最高，会吞掉域路由）: %s'
+            bad('config.yaml', '越界词与接管词冲突 %d 个（越界为初筛，冲突即吞掉域路由）: %s'
                 % (len(_clash), '、'.join(_clash)))
         _dup = sorted({b for a in _oos for b in _oos if a != b and a in b})
         if _dup:
@@ -1239,12 +1243,19 @@ def run_round(r):
             if _ex_inline:
                 bad('SKILL.md', '§1.5 内联越界词不在 config.yaml 越界表内: %s'
                     % '、'.join(_ex_inline))
-        # 判据双处声明：单词命中≠接管（主键 T+O）；越界优先级最高
-        for _f8, _t8, _needs in (('config.yaml', cfg, ('需求主键', '优先级最高')),
-                                 ('SKILL.md', _sk, ('归属由主键定', '优先级最高'))):
+        # 判据双处声明：单词命中≠接管（主键 T+O）；越界只做初筛、归属按仲裁顺序
+        for _f8, _t8, _needs in (('config.yaml', cfg, ('需求主键', '仲裁顺序')),
+                                 ('SKILL.md', _sk, ('归属由主键定', '仲裁顺序'))):
             for _n8 in _needs:
                 if _n8 not in _t8:
-                    bad(_f8, '触发门判据缺「%s」（单词命中≠接管 / 越界优先）' % _n8)
+                    bad(_f8, '触发门判据缺「%s」（单词命中≠接管 / 越界按仲裁顺序）' % _n8)
+        # 越界词只做初筛：仲裁顺序唯一副本在位，且不再自称「优先级最高」
+        if not re.search(r'^\s*arbitration:', cfg, re.M):
+            bad('config.yaml', '缺 trigger.arbitration（越界仲裁顺序唯一副本）')
+        if '优先级最高' in cfg or '优先级最高' in _sk:
+            bad('config.yaml', '越界表仍自称「优先级最高」（应为初筛，归属由主键终判）')
+        if '初筛' not in _sk or '初筛' not in rd('library/domain-review.md'):
+            bad('SKILL.md', '越界初筛语义未在 SKILL.md / domain-review.md 双处声明')
 
     # ---------- T 输出形态硬契约（全量输出块零内部名） ----------
     # 与 runcheck.py 的 L3-5 的差别：runcheck 只校验**首块**（正常路径示例），
@@ -1319,10 +1330,80 @@ def run_round(r):
                 bad(_xf, '%s 的起始句型与唯一副本不一致（缺 %s）' % (_xlbl, ' / '.join(_xmiss)))
 
         # 组数声明同源（防止新增组后文档计数漂移）
-        _xngroups = 20
+        _xngroups = 21
         if ('%d 组断言' % _xngroups) not in rd('README.md') or \
            ('%d 组断言' % _xngroups) not in rd('INSTALL.md'):
             warn('README.md', 'aligncheck 组数声明与实现不一致（期望「%d 组断言」）' % _xngroups)
+
+    # ---------- Y 体验层闭环（B2/B3/C1/C2/C3）----------
+    # 体验层的五条规则各自「只有一个副本 + 至少一处断言」，防止再次退化成零断言层。
+    _cf = rd('config.yaml')
+    _cl = rd('library/clarity.md')
+    _mm = rd('library/memory.md')
+    _lp = rd('library/login-policy.md')
+    _sk = rd('SKILL.md')
+    _xt = rd(XPATH)
+
+    # [Y1] B2 澄清门：复述档必须是「实质歧义驱动」，且降级路径写清
+    if '实质歧义' not in _cl:
+        bad('library/clarity.md', '复述档未声明「实质歧义」判据（会退化为白复述）')
+    if '无实质歧义' not in _cl or '免复述' not in _cl:
+        bad('library/clarity.md', '复述档缺少「无实质歧义 → 直接执行（免复述）」降级路径')
+    if '实质歧义' not in _cf:
+        bad('config.yaml', '澄清门阈值注释未同步「实质歧义」语义')
+    _y1 = section(_cl, r'^###\s*3\.1\s')
+    if not _y1 or '**确定档**（降级）' not in _y1:
+        bad('library/clarity.md', '§3.1 关系表缺少「确定档（降级）」一行')
+    if not _y1 or '复述档的四条硬规格' not in _y1:
+        bad('library/clarity.md', '§3.1 未把复述规格升级为「四条（含实质歧义）」')
+
+    # [Y2] B3 记忆口径：续接固定回话唯一副本 + 三处同源
+    _y2 = section(_mm, r'^###\s*3\.2\s*[^\n]*续接')
+    if '续接固定回话' not in _mm:
+        bad('library/memory.md', '缺少 §3.2「续接固定回话」唯一副本')
+    if not _y2 or '不得假称记得' not in _y2:
+        bad('library/memory.md', '§3.2 缺少「不得假称记得」硬约束')
+    if not _y2 or '两条出路' not in _y2:
+        bad('library/memory.md', '§3.2 缺少「必须给出两条出路」硬约束')
+    if '`library/memory.md` §3.2' not in _sk:
+        bad('SKILL.md', '会话连续性段落未指向 `library/memory.md` §3.2（口径未同源）')
+
+    # [Y3] C1 越界仲裁：初筛 → 终判，且「优先级最高」已彻底退场
+    if '仲裁顺序' not in _cf or '仲裁顺序' not in _sk:
+        bad('config.yaml', '越界「仲裁顺序」未在 config.yaml / SKILL.md 双处声明')
+    if '优先级最高' in _cf or '优先级最高' in _sk:
+        bad('SKILL.md', '越界表仍自称「优先级最高」（应降级为初筛）')
+    if not re.search(r'^\s*arbitration:', _cf, re.M):
+        bad('config.yaml', '缺少 trigger.arbitration 键')
+    _y3 = section(rd('library/domain-review.md'), r'^###\s*2\.1\s')
+    if not _y3 or '初筛' not in _y3 or '终判' not in _y3:
+        bad('library/domain-review.md', '§2.1 未声明「初筛 → 终判」仲裁语义')
+
+    # [Y4] C2 登录交还：三步 + 固定一句话 + 交还优先于权限叙事
+    if '交还三步' not in _lp:
+        bad('library/login-policy.md', '缺少「交还三步」')
+    if '看完了' not in _lp:
+        bad('library/login-policy.md', '缺少交还固定一句话（唯一副本）')
+    if '不想登录也告诉我，我给通用流程' not in _lp:
+        bad('library/login-policy.md', '交还固定一句话措辞被改写（唯一副本失效）')
+    if '交还话术**优先于**权限与安全叙事' not in _lp:
+        bad('library/login-policy.md', '缺少「交还优先于权限叙事」的顺序声明')
+    if '交还' not in section(_sk, r'^##\s*硬规则'):
+        bad('SKILL.md', '硬规则未声明「看完之后的交还」')
+
+    # [Y5] C3 体验层自检指标：5 项静态指标 + 零数据承诺 + 断言源交叉在位
+    _y5 = section(_xt, r'^##\s*7[.、]?\s*体验层自检指标')
+    if not _y5:
+        bad(XPATH, '缺少 §7「体验层自检指标」')
+    for _m in ('呈现层零内部名', '入口文案单源', '澄清门歧义驱动', '越界仲裁单点', '交还与记忆口径'):
+        if _m not in _y5:
+            bad(XPATH, '§7 指标表缺项：%s' % _m)
+    if '零用户数据' not in _y5 or '默认不记录' not in _y5:
+        bad(XPATH, '§7 未声明「零用户数据 / 默认不记录」')
+    _y5src = rd('scripts/aligncheck.py') + rd('scripts/regress.sh')
+    for _k in ('输出块泄漏内部名', '的起始句型与唯一副本不一致', '实质歧义', '仲裁顺序', '续接固定回话'):
+        if _k not in _y5src:
+            bad(XPATH, '§7 指标断言的断言源不成立（缺 %s）' % _k)
 
     # ---------- 汇总 ----------
     nf = sum(1 for x in FIND if x[0] == 'FAIL')
