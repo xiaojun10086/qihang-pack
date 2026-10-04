@@ -79,6 +79,7 @@ bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
 ## 五、装完自检
 
 ```bash
+bash scripts/qihang.sh quick       # 快速入口（自然语言起始句型示例）
 bash scripts/qihang.sh status      # 三级结构完整度
 bash scripts/qihang.sh platform    # 探测本机 LearnBuddy 安装位置
 bash scripts/qihang.sh domains     # 20 域清单

@@ -1,7 +1,7 @@
 ---
 name: qihang-defense-qa
 description: 「启航」R4 学术产出与投稿域库内 skill：答辩问答演练——幽灵测试过论证、三问自审防守核心论点、预设评委问题清单与应答框架；面向开题 / 中期 / 答辩 / 会议质询的对抗性准备。
-version: 3.3.9
+version: 3.4.0
 license: MIT
 ---
 
