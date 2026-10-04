@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""自检单入口：一次跑齐 5 个校验器 + 逐项计时 + 模拟跑摘要（可选负向自测）。
+"""自检单入口：一次跑齐静态检查器 + 逐项计时 + 结果摘要（可选负向自测）。
 
-为什么要有它：此前要手工跑 5 条命令（顺序、轮数、工作目录都可能漏）—— **漏跑本身就是缺陷来源**。
-本入口固定顺序、固定编码、逐项计时、任一 FAIL 即非零退出，并打印「模拟跑摘要」供回归对比。
+为什么要有它：此前要手工跑多条命令（顺序、轮数、工作目录都可能漏）—— **漏跑本身就是缺陷来源**。
+本入口固定顺序、固定编码、逐项计时、任一 FAIL 即非零退出，并打印检查项摘要供回归对比。
 
 用法：
     python scripts/checkall.py [树根]              # 全跑（regress 1 轮）
@@ -19,6 +19,9 @@
 regress ~44s ｜ negative ~3s ｜ **--quick 全跑 ~28s ／ full+negative ~121s**。基线只作「速度回归」参照。
 """
 import os, re, sys, time, shutil, subprocess
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
@@ -65,7 +68,7 @@ CHECKS = [
     ('selfcheck', ['@bash', 'scripts/selfcheck.sh'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '结构 / 计数 / 交叉引用', 2),
     ('audit', ['@bash', 'scripts/audit.sh'], r'结果:\s*✅\s*(\d+)\s*通过\s*｜\s*⚠️?\s*(\d+)\s*警告\s*｜\s*❌\s*(\d+)\s*失败', '安全 / 合规 / 门禁', 2),
     ('aligncheck', ['@py', 'scripts/aligncheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '全量文件级对齐', 0),
-    ('runcheck', ['@py', 'scripts/runcheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '端到端运行性（三级链）', 0),
+    ('runcheck', ['@py', 'scripts/runcheck.py', '.', ROUNDS], r'最终：FAIL\s*(\d+)\s*｜\s*WARN\s*(\d+)', '静态路由 / 示例 / 输出契约', 0),
     ('extskill', ['@py', 'scripts/extskill.py', '.'], r'结果:\s*OK\s*(\d+)\s*｜\s*WARN\s*(\d+)\s*｜\s*FAIL\s*(\d+)', '外部 skill 桥接（接线 + 登记 + 许可）', 2),
     ('regress', ['@bash', 'scripts/regress.sh', ROUNDS], r'累计 FAIL\s*=\s*(\d+)', '行为回归（澄清门 / 门禁 / 输出标准）', 0),
 ]
@@ -141,7 +144,7 @@ if NEGATIVE:
 
 total = time.time() - t_all
 print('=' * 76)
-print('模拟跑摘要（每项关键计数）')
+print('校验结果摘要（每项关键计数）')
 for name, what, ok, dt, detail, note in rows:
     print('  %-11s %-6s %6.1fs  %s' % (name, 'PASS' if ok else 'FAIL', dt, detail))
 if skipped:

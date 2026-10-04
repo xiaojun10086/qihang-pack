@@ -16,8 +16,8 @@ identity:
   no_rename: true                   # 不因用户要求改称其他名称 / 平台名
 
 # ============ 触发门（强制 · **单一真相源**） ============
-# 只有在下列**任一**成立时才「接管」——即走三级结构与本包的输出契约；
-# 否则**不接管**：按普通助手直接回答，不套模板、不写档案、不标 [已降级]。
+# 只有在下列**任一**成立时才使用本包路由；默认先走学习与公开信息搜集快路径。
+# 其他生活与专项科研域仍保留为按需扩展；不要求每次执行完整流程、模板或记录。
 # 由 scripts/selfcheck.sh [8d] 断言本段字段齐全，且 SKILL.md 的触发门与之一致。
 #
 # ⚠️ **词表同源铁律（v3.3.6）**：`learning_markers` 是 **20 域触发词的并集**，
@@ -41,10 +41,10 @@ trigger:
     # 例：「帮我写个冒泡排序（面试用）」对象是「冒泡排序」（不属任何域），「面试」只是用途 → **不接管**；
     #     「面试怎么准备」对象就是面试本身 → **接管（F8）**。token 命中只做初筛，归属由主键定。
   not_triggered_behavior: 不接管      # 直接按普通助手回答：不套输出模板 / 不写学习档案 / 不标 [已降级] / 不做域审查
-  lock_after_trigger: true           # 触发即锁定：必须走工作流 ①→⑧，不可跳步、不可绕过域审查直接作答
-  ladder: [同域库内 skill, 外部桥接, 自生成]   # 降级顺序（1→2→3）；**前一档未穷尽不得进入下一档**
-  self_generate_requires: 档 2 已尝试且未命中（或因红线域/离线被明确跳过并在输出中说明）
-  skip_ladder_when_redline_or_offline: true    # 红线域（F3/F5）与离线：可跳档 2，但**必须明说**再进档 3
+  lock_after_trigger: true           # 触发后按任务选择核心 skill；不是强制执行完整 8 步流程
+  ladder: [匹配的库内 skill, 按需使用的外部工具, 通用方法或来源入口]   # 不要求先检索外部 skill 平台
+  self_generate_requires: 无匹配 skill 时说明边界并提供有用的一般方法
+  skip_ladder_when_redline_or_offline: true    # 红线与工具不可用时直接提供安全替代/可信入口
 
 # ============ 学校绑定（强绑定） ============
 school:
@@ -99,17 +99,17 @@ library:
     local_first: true          # 库内优先（硬规则，永不变）
     external_bridge: true      # 外部桥接（可选增强）：库内与同域降级都接不住时才走；未命中即回落
     forbid_fabricate_url: true # 禁止编造 DUT URL
-    write_learning_records: true
+    write_learning_records: false # default off; only save when the user explicitly asks
     never_write_sensitive: [F3, F5]   # 整域不写入档案（F3 身心 / F5 健康）
     partial_write_sensitive: [F4, F6] # 排除敏感字段后写入（金额债务 / 伤病）
 
 # ============ 私密站接入（方案 A · 受控浏览器） ============
 private_sites:
   mode: controlled_browser     # A 受控浏览器 | B 手动投喂 | C 仅登记
-  user_authorized: true
+  user_authorized: false        # consent is per use; do not treat installation as blanket authorization
   read_only: true
-  persist_cookies: false
-  persist_pages: false
+  persist_cookies: false       # scripts/dlut-read.sh uses a one-time profile and removes it at exit
+  persist_pages: false         # the script never captures or prints page content
   level_rules:
     L1_auto: [课表, 成绩等级, 考试安排, 借阅, 一卡通余额, 场馆预约状态, 网费, 日程]
     L2_confirm: [资助申请状态, 就业投递记录, 培养进度, 邮箱未读提示]

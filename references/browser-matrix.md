@@ -76,33 +76,31 @@
 
 ---
 
-## 六、本包的推荐配置（唯一定式）
+## 六、本包的推荐配置
 
 ```bash
-agent-browser open <url> --headed \
-  --profile "$HOME/.qihang/browser-profile"
+agent-browser --session "$SESSION_ID" open <url> --headed \
+  --profile "$HOME/.qihang/browser-profile.XXXXXX"
 ```
 
 | 参数 | 为什么 |
 |---|---|
 | `--headed` | 用户需在窗口内**亲眼看到**并**自行登录** |
-| `--profile <独立目录>` | **强制隔离**，绝不复用真实浏览器登录态 |
+| `--session <随机名>` | 本次只操作自己的 agent-browser 会话，不影响用户其他会话 |
+| `--profile <一次性目录>` | **强制隔离**，不复用真实浏览器登录态；退出后删除 |
 | 不加 `--auto-connect` / `--cdp` | 避免继承全量登录态 |
 | 不加 `--provider` | 避免把校内访问外发到云端 |
+| 不调用 `snapshot` / `read` | 工具不采集、复制或输出网页内容；用户自行查看并决定是否分享最少必要字段 |
 
-**收尾必做**：`agent-browser close --all` → 确认 `No active sessions`。
+**收尾必做**：只关闭本次随机会话并删除其一次性 Profile。打开失败、隔离校验失败或清理失败都必须显式报错；禁止用 `close --all` 影响其他会话。
 
 ---
 
-## 七、隔离性自检方法（可向用户出示证据）
+## 七、异常退出后的清理
 
 ```bash
-# 独立 Profile 的 Cookies 应为「刚刚创建」
-ls -la "$HOME/.qihang/browser-profile/Default/Network/Cookies"
-
-# 用户真实 Chrome 的 Cookies 时间戳应「未变化」
-ls -la "$LOCALAPPDATA/Google/Chrome/User Data/Profile 2/Network/Cookies"
+# 查看一次性 Profile 是否有异常残留；只删除确认属于本包的目录
+find "$HOME/.qihang" -maxdepth 1 -type d -name 'browser-profile.*' -print
 ```
 
-两者时间戳不同 → 证明**未复用真实浏览器**。
-（实测样例：独立 23:33 新建 ｜ 真实 Chrome 仍为 9/15，未被触碰）
+仅在确认没有对应浏览器进程仍在使用目录后，手动删除异常残留。正常执行会自动清理。

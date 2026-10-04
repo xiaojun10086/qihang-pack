@@ -10,7 +10,7 @@
   audit.sh       安全/合规/门禁（bash）
   regress.sh     行为回归（bash，澄清门算例与 L3 门禁矩阵）
   aligncheck.py  **全量文件级对齐 + skill 可行性契约**（本脚本，Python）
-  runcheck.py    端到端运行性（每域多触发词跑完整三级链）
+  runcheck.py    静态路由、skill 文档、示例与输出契约检查（不调用目标平台）
 
 用法:
   python scripts/aligncheck.py .            # 单轮

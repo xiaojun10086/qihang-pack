@@ -20,5 +20,5 @@ description: F7 升学深造（生活类）域入口卡：保研、考研、留�
 3. **库内择优**：按**主体与任务**在本域 4 个库内 skill 中择优 —— 首选 `grad-plan`；其余 `grad-calendar` / `material-kit` / `school-pick` 按触发场景择用
    路径：`domains/F7-further-study/skills/local/grad-calendar/SKILL.md`、`domains/F7-further-study/skills/local/grad-plan/SKILL.md`、`domains/F7-further-study/skills/local/material-kit/SKILL.md`、`domains/F7-further-study/skills/local/school-pick/SKILL.md`
 4. **输出与归档**：按 `library/output-spec.md` 输出 ≤6 条要点，并按 `library/memory.md` 归档。
-5. **DUT 绑定点**：见 `domains/F7-further-study/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（只读 / 不外传 / 不落盘）。
+5. **DUT 绑定点**：见 `domains/F7-further-study/_domain.md`；涉及需登录站点按 `library/login-policy.md` 走方案 A（用户自查页面；工具不采集页面内容）。
 6. **外部桥接（最后的兜底）**：库内 skill 与同域降级都接不住时，读 `library/external-bridge.md` → 按 `references/external-sources.md` 检索 12 平台 → 过五步自检 → 输出首行标 `[外接] 来源 + 许可`；**未命中则回落「纯提示词模式」**（原有流程）。

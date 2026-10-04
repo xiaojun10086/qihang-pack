@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# 「启航」DUT 私密站只读取数（方案 A · 受控浏览器）
+# 「启航」DUT 私密站访问辅助（方案 A · 受控浏览器）
 #
 # 用法: bash dlut-read.sh <目标> [--yes] [--dry-run]
 #   目标: 门户 | 课表 | 成绩等级 | 借阅 | 一卡通 | 网费 | 日程 | 邮箱提示 | 资助申请状态 | 就业投递记录 | 培养进度
 #
-# 铁律：① 只读 ② 不外传 ③ 不落盘  ④ 必须用独立 Profile
-# 授权分级：L1 直接读 | L2 需 --yes 确认 | L3 一律拒绝
-# 退出码：0 成功或 L1 | 1 用法错误或需区分 | 2 L2 未确认 | 3 L3 拒绝 | 4 未装 agent-browser | 5 隔离校验失败
+# 本工具只打开独立浏览器供用户查看，不读取或输出网页内容。
+# 铁律：① 只读 ② 不外传 ③ 临时 Profile 用后删除 ④ 不复用或关闭用户的其他浏览器会话
+# 访问分级：L1 可自行查看 | L2 需 --yes 确认后打开 | L3 一律拒绝
+# 退出码：0 成功或 L1 | 1 用法错误或需区分 | 2 L2 未确认 | 3 L3 拒绝 | 4 未装 agent-browser | 5 隔离校验失败 | 6 打开或清理失败
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-HOME_DIR="${HOME:-$USERPROFILE}"
-PROFILE_DIR="${HOME_DIR}/.qihang/browser-profile"
+HOME_DIR="${HOME:-${USERPROFILE:-}}"
+QIHANG_DIR="${HOME_DIR}/.qihang"
+PROFILE_DIR=""
+SESSION_ID="qihang-${PPID}-${RANDOM}-${RANDOM}"
+SESSION_STARTED=0
 SSO="https://sso.dlut.edu.cn/"
 PORTAL="https://portal.dlut.edu.cn/"
 XSC="https://xsc.dlut.edu.cn/"      # 学生工作系统（资助/评奖）
@@ -63,8 +67,8 @@ if [ -n "$L3_HIT" ]; then
 ❌ 拒绝执行：目标「$TARGET」属于 L3 禁止读取级别（命中关键词「$L3_HIT」）。
 
 「启航」私密站授权分级：
-  L1 直接读   ：课表 / 成绩等级 / 考试安排 / 借阅 / 一卡通余额 / 场馆预约状态 / 网费 / 日程
-  L2 需确认   ：资助申请状态 / 就业投递记录 / 培养进度 / 邮箱未读提示
+  L1 可自行查看：课表 / 成绩等级 / 考试安排 / 借阅 / 一卡通余额 / 场馆预约状态 / 网费 / 日程
+  L2 需确认   ：资助申请状态 / 就业投递记录 / 培养进度 / 邮箱未读条数
   L3 一律拒绝 ：缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细
 
 匹配口径：**关键词包含**（不再是精确等于）。含「绩点」也一律拒绝（属成绩明细）。
@@ -102,7 +106,7 @@ case "$TARGET" in
   课表)      LEVEL=L1; URL="$PORTAL";        DESC="我的课表（门户首页区块）" ;;
   成绩等级)  LEVEL=L1; URL="$PORTAL";        DESC="成绩等级 / 是否通过（**不含单科分数明细**）" ;;
   借阅)      LEVEL=L1; URL="$PORTAL";        DESC="我的借阅（当前借阅册数）" ;;
-  一卡通)    LEVEL=L1; URL="$PORTAL";        DESC="一卡通（当日消费/账户有效期，不含金额明细）" ;;
+  一卡通)    LEVEL=L1; URL="$PORTAL";        DESC="一卡通余额 / 账户有效期（不含消费明细）" ;;
   网费)      LEVEL=L1; URL="$PORTAL";        DESC="网络自助（余额/流量）" ;;
   日程)      LEVEL=L1; URL="$PORTAL";        DESC="我的日程 / 校内通知" ;;
   邮箱提示)  LEVEL=L2; URL="$PORTAL";        DESC="邮箱未读提示（**不读邮件正文**）" ;;
@@ -119,54 +123,82 @@ esac
 # ---------- L2 需确认 ----------
 if [ "$LEVEL" = "L2" ] && [ "$CONFIRM" -ne 1 ]; then
   echo "⚠️ 目标「$TARGET」属于 L2 级别（需确认）。"
-  echo "   将读取：$DESC"
+  echo "   将打开的页面用途：$DESC"
   echo "   确认请加 --yes 重跑：bash dlut-read.sh '$TARGET' --yes"
   exit 2
 fi
 
 # ---------- 定位 agent-browser ----------
-AB=""
+AB_BIN=""
+AB_ARGS=()
 if command -v agent-browser >/dev/null 2>&1; then
-  AB="agent-browser"
+  AB_BIN="$(command -v agent-browser)"
 else
   for base in "${HOME_DIR}/.workbuddy/binaries/node/versions"/*; do
     cand="${base}/node_modules/agent-browser/bin/agent-browser.js"
     if [ -f "$cand" ]; then
-      AB="node ${cand}"
+      AB_BIN="node"
+      AB_ARGS=("$cand")
       break
     fi
   done
 fi
-if [ -z "$AB" ]; then
+if [ -z "$AB_BIN" ]; then
   # 不在此处直接退出：--dry-run 只是「打印执行计划」，不该被「本机是否装了浏览器」绑死。
   # 否则受限环境里 L1 的 dry-run 契约（独立 Profile / 未启动浏览器）无法被回归验证。
   AB_PENDING=1
-  AB="agent-browser（本机未安装）"
+  AB_LABEL="agent-browser（本机未安装）"
 else
   AB_PENDING=0
+  AB_LABEL="$AB_BIN"
 fi
+
+ab() {
+  "$AB_BIN" "${AB_ARGS[@]}" --session "$SESSION_ID" "$@"
+}
+
+cleanup() {
+  rc=$?
+  trap - EXIT
+  if [ "$SESSION_STARTED" -eq 1 ]; then
+    if ! ab close >/dev/null 2>&1; then
+      echo "❌ 无法确认独立浏览器会话已关闭；请检查并关闭会话「$SESSION_ID」。" >&2
+      rc=6
+    fi
+  fi
+  if [ -n "$PROFILE_DIR" ]; then
+    if [ "$(dirname "$PROFILE_DIR")" != "$QIHANG_DIR" ] || \
+       [ "$(basename "$PROFILE_DIR")" != browser-profile.* ]; then
+      echo "❌ 拒绝清理路径不符合预期的临时 Profile。" >&2
+      rc=6
+    elif ! rm -rf -- "$PROFILE_DIR"; then
+      echo "❌ 临时 Profile 清理失败：$PROFILE_DIR" >&2
+      rc=6
+    fi
+  fi
+  exit "$rc"
+}
 
 # ---------- 执行计划 ----------
 cat <<EOF
-「启航」DUT 只读取数 · 方案 A
+「启航」DUT 私密站访问辅助 · 方案 A
 ----------------------------------------
 目标      : $TARGET（$LEVEL）
 说明      : $DESC
 入口      : $URL
-浏览器    : $AB
-独立Profile: $PROFILE_DIR   ← 强制隔离（绝不复用真实 Chrome profile）
-隐私      : 只读 · 不外传 · 不落盘 · 结束即 close --all
+浏览器    : $AB_LABEL
+Profile   : 每次新建临时目录，结束后删除
+隐私      : 只读 · 不采集页面内容 · 不复用/关闭其他浏览器会话
 ----------------------------------------
 EOF
 
 if [ "$DRYRUN" -eq 1 ]; then
   echo "[dry-run] 将执行："
-  echo "  0) $AB close --all           # 先清既有会话，保证下一步 --profile 不被忽略"
-  echo "  1) $AB open <入口> --headed --profile \"$PROFILE_DIR\""
-  echo "  2) 若未登录 → 提示你本人登录（本工具不接触凭证）"
-  echo "  3) $AB snapshot -c           # 只读读取当前页面"
-  echo "  4) 抽取「$DESC」相关字段后直接输出"
-  echo "  5) $AB close --all           # 结束会话，不保存 Cookie"
+  echo "  1) 创建一次性独立会话与临时 Profile"
+  echo "  2) $AB_LABEL --session <随机会话> open <入口> --headed --profile <临时目录>"
+  echo "  3) 若未登录 → 提示你本人登录（本工具不接触凭证）"
+  echo "  4) 你在浏览器窗口查看所需信息；工具不读取或输出页面内容"
+  echo "  5) 结束时只关闭本次会话并删除临时 Profile"
   [ "$AB_PENDING" -eq 1 ] && \
     echo "[dry-run] ⚠️ 本机未安装 agent-browser；正式读取前先执行：npm install -g agent-browser && agent-browser install"
   echo "[dry-run] 未启动浏览器，未读任何数据。"
@@ -178,43 +210,53 @@ if [ "$AB_PENDING" -eq 1 ]; then
   exit 4
 fi
 
-mkdir -p "$PROFILE_DIR"
+if [ -z "$HOME_DIR" ]; then
+  echo "❌ 无法确定用户目录，不能安全创建临时 Profile。" >&2
+  exit 6
+fi
 
-# ---------- 隔离前置：先关掉既有 daemon 会话（否则 --profile 会被静默忽略） ----------
-$AB close --all >/dev/null 2>&1 || true
+if [ ! -t 0 ]; then
+  echo "❌ 需要交互式终端，以便你在浏览器内自行查看信息。" >&2
+  exit 6
+fi
 
-echo "▶ 打开入口（若未登录，请在弹出的窗口里自行登录）..."
-OPEN_OUT="$($AB open "$URL" --headed --profile "$PROFILE_DIR" 2>&1 | head -20)"
-echo "$OPEN_OUT"
+umask 077
+mkdir -p "$QIHANG_DIR" || { echo "❌ 无法创建临时目录：$QIHANG_DIR" >&2; exit 6; }
+PROFILE_DIR="$(mktemp -d "$QIHANG_DIR/browser-profile.XXXXXX")" || {
+  echo "❌ 无法创建一次性浏览器 Profile。" >&2
+  exit 6
+}
+trap cleanup EXIT
 
-# ---------- 隔离校验：--profile 必须真的生效（失效即中止，不在未隔离窗口继续读）----------
-PROFILE_BASE="$(basename "$PROFILE_DIR")"
+echo "▶ 打开独立入口（若未登录，请在弹出的窗口里自行登录）..."
+SESSION_STARTED=1
+OPEN_OUT="$(ab open "$URL" --headed --profile "$PROFILE_DIR" 2>&1)"
+OPEN_RC=$?
+if [ "$OPEN_RC" -ne 0 ]; then
+  printf '%s\n' "$OPEN_OUT" >&2
+  echo "❌ 独立浏览器启动失败。" >&2
+  exit 6
+fi
+
+# ---------- 隔离校验：会话独立且 Profile 未被忽略 ----------
 if printf '%s' "$OPEN_OUT" | grep -qiE 'profile[[:space:]]+ignored|daemon already running'; then
   cat >&2 <<EOF
 ❌ 中止：本次会话未使用独立 Profile（检测到 profile 被忽略 / daemon 已在运行）。
-   隐私隔离已失效，不继续读取。请先执行：$AB close --all，再重跑本命令。
+   隐私隔离已失效，不继续读取；退出时将尝试关闭本次会话并删除临时 Profile。
 EOF
   exit 5
 fi
-if printf '%s' "$OPEN_OUT" | grep -qF "$PROFILE_BASE"; then
-  echo "隔离校验: ✅ 独立 Profile 已生效（$PROFILE_DIR）"
-else
-  echo "隔离校验: ⚠️ 浏览器未回显 Profile 路径，无法从输出直接确认；"
-  echo "          已通过「打开前 close --all」保证无既有会话可复用（凭据隔离成立）。"
-fi
+echo "隔离校验: ✅ 使用随机命名的独立会话与一次性 Profile"
 
 echo ""
-echo "▶ 等待页面就绪（加载完成后回车继续）..."
+echo "▶ 请只在浏览器窗口查看「$DESC」所需信息；本工具不会读取、复制或输出页面内容。"
+echo "   请勿在聊天中粘贴密码、验证码或其他无关敏感信息。"
+echo "   查看完成后按回车关闭本次会话并清理临时 Profile。"
 read -r _ || true
-
-echo ""
-echo "▶ 只读读取 ..."
-$AB snapshot -c 2>&1 | head -200
-
-echo ""
-echo "▶ 关闭会话 ..."
-$AB close --all 2>&1 | head -3
-echo "会话状态: $($AB session list 2>&1 | head -1)"
-echo ""
-echo "✅ 完成。以上内容仅服务本次回答，未写入任何文件。"
-echo "   如需写入学习档案，由 1 级库按 library/memory.md 规则处理（本脚本不写）。"
+SESSION_STARTED=0
+if ! ab close; then
+  echo "❌ 本次浏览器会话关闭失败；清理时将再次尝试。" >&2
+  SESSION_STARTED=1
+  exit 6
+fi
+echo "✅ 本次会话已关闭；临时 Profile 将在退出时删除。"

@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-「启航」三级结构 · 运行性检查器（runcheck）
+「启航」三级结构 · 静态契约检查器（runcheck）
 =========================================
-把每个域的「三级结构」**真正跑一遍**：触发词 → 域 → 库内 skill → 输出，逐级确认返回结果可解。
+检查各域与 skill 文档中的路由、执行步骤、示例和输出契约。
+本工具不调用模型、LearnBuddy 或其他目标运行平台，不能证明真实对话行为正确。
 
 与其余四脚本的分工：
   selfcheck.sh  结构/计数（静态）
   audit.sh      安全/合规/门禁
   regress.sh    澄清门算例 / L3 门禁矩阵（行为）
   aligncheck.py 全量文件级对齐（静态契约）
-  runcheck.py   **端到端运行性**：每域多触发词跑完整三级链，校验每级返回结果与最终输出合规格
+  runcheck.py   **静态契约检查**：检查每域路由、skill 文档与示例输出，不执行模型调用
 
 检查项：
-  L1  需求明确 + 域审查 两步已接入（运行前置不可跳）
+  L1  检查核心路由与复杂任务审查入口均有说明（不要求普通请求走完整流程）
   L2  注册表路由可解：registry 行在位 / 触发词 ⊆ 域文件 / 每个触发词命中自身 /
       跨域共享词有裁决 / 声明 skill == 实体目录
   L2b 域执行顺序：先判红线前置为第 0 步 / 覆盖全部库内 skill / 接输出规范 / 无库外通道
@@ -179,7 +180,7 @@ def check_output_block(o):
 def run_round(r):
     del FIND[:]
     print('=' * 70)
-    print('运行性检查 · 第 %d 轮 ｜ 域 %d ｜ 目标域 %s'
+    print('静态契约检查 · 第 %d 轮 ｜ 域 %d ｜ 目标域 %s'
           % (r, len(DOMS), ', '.join(ONLY) if ONLY else '全部'))
 
     # ---------- 载入 registry ----------
@@ -380,13 +381,11 @@ def run_round(r):
                 if did_ref.upper() not in ROW:
                     bad(sp, '分工表引用了不存在的域 `%s`' % did_ref)
 
-            # L3-10 降级标注写法存在
-            if '[已降级' not in st:
-                warn(sp, '未声明 [已降级] 标注（降级时输出不合规）')
+            # Downgrade labels are optional; validate their format only when present.
 
     nf = sum(1 for x in FIND if x[0] == 'FAIL')
     nw = sum(1 for x in FIND if x[0] == 'WARN')
-    print('  运行链解得域数: %d ｜ 检查项失败: %d' % (n_chain, nf))
+    print('  已检查域数: %d ｜ 检查项失败: %d' % (n_chain, nf))
     print('-' * 70)
     for lv, f, m in FIND:
         print('  %-4s %s :: %s' % (lv, f, m))
@@ -408,5 +407,5 @@ if __name__ == '__main__':
                           if len(set(hist)) == 1 else '⚠️ 各轮结果不一致，存在非确定性！'))
     tot = hist[-1][0]
     print('最终：FAIL %d ｜ WARN %d ｜ %s'
-          % (tot, hist[-1][1], '运行链全部可解' if tot == 0 else '存在不可解运行链'))
+          % (tot, hist[-1][1], '静态契约通过' if tot == 0 else '存在静态契约错误'))
     sys.exit(0 if tot == 0 else 1)
