@@ -13,6 +13,13 @@
 """
 import os, re, sys, io, shutil, tempfile, subprocess
 
+# ⚠️ 实测坑（Windows）：默认 stdout 编码是 GBK，打印 ✅/❌ 直接 UnicodeEncodeError 崩掉
+# （rc=1，且崩在结果行，看起来像「负向自测失败」）。与 checkall.py 同一口径强制 UTF-8。
+for _s in ('stdout', 'stderr'):
+    _f = getattr(sys, _s, None)
+    if hasattr(_f, 'reconfigure'):
+        _f.reconfigure(encoding='utf-8', errors='replace')
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARG = [a for a in sys.argv[1:] if not a.startswith('-')]
 SRC = os.path.abspath(ARG[0]) if ARG else os.path.abspath(os.path.join(HERE, '..'))
@@ -200,6 +207,61 @@ def inject_missing_fallback(tree):
     return [p], None        # 特殊：移走文件
 
 
+def inject_stale_file_count(tree):
+    """把 README 的「交付树 N 个文件」改成过期数字 → aligncheck Q 组应 FAIL。"""
+    p = os.path.join(tree, 'README.md')
+    t = io.open(p, encoding='utf-8').read()
+    m = re.search(r'(交付树[^\n]{0,14}?)(\d{2,4})(\s*个文件)', t)
+    if not m:
+        return [p], t
+    return [p], t[:m.start(2)] + str(int(m.group(2)) - 3) + t[m.end(2):]
+
+
+def inject_stale_platform_count(tree):
+    """把 `domains/_registry.md` 的平台目录数改回旧口径 12 → aligncheck 应 FAIL。"""
+    p = os.path.join(tree, 'domains', '_registry.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], re.sub(r'\d{1,3}(\s*个平台目录)', r'12\1', t, count=1)
+
+
+def inject_gate_list_short(tree):
+    """把 qihang.sh status 的 1 级清单删掉一项 → aligncheck 应 FAIL（防清单静默漏列）。"""
+    p = os.path.join(tree, 'scripts', 'qihang.sh')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], t.replace('library/external-bridge.md ', '', 1)
+
+
+def inject_marker_word_dropped(tree):
+    """从 learning_markers 里删一个域触发词 → aligncheck 应 FAIL（词表同源铁律）。"""
+    p = os.path.join(tree, 'config.yaml')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], re.sub(r'(, 作文批改)(\])', r'\2', t, count=1)
+
+
+def inject_platform_line_removed(tree):
+    """删掉某域「指定检索平台」行 → extskill 覆盖率断言应 FAIL（防域被静默跳过）。"""
+    p = os.path.join(tree, 'domains', 'R3-research-tools', '_domain.md')
+    t = io.open(p, encoding='utf-8').read()
+    return [p], re.sub(r'(?m)^\*\*指定检索平台[^\n]*\n', '', t, count=1)
+
+
+def inject_exempt_decl_removed(tree):
+    """删掉 external-sources.md §一 的「例外」声明 → extskill 应 FAIL（豁免不可无声明放行）。"""
+    p = os.path.join(tree, 'references', 'external-sources.md')
+    t = io.open(p, encoding='utf-8').read()
+    lines = [l for l in t.split('\n')
+             if not (l.lstrip().startswith('>') and '例外' in l)]
+    return [p], '\n'.join(lines)
+
+
+def inject_url_count_drift(tree):
+    """把 §11.2 的「唯一外链」改成旧值 138 → aligncheck 应 FAIL（外链计数不可漂移）。"""
+    p = os.path.join(tree, 'references', 'dlut-url-verification.md')
+    t = io.open(p, encoding='utf-8').read()
+    t = t.replace('唯一外链 148 条', '唯一外链 138 条', 1)
+    return [p], t
+
+
 def main():
     base = os.path.join(tempfile.gettempdir(), 'qihang_negtest_%d' % int(__import__('time').time()))
     shutil.copytree(SRC, base, ignore=IGNORE)
@@ -232,6 +294,20 @@ def main():
          ['@bash', 'scripts/selfcheck.sh'], 'selfcheck [7c]'),
         ('规则文件引用生成器路径（副本必判失效引用）', inject_build_path,
          ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck'),
+        ('交付树文件数声明过期（173 vs 176）', inject_stale_file_count,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 交付树文件数'),
+        ('平台目录数退回旧口径 12', inject_stale_platform_count,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 平台数'),
+        ('status 1 级清单漏列 library 文件', inject_gate_list_short,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 1 级清单'),
+        ('learning_markers 漏掉域触发词', inject_marker_word_dropped,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 词表同源'),
+        ('某域「指定检索平台」行被删', inject_platform_line_removed,
+         ['@py', 'scripts/extskill.py', '.'], 'extskill 平台覆盖率'),
+        ('豁免声明被删（R6 无声明放行）', inject_exempt_decl_removed,
+         ['@py', 'scripts/extskill.py', '.'], 'extskill 豁免白名单'),
+        ('外链计数漂移（148 条被改回 138 条）', inject_url_count_drift,
+         ['@py', 'scripts/aligncheck.py', '.'], 'aligncheck 外链计数'),
     ]
     if WITH_REGRESS:
         cases.append(('移走零命中兜底框架', inject_missing_fallback,

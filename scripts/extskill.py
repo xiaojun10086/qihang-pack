@@ -18,6 +18,13 @@ import os
 import re
 import sys
 
+# ⚠️ 实测坑（Windows）：默认 stdout 编码是 GBK，中文/符号输出会乱码甚至 UnicodeEncodeError。
+# 与 checkall.py 同一口径强制 UTF-8。
+for _s in ('stdout', 'stderr'):
+    _f = getattr(sys, _s, None)
+    if hasattr(_f, 'reconfigure'):
+        _f.reconfigure(encoding='utf-8', errors='replace')
+
 ROOT = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith('-') \
     else os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 os.chdir(ROOT)
@@ -204,6 +211,17 @@ if POOL:
 
 
 # ---------- 6. 指定检索平台：数量 2–3 且必须在 20 个平台之内 ----------
+# 段名两种口径都收：多数域用「## 外部承接」，S1-course-qa 用「## 可选外部参考」（指定平台位相同）。
+# 为什么加：旧版只认「外部承接」，S1 的平台清单**从未被校验过**，而输出仍打印「18 个域」并 PASS。
+SEC_EXT = r'^##\s*(?:外部承接|可选外部参考)[^\n]*$'
+# 唯一豁免域（R6 直查第一方来源，不做 skill 平台检索）：豁免集合从文档解析，
+# 不让代码里偷偷放行 —— 文档改了口径，这里必须跟着变，否则断言 FAIL。
+EXEMPT = set()
+if os.path.isfile('references/external-sources.md'):
+    for _l in rd('references/external-sources.md').splitlines():
+        if _l.lstrip().startswith('>') and '例外' in _l:
+            EXEMPT |= set(re.findall(r'`([A-Z]\d-[a-z0-9-]+)`', _l))
+
 PLATSET = set()
 if os.path.isfile('references/external-sources.md'):
     for m in re.finditer(r'https?://([a-z0-9.-]+)', rd('references/external-sources.md')):
@@ -212,13 +230,15 @@ if os.path.isfile('references/external-sources.md'):
     PLATSET.discard('github.com')
 
 n_pl = {}
+no_sec = []
 for d in dom_dirs:
     p = 'domains/%s/_domain.md' % d
     if not os.path.isfile(p):
         continue
     t = rd(p)
-    m = re.search(r'^##\s*外部承接[^\n]*$', t, re.M)
+    m = re.search(SEC_EXT, t, re.M)
     if not m:
+        no_sec.append(d)
         continue
     nxt = re.search(r'^##\s', t[m.end():], re.M)
     body = t[m.end():][:nxt.start() if nxt else len(t)]
@@ -233,8 +253,20 @@ for d in dom_dirs:
     for x in pl:
         if x.replace('www.', '') not in PLATSET:
             bad('%s 指定了未登记的平台 `%s`（疑编造平台）' % (p, x))
+# 覆盖率断言（双向）：除豁免域外每域都必须给出「指定检索平台」；豁免域必须真的没有。
+_uncov = [d for d in no_sec if d not in EXEMPT]
+if _uncov:
+    bad('以下域既无「指定检索平台」也未在 external-sources.md §一 声明豁免：%s'
+        % '、'.join(_uncov))
+_stale = sorted(EXEMPT & set(n_pl))
+if _stale:
+    bad('external-sources.md §一 声明豁免但实际已给出「指定检索平台」的域（豁免已过期）：%s'
+        % '、'.join(_stale))
+if not EXEMPT:
+    bad('external-sources.md §一 未声明豁免域（覆盖率断言无豁免白名单，可能误放行）')
 if n_pl:
-    ok('指定检索平台：%d 个域，均为 2–3 个且已在平台表登记' % len(n_pl))
+    ok('指定检索平台：%d 个域，均为 2–3 个且已在平台表登记（豁免 %d 域：%s）'
+       % (len(n_pl), len(EXEMPT), '、'.join(sorted(EXEMPT)) or '无'))
 
 # ---------- 6b. 平台检索式必须在位（否则检索必 0 命中）----------
 for d in dom_dirs:

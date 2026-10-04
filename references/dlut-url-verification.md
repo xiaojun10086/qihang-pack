@@ -303,7 +303,7 @@
 
 ---
 
-## 十一、全量外链自查（2026-10-03）· 138 条外链 · 三通道交叉
+## 十一、全量外链自查（2026-10-03）· 148 条外链 · 三通道交叉
 
 **为什么重做**：此前各轮都只用**一条**出网通道（WebFetch 或 `node fetch`），
 且部分轮次把「本机抓取失败」直接判为「站点失效」→ 结论里混入了**通道噪声**。
@@ -327,7 +327,13 @@
 
 ### 11.2 总量与结论
 
-- 范围：包内**唯一外链 138 条 / 引用 654 处**（不含 `*.dlut.edu.cn` 这类通配写法）。
+- 范围：包内**唯一外链 148 条 / 出现 523 处**；其中 **DUT 域内 118 条 / 485 处**，非 DUT 站点 30 条
+  （`github.com` 11 条等）—— 口径与复现命令见 §11.7 ①（`http` 与 `https` 视为同一条、去尾斜杠）。
+- ⚠️ **口径更正**：本节初版写「唯一外链 138 条 / 引用 654 处」，但**未声明口径**，且 §11.7 的
+  复现命令指向**从未随包交付**的 `urlcheck.py` → 该两数**无法复现**（已删）。现按 §11.7 ① 重算，
+  并由 `scripts/aligncheck.py` 断言：改了链接不同步本节 → 直接 FAIL。
+- ⚠️ **可达性分布是快照、未复测**：下表 `135 / 1 / 1 / 1` 之和 = 138，是 **2026-10-03 网络实测**
+  的当时口径（口径未记录），与上行的「唯一外链 148 条」**不是同一口径**，勿混用。
 - **135 条 200 ｜ 1 条 404 ｜ 1 条 NXDOMAIN ｜ 1 条为通配写法（非真实 URL）**。
 
 | 判定 | 条数 | 说明 |
@@ -399,13 +405,41 @@
 ### 11.7 复现命令
 
 ```bash
-# 三通道 DNS + 端口 + 双协议实抓（Python 3.10+，标准库即可）
-python urlcheck.py <仓库根>          # D1/D2/D3 + T80/T443 + GET ×3
-# 单点复核（任一条即可证伪「失效」）
+# ① 计数口径 —— §11.2 的两个数就出自这段（Python 3.10+，标准库即可）
+python - <<'PY'
+import os, re, collections
+DEV = {'validation-report.md', 'acceptance-v2.md', 'review-report-v2.2.md', 'review-report-v2.3.md',
+       'review-report-v2.4.md', 'stress-test-v3.md', 'alignment-audit-v3.md', '需求确认书-v2三级结构.md'}
+occ = collections.Counter()
+for b, d, fs in os.walk('.'):
+    d[:] = [x for x in d if x not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
+    for f in fs:
+        if f in DEV or f == '.gitignore':
+            continue
+        t = open(os.path.join(b, f), encoding='utf-8', errors='replace').read()
+        for m in re.finditer(r'https?://[^\s`"\u3000）)】|>,;]+', t):
+            u = m.group(0)
+            if u.startswith('http:'):
+                u = 'https' + u[4:]
+            u = u.rstrip('/').rstrip('。').rstrip('、')
+            occ[u] += 1
+dut = {u: v for u, v in occ.items() if 'dlut' in u}
+print('唯一外链 %d 条 / 出现 %d 处；DUT 域内 %d 条 / %d 处'
+      % (len(occ), sum(occ.values()), len(dut), sum(dut.values())))
+PY
+
+# ② 单点复核（任一条即可证伪「失效」）
 curl -sI http://jxgl.dlut.edu.cn/student/home          # 期望 200
 python -c "import socket;print(socket.getaddrinfo('law.dlut.edu.cn',None))"   # 期望 gaierror
+
+# ③ 三通道 DNS + 端口 + 双协议实抓（D1/D2/D3 + T80/T443 + GET ×3）
+#    ⚠️ 这部分的工具**不在包内**：初版本节写 `python urlcheck.py <仓库根>`，但仓库里
+#    从来没有这个文件（开发期脚本未随包交付）→ 该命令**不可复现**。
+#    需要三通道复核时，按 11.1 的通道表自行实现，或直接用 ② 的单点复核证伪「失效」。
 ```
 
 > **口径声明**：本节的「可达」= **至少一条通道取到 HTTP 200**；
 > 「不存在」= **D1/D2/D3 三条独立解析通道一致否定**且端口全关。
 > 二者都**不含**「站点内容是否权威、是否需登录」的判断 —— 后者另见 `dlut-site-profiles.md`。
+> **「唯一外链」= 按 ① 归一化后的不同 URL 数**（`http://` 与 `https://` 视为同一条、去尾斜杠），
+> **「出现」= 同一 URL 在包内被引用的总次数**；两数由 `scripts/aligncheck.py` 断言，改链接不同步本节即 FAIL。

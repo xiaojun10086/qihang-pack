@@ -16,7 +16,7 @@
 | 在线浏览 | [github.com/xiaojun10086/qihang-pack/tree/release](https://github.com/xiaojun10086/qihang-pack/tree/release ) |
 | 命令行安装 | `git clone -b release https://github.com/xiaojun10086/qihang-pack.git` |
 
-> **`release` 分支 = 纯净交付树**（173 个文件）：只含运行所需内容 —— 无构建脚本、无内部过程文档、无本机路径。
+> **`release` 分支 = 纯净交付树**（176 个文件）：只含运行所需内容 —— 无构建脚本、无内部过程文档、无本机路径。
 > 下载后把目录放到 `~/.learnbuddy/skills/qihang`（用户级）或当前工作区 `.learnbuddy/skills/qihang`（项目级）即可使用，
 > **无需安装任何依赖**（私密站只读为可选功能，见 `INSTALL.md` §六）。
 > 开发树（含生成器链与过程文档）在 [`main` 分支](https://github.com/xiaojun10086/qihang-pack )。
@@ -48,11 +48,12 @@ qihang-pack/
 │   ├── dlut-official-sites.md      DUT 公开站信息库（142 条条目 / 表格行 162）
 │   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
 │   ├── dlut-field-map.md           私密站字段映射表
-│   ├── dlut-url-verification.md    URL 核验台账（22 项待人工补）
-│   ├── dlut-site-profiles.md       19 站画像
+│   ├── dlut-url-verification.md    URL 核验台账（16 项待人工补）
+│   ├── dlut-site-profiles.md       18 站画像
 │   ├── browser-matrix.md           浏览器实测矩阵
 │   ├── skill-compliance-audit.md   库内 skill 来源合规自检报告
 │   ├── skill-selection-matrix.md   skill 选型矩阵（校园主体 → 域 → skill）
+│   ├── external-sources.md         外部平台入口清单（20 个入口 + 检索规则）
 │   ├── platforms.md                平台适配表
 │   └── e2e-scenarios.md            3 条端到端演示路径
 ├── commands/                    22 张入口卡（含学习/信息搜集默认入口与各可选域卡）

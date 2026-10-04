@@ -39,7 +39,7 @@
   T **输出形态硬契约**：全量输出块零内部名（域代号 / skill 名 / 脚本与库文件名 / 流程词 /
     「红线」）/ 结论前置 / 恰好 1 个【下一步】/ 降级标注只写能力级
 """
-import os, re, sys, json, glob, io, hashlib, collections
+import os, re, sys, json, glob, io, hashlib, collections, subprocess
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].isdigit() else '.')
@@ -70,6 +70,8 @@ DEV_ONLY_DOCS = {
     'review-report-v2.2.md', 'review-report-v2.3.md', 'review-report-v2.4.md',
     'stress-test-v3.md', 'alignment-audit-v3.md', '需求确认书-v2三级结构.md',
 }
+# 开发侧版本控制元数据：release 树里没有（`.gitattributes` 有，故不在此列）。
+DELIV_EXCLUDE_FILES = {'.gitignore'}
 
 
 def walk_files():
@@ -84,6 +86,11 @@ def walk_files():
 
 FILES = walk_files()
 MD = [f for f in FILES if f.endswith('.md')]
+# 「活文档」= MD 去掉开发期生成器目录 `scripts/_build/`。
+# `_build/v3/README.md` 是**历史变更记录**（如「step62：平台 12 → 20」「12 平台入口表」），
+# 描述的是当时的状态，不是当下的声明 —— 拿它去对当下的实测数会误判。
+# 且 `_build` 不随包交付（release 树无此目录），用户永远看不到。
+LIVE_MD = [f for f in MD if not f.startswith('scripts/_build/')]
 SKILLS = [f for f in FILES if f.endswith('SKILL.md')]
 LOCAL = [f for f in SKILLS if '/skills/local/' in f]
 DOMAIN = [f for f in FILES if f.endswith('/_domain.md')]
@@ -869,6 +876,203 @@ def run_round(r):
                     if int(_m2.group(1)) != _n8:
                         bad(_f2, '「未核实清单」项数 %s ≠ 实测 %d'
                             % (_m2.group(1), _n8))
+            # 「N 项待人工补」= §8 未核实清单（同一口径的另一种写法）
+            for _f2 in [x for x in LIVE_MD if '待人工补' in rd(x)]:
+                for _m2 in re.finditer(r'(\d{1,3})\s*项待人工补', rd(_f2)):
+                    if int(_m2.group(1)) != _n8:
+                        bad(_f2, '「待人工补」项数 %s ≠ §8 未核实清单实测 %d'
+                            % (_m2.group(1), _n8))
+
+    # 站点画像数：`dlut-site-profiles.md` 表头声明「N 个站点」== §一 表格数据行数；
+    # 其他文档写「N 站画像」也必须同源。
+    # 为什么加：README 长期写「19 站画像」而文件自身声明 18 —— 四个校验器全绿，无人断言。
+    _sp = 'references/dlut-site-profiles.md'
+    if os.path.exists(_sp):
+        _stp = rd(_sp)
+        _dm = re.search(r'(\d{1,3})\s*个站点', _stp)
+        _s1 = section(_stp, r'^## 一、')
+        _nsp = None
+        if _s1 is not None:
+            _r1 = [l for l in _s1.splitlines() if l.startswith('|')]
+            _sep1 = {i for i, l in enumerate(_r1) if set(l.strip()) <= set('|-: ')}
+            _nsp = len([l for i, l in enumerate(_r1)
+                        if i not in _sep1 and (i - 1) not in _sep1])
+        if _dm and _nsp is not None and int(_dm.group(1)) != _nsp:
+            bad(_sp, '站点画像声明 %s 个站点 ≠ §一 表格实测 %d 行'
+                % (_dm.group(1), _nsp))
+        if _nsp is not None:
+            for _f4 in LIVE_MD:
+                if not os.path.exists(_f4):
+                    continue
+                for _m4 in re.finditer(r'(\d{1,3})\s*站画像', rd(_f4)):
+                    if int(_m4.group(1)) != _nsp:
+                        bad(_f4, '「站画像」声明 %s ≠ 实测 %d'
+                            % (_m4.group(1), _nsp))
+
+    # 交付树文件总数：README 声明的「release 分支 = 纯净交付树（N 个文件）」必须等于交付集实际文件数。
+    # 交付集口径 = 排除 .git/.idea/.learnbuddy/__pycache__/_build 与过程文档（与负向自测的复制口径一致）。
+    # 另排除开发侧版本控制元数据 `.gitignore`（release 树无此文件，实测 `git ls-tree release` 176 项）。
+    # ⚠️ `.gitattributes` **不排除** —— 它确实在 release 树里（与 main 同 blob），算进去才与
+    # 「release 分支 = 纯净交付树（176 个文件）」同解；把它一并排除会得到 175，反而与事实不符。
+    # 为什么加：该计数曾长期停留在 173（实际 176），而四个校验器全绿。
+    # 为什么不用 git 当唯一真值：负向自测在**无 .git 的临时树**上跑，只认 git 的断言在负向测试里会空转。
+    _deliv = 0
+    for _b5, _d5, _fs5 in os.walk('.'):
+        _d5[:] = [d for d in _d5 if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
+        _deliv += len([f for f in _fs5
+                       if f not in DEV_ONLY_DOCS and f not in DELIV_EXCLUDE_FILES])
+    if _deliv:
+        for _f5 in LIVE_MD:
+            if not os.path.exists(_f5):
+                continue
+            for _m5 in re.finditer(r'交付树[^\n]{0,14}?(\d{2,4})\s*个文件', rd(_f5)):
+                if int(_m5.group(1)) != _deliv:
+                    bad(_f5, '交付树文件总数声明 %s ≠ 交付集实测 %d'
+                        % (_m5.group(1), _deliv))
+    # 有 .git 时再交叉核验一次：工作树交付集必须与 release ref 一致（防「本地多塞了文件」）。
+    if os.path.isdir('.git') and _deliv:
+        try:
+            _rel = subprocess.run(['git', 'ls-tree', '-r', '--name-only', 'release'],
+                                  capture_output=True, text=True, timeout=60)
+        except Exception:
+            _rel = None
+        if _rel is not None and _rel.returncode == 0:
+            _nr = len([x for x in _rel.stdout.splitlines() if x.strip()])
+            if _nr != _deliv:
+                bad('README.md', '交付集文件数 %d ≠ release ref %d（工作树与 release 不一致）'
+                    % (_deliv, _nr))
+
+    # qihang.sh status 的 1 级清单 == library/ 实际文件（INSTALL.md 声明「逐行列出 11 个」）
+    # 为什么加：实测该循环漏列 external-bridge.md / general-fallback.md（9/11），
+    # 而 selfcheck 只断言 library 文件数 = 11，不断言「被列出的」是不是同一批。
+    if os.path.exists('scripts/qihang.sh'):
+        _qs = rd('scripts/qihang.sh')
+        _blk = re.search(r'\[1级\] skill 库"(.*?); do', _qs, re.S)
+        if _blk:
+            _listed = set(re.findall(r'library/([\w-]+\.md)', _blk.group(1)))
+            _actual = {f.split('/')[-1] for f in FILES
+                       if f.startswith('library/') and f.endswith('.md')}
+            _miss = sorted(_actual - _listed)
+            if _miss:
+                bad('scripts/qihang.sh', 'status 的 1 级清单漏列 %d 个 library 文件: %s'
+                    % (len(_miss), '、'.join(_miss)))
+
+    # 外部平台目录数：`references/external-sources.md` 的编号入口行数 == 各处声明数。
+    # 为什么加：`domains/_registry.md` 长期写「12 个平台目录」（v3.3.1 已扩到 20 个），
+    # 且 aligncheck 只在 `_domain.md` 里拦「检索 12 平台」旧口径，总表这一处是射程外。
+    _es = 'references/external-sources.md'
+    if os.path.exists(_es):
+        # 只数**入口表**（表头 `| # | 平台 | 检索入口 | …`）的数据行 —— 文件内其他表也有编号行，
+        # 全局数「编号行」会得到 58 这类假值（实测踩过）。
+        _esl = rd(_es).splitlines()
+        _npl = 0
+        for _i6, _l6 in enumerate(_esl):
+            if _l6.startswith('|') and '平台' in _l6 and '检索入口' in _l6:
+                for _l6b in _esl[_i6 + 1:]:
+                    if not _l6b.startswith('|'):
+                        break
+                    if set(_l6b.strip()) <= set('|-: '):
+                        continue
+                    _npl += 1
+                break
+        if _npl:
+            for _f6 in LIVE_MD:
+                if not os.path.exists(_f6):
+                    continue
+                _t6 = rd(_f6)
+                for _pat6 in (r'(?<![\d\u2013\u2014-])(\d{1,3})\s*个平台(?:目录|入口)',
+                              r'(?<![\d\u2013\u2014-])(\d{1,3})\s*平台'):
+                    for _m6 in re.finditer(_pat6, _t6):
+                        if int(_m6.group(1)) != _npl:
+                            bad(_f6, '平台数声明 %s ≠ external-sources.md 实测 %d'
+                                % (_m6.group(1), _npl))
+                for _l6 in _t6.splitlines():
+                    if '平台' not in _l6:
+                        continue
+                    for _m6 in re.finditer(r'(?<![\d\u2013\u2014-])(\d{1,3})\s*个入口', _l6):
+                        if int(_m6.group(1)) != _npl:
+                            bad(_f6, '平台入口数声明 %s ≠ external-sources.md 实测 %d'
+                                % (_m6.group(1), _npl))
+
+    # §11.2 外链口径计数：`dlut-url-verification.md` 声明的「唯一外链 N 条 / 出现 M 处」
+    # 与「DUT 域内 N 条 / M 处」必须等于按 §11.7 ① 口径在交付集上的实测值。
+    # 为什么加：该行长期写「138 条 / 654 处」，无口径、复现命令还指向从未交付的 `urlcheck.py`，
+    # 四个校验器全绿 —— 数字对不上也没人发现。口径 = `https?://` 匹配 + http→https + 去尾斜杠。
+    _uv = 'references/dlut-url-verification.md'
+    if os.path.exists(_uv):
+        _occ = collections.Counter()
+        for _b8, _d8, _fs8 in os.walk('.'):
+            _d8[:] = [d for d in _d8
+                      if d not in ('.git', '.idea', '.learnbuddy', '__pycache__', '_build')]
+            for _f8 in _fs8:
+                if _f8 in DEV_ONLY_DOCS or _f8 in DELIV_EXCLUDE_FILES:
+                    continue
+                _p8 = os.path.join(_b8, _f8)
+                try:
+                    _t8 = rd(_p8)
+                except Exception:
+                    continue
+                for _m8 in re.finditer(r'https?://[^\s`"\u3000）)】|>,;]+', _t8):
+                    _u8 = _m8.group(0)
+                    if _u8.startswith('http:'):
+                        _u8 = 'https' + _u8[4:]
+                    _occ[_u8.rstrip('/').rstrip('。').rstrip('、')] += 1
+        _dut8 = {u: v for u, v in _occ.items() if 'dlut' in u}
+        _uvt = rd(_uv)
+        for _m8 in re.finditer(r'唯一外链\s*(\d{1,4})\s*条\s*/\s*出现\s*(\d{1,4})\s*处', _uvt):
+            if int(_m8.group(1)) != len(_occ):
+                bad(_uv, '「唯一外链」声明 %s ≠ §11.7 口径实测 %d'
+                    % (_m8.group(1), len(_occ)))
+            if int(_m8.group(2)) != sum(_occ.values()):
+                bad(_uv, '「外链出现」声明 %s ≠ §11.7 口径实测 %d'
+                    % (_m8.group(2), sum(_occ.values())))
+        for _m8 in re.finditer(r'DUT 域内\s*(\d{1,4})\s*条\s*/\s*(\d{1,4})\s*处', _uvt):
+            if int(_m8.group(1)) != len(_dut8):
+                bad(_uv, '「DUT 域内外链」声明 %s ≠ 实测 %d'
+                    % (_m8.group(1), len(_dut8)))
+            if int(_m8.group(2)) != sum(_dut8.values()):
+                bad(_uv, '「DUT 域内外链出现」声明 %s ≠ 实测 %d'
+                    % (_m8.group(2), sum(_dut8.values())))
+
+    # 触发门词表同源（config.yaml「词表同源铁律」）：`learning_markers` 必须**逐词等于**
+    # 20 域 `## 触发词` 段的并集，且文档里「共 N 词」必须等于该词数。
+    # 为什么加：SKILL.md 长期写「共 196 词」（实测 219），而四个校验器全绿 —— 词表规模无人断言。
+    _mlm = re.search(r'^\s*learning_markers:\s*\[(.*?)\]\s*$', cfg, re.M | re.S)
+    if _mlm:
+        _lmw = [x.strip() for x in _mlm.group(1).split(',') if x.strip()]
+        if len(set(_lmw)) != len(_lmw):
+            bad('config.yaml', 'learning_markers 含重复项')
+        _uw = []
+        for d in DOMS:
+            _dt = rd('domains/%s/_domain.md' % d)
+            _sec = section(_dt, r'^##\s*触发词')
+            if _sec is None:
+                bad('domains/%s/_domain.md' % d, '缺 `## 触发词` 段（触发门并集无法派生）')
+                continue
+            for _w in re.findall(r'`([^`]+)`', _sec):
+                # 段内的反引号也可能包着路径 / 域代号（如 `R6`、`_registry.md`），不是触发词
+                if re.fullmatch(r'[A-Z]\d', _w) or '/' in _w or '.' in _w:
+                    continue
+                _uw.append(_w)
+        _miss = sorted(set(_uw) - set(_lmw))
+        _extra = sorted(set(_lmw) - set(_uw))
+        if _miss:
+            bad('config.yaml', 'learning_markers 漏掉 %d 个域触发词: %s'
+                % (len(_miss), '、'.join(_miss[:8])))
+        if _extra:
+            bad('config.yaml', 'learning_markers 多出 %d 个非域触发词: %s'
+                % (len(_extra), '、'.join(_extra[:8])))
+        _nlm = len(set(_lmw))
+        for _f7 in LIVE_MD:
+            if not os.path.exists(_f7):
+                continue
+            for _l7 in rd(_f7).splitlines():
+                if 'learning_markers' not in _l7:
+                    continue
+                for _m7 in re.finditer(r'共\s*(\d{1,3})\s*词', _l7):
+                    if int(_m7.group(1)) != _nlm:
+                        bad(_f7, 'learning_markers 词数声明 %s ≠ 实测 %d'
+                            % (_m7.group(1), _nlm))
 
     # ---------- T 输出形态硬契约（全量输出块零内部名） ----------
     # 与 runcheck.py 的 L3-5 的差别：runcheck 只校验**首块**（正常路径示例），
