@@ -32,7 +32,7 @@ qihang-pack/
 ├── skills/               # 25 个扁平 skill
 │   └── <skill-name>/SKILL.md
 ├── agents/               # 3 个人格：study-coach / research-librarian / campus-concierge
-├── commands/             # 7 个斜杠命令：learn / notes / exam / paper / code / search / campus
+├── commands/             # 7 个斜杠命令：/learn /notes /exam /paper /code /search /campus
 ├── docs/                 # skill-anatomy / getting-started / agents
 └── references/           # 可核验信息源：dlut-official-sites / dlut-login-sites / dlut-field-map
 ```
