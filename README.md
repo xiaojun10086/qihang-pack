@@ -1,203 +1,151 @@
-# 「启航」新生学习生活一体化学伴包 v3.4
+# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.0
 
-> **默认先满足学生高频任务：学习 + 公开信息搜集；其余生活与科研专域作为可选扩展。**
-> 面向大连理工大学 2026 级本科新生 ｜ 强绑定 DUT 公开站与需登录的私密站
-> 适配：**LearnBuddy（= 连小理）**（单一目标平台）
-> 定位：**DUT 特化规则与 skill 库（库内优先）** —— 文本资产离线可读；技能实际执行依赖宿主平台的模型与工具；
-> 库内与同域降级都接不住时，可走**可选的外部桥接**（平台目录当前列出 20 个入口 + 五步自检，见 `library/external-bridge.md`），**外部未命中即回落原有流程**
+> 面向大连理工大学（大工 / DUT）学生 ｜ 强绑定 DUT 公开站与需登录的校内平台
+> 结构：**扁平 skill 包，25 个 skill**，按「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段组织
+> 用法：直接用自然语言说需求，**不需要斜杠命令，也不需要先选分类**
 
 ---
 
-## 0. 下载与快速开始
+## 0. 快速开始
 
-| 方式 | 一步到位 |
-|---|---|
-| **下载交付包（推荐）** | [`release` 分支 ZIP](https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/release.zip ) |
-| 在线浏览 | [github.com/xiaojun10086/qihang-pack/tree/release](https://github.com/xiaojun10086/qihang-pack/tree/release ) |
-| 命令行安装 | `git clone -b release https://github.com/xiaojun10086/qihang-pack.git` |
+```bash
+git clone https://github.com/xiaojun10086/qihang-pack.git
+cp -r qihang-pack ~/.learnbuddy/skills/qihang     # 或项目级 .learnbuddy/skills/qihang
+```
 
-> **`release` 分支 = 纯净交付树**（177 个文件）：只含运行所需内容 —— 无构建脚本、无内部过程文档、无本机路径。
-> 下载后把目录放到 `~/.learnbuddy/skills/qihang`（用户级）或当前工作区 `.learnbuddy/skills/qihang`（项目级）即可使用，
-> **无需安装任何依赖**（私密站只读为可选功能，见 `INSTALL.md` §六）。
-> 开发树（含生成器链与过程文档）在 [`main` 分支](https://github.com/xiaojun10086/qihang-pack )。
+**装完怎么开始**：直接说需求即可。
 
-**装完怎么开始**：在宿主里直接说需求即可，不必先选分类或模式。
-
-- **能做什么**：理解题目、整理课堂笔记、拆作业与检查点、备考计划、查学校与课程信息、查学术资料
-- **怎么开口**：用自然语言说目标即可，不必先选分类；只有会改变答案的关键信息缺失时才会被追问
-- **一句话示例**：「帮我理解这道题」／「安排一周备考计划」
+- 「这步怎么来的，没听懂」→ 分步讲解
+- 「下周考高数，怎么复习」→ 考前冲刺
+- 「帮我上教务系统查一下这学期课表」→ 校内平台代操作
+- 「最近有什么奖学金通知」→ 通知跟踪
 
 ---
 
-## 1. 三级结构
+## 1. 结构
 
 ```
 qihang-pack/
-├── SKILL.md                  入口（安装单元）
-├── LICENSE                     MIT 许可证全文
-├── THIRD_PARTY_NOTICES.md      skill 来源说明与许可证归属（10 个 MIT 来源 + 2 项零摘录思路参考）
-├── config.yaml               学校绑定 + 学期配置 + 域开关
-├── library/                  ★1 级 · skill 库（既是 skill 也是库）
-│   ├── README.md             库导航页（非安装入口，无 frontmatter）
-│   ├── login-policy.md       登录选择原则（A/B/C 三档）
-│   ├── clarity.md            职责1：需求明确（6 槽位 + 澄清门）
-│   ├── domain-review.md      职责2：域审查（锁定/越界/跨域/无域兜底）
-│   ├── domain-review-cases.md  配套：越界用例（含反例）
-│   ├── output-spec.md        职责3：输出规范（模板 + 简略原则）
-│   ├── output-checklist.md   配套：7 项硬校验
-│   ├── memory.md             学习档案：四类内容 + 分层落点 + 敏感域红线
-│   ├── skill-evolution.md    习惯自迭代（只改可改段的非结构性迭代）
-│   ├── external-bridge.md    外部桥接（库内与同域降级都接不住时的桥接档）
-│   ├── general-fallback.md   职责4：通用兜底框架（零 skill 命中也出结果）
-│   └── experience.md         学生呈现层（前台白名单 / 禁止物 / 翻译规则 / 起始句型唯一副本）
-├── domains/                  ★2 级 · 域（20 个）
-│   ├── _registry.md          域总表 + 方向自查 + 触发词消歧
-│   └── <域ID>-<slug>/
-│       ├── _domain.md        域定义：边界 / 触发词 / DUT 绑定点
-│       └── skills/
-│           └── local/<name>/SKILL.md    ★3 级 · 库内 skill（唯一通道，无需安装）
-├── references/                  数据与依据
-│   ├── dlut-official-sites.md      DUT 公开站信息库（142 条条目 / 表格行 162；16 项待人工补）
-│   ├── dlut-login-sites.md         DUT 私密站清单（方案 A + Profile 隔离）
-│   ├── dlut-field-map.md           私密站字段映射表
-│   ├── dlut-url-verification.md    URL 核验台账（域名可达性 · 外链三通道自查）
-│   ├── dlut-site-profiles.md       18 站画像
-│   ├── browser-matrix.md           浏览器实测矩阵
-│   ├── skill-compliance-audit.md   库内 skill 来源合规自检报告
-│   ├── skill-selection-matrix.md   skill 选型矩阵（校园主体 → 域 → skill）
-│   ├── external-sources.md         外部平台入口清单（20 个入口 + 检索规则）
-│   ├── platforms.md                平台适配表
-│   └── e2e-scenarios.md            3 条端到端演示路径 + 真实运行记录协议（§0）
-├── commands/                    22 张入口卡（含学习/信息搜集默认入口与各可选域卡）
-└── scripts/
-    ├── selfcheck.sh             结构与计数自检
-    ├── audit.sh                 安全审计 + L3 门禁实测
-    ├── regress.sh               行为回归（澄清门算例 / 门禁矩阵）
-    ├── aligncheck.py            全量文件级对齐审计（22 组断言）
-    ├── runcheck.py              结构 / 示例 / 输出契约静态检查（不调用模型或目标平台）
-    ├── extskill.py              外部 skill 桥接静态自检（来源与许可门禁）
-    ├── negative_test.py         负向自测（注入缺陷，断言必须 FAIL）
-    ├── checkall.py              自检单入口（固定顺序 + 逐项计时 + 摘要）
-    ├── metrics.py               指标埋点口径与发布门禁（唯一真相源）
-    ├── dlut-read.sh             DUT 私密站只读访问辅助（方案 A 受控浏览器）
-    └── qihang.sh                管理脚本
+├── SKILL.md              # 包入口（兼容单 skill 装载）
+├── plugin.json           # 插件清单，"skills": "./skills"
+├── config.yaml           # 学校绑定与学期参数（唯一需要按学期修改的文件）
+├── skills/               # 25 个扁平 skill
+│   └── <skill-name>/SKILL.md
+├── agents/               # 3 个人格：study-coach / research-librarian / campus-concierge
+├── commands/             # 7 个斜杠命令：/learn /notes /exam /paper /code /search /campus
+├── docs/                 # skill-anatomy / getting-started / agents
+└── references/           # 可核验信息源：dlut-official-sites / dlut-login-sites / dlut-field-map
 ```
 
-## 2. 默认工作流（核心快路径）
+**加载机制**：启动时只有每个 skill 的 `name` + `description` 进入上下文，`SKILL.md` 正文按需加载。因此 description 决定能不能被发现。
 
-```
-用户需求
-  ↓ 直接描述目标，不用先选 skill / domain
-  ↓ 自动分析任务并路由到最合适的能力
-  ↓ 只在关键信息会改变回答时追问
-  ↓ 学习任务直接辅导；事实检索给来源、日期与核验状态
-```
+结构规范见 [`docs/skill-anatomy.md`](docs/skill-anatomy.md)。
 
-### 2.1 第一阶段体验增强（产品化改进）
+---
 
-这个版本优先解决“用户不需要懂内部结构”的体验问题。第一阶段的核心改进包括：
+## 2. 25 个 skill
 
-- 统一快速上手入口与自然语言模板：不要求用户先理解 `S1/S2/R6` 等域编号
-- 统一快速模板：用户直接输入自然语言即可启动
-- 最小必要追问：只在关键信息会改变答案时追问，且先说明为什么需要
-- 后台规则收敛：触发门、红线、安全边界保留，但在前台不暴露为复杂流程
-- 结果输出统一：结论、依据、来源、下一步，减少使用者理解成本
-- `bash scripts/qihang.sh quick` 展示自然语言示例；它只是帮助菜单，不会启动对话或代替宿主执行任务
+| 阶段 | skill | 做什么 |
+|---|---|---|
+| — | `using-qihang` | 总入口与路由；三条共享行为准则 |
+| 学习 | `explain-stepwise` | 分步讲解一个概念或一道题 |
+| 学习 | `error-diagnose` | 从多道错题里归因 |
+| 学习 | `faster-cycle` | 系统学完一门课 |
+| 学习 | `lecture-to-notes` | 讲义 / 课堂整理成可复习笔记 |
+| 学习 | `reading-note` | 精读论文与专著 |
+| 学习 | `lang-drill` | 语言能力练习 |
+| 巩固 | `exam-sprint` | 考前冲刺排程 |
+| 巩固 | `recall-schedule` | 记忆与间隔重复排程 |
+| 产出 | `assignment-plan` | 大作业与小组任务拆解 |
+| 产出 | `lab-report` | 实验报告骨架与自查 |
+| 产出 | `paper-outline` | 论文结构与答辩准备 |
+| 产出 | `cite-normalize` | 参考文献格式与文献管理 |
+| 数据代码 | `data-lab` | 实验数据处理与统计 |
+| 数据代码 | `code-mentor` | 编程学习与科研代码 |
+| 检索 | `campus-search` | 校园公开信息检索 |
+| 检索 | `advisor-finder` | 导师与教师资料 |
+| 检索 | `notice-track` | 通知与截止节点跟踪 |
+| 检索 | `lit-fetch` | 文献检索与全文获取 |
+| 检索 | `citation-verify` | 引文核验 |
+| 校务 | `campus-desk` | 校园事务办理路径 |
+| 校务 | `course-select` | 选课与培养方案对照 |
+| 校务 | `campus-proof-guide` | 证明开具 |
+| 校务 | `dorm-life` | 宿舍、报修、离校 |
+| 校务 | `portal-operator` | 校内平台代操作 |
 
-**可直接使用的起始句型**（唯一副本：`library/experience.md`）：
+---
 
-- 「帮我理解这道题」
-- 「这节课我没听懂，整理重点和笔记」
-- 「我有作业，先拆任务，再给检查点」
-- 「安排一周备考计划」
-- 「查一下学校通知 / 课程安排 / 教务信息」
-- 「我需要查学术资料，先给检索思路和可信来源」
+## 3. 三条共享行为准则
 
-> ⚠️ **危机与安全**：若你或身边的人出现自伤 / 自杀念头，请立即拨打心理援助热线 **12356**（或 **010-82951332**）；遇诈骗、可疑转账先拨 **96110**。本包**不做诊断、不做危机干预**，只做转介——出现危机信号时先给出口，再谈任务。
+所有 skill 都遵守，正文不再重复声明：
 
-**默认核心域**：S1–S6 学习 + R6 学生公开信息搜集。R1 文献检索为专项扩展；F1–F8 与 R2–R5 保留为可选扩展，只有相关任务出现时才路由。普通请求不强制走 8 步工作流、外部 skill 搜索、固定输出模板、自动归档或自迭代。实时信息依赖宿主提供的搜索工具；没有工具时会明确说明无法实时核验。
+1. **先给可用的答案** —— 结论放最前面；只追问会改变答案、安全边界或下一步行动的信息，一轮内一次问完。
+2. **区分「解释」与「代做」** —— 讲方法、给结构、给路径、给同类练习可以；不产出用于提交的成品（作业答案、论文正文、可提交代码、文书）。判据是用途：说「交上去」不给成品，说「自己对着学」就讲透。
+3. **涉及事实必须给来源** —— 校内信息优先官方来源，附出处与日期；未实时核验就明说「未核验」，不编造 URL、电话、单位名、时间。
 
-### 2.2 第二、三阶段（宿主内的体验增强）
+### 安全兜底（高于以上全部）
 
-- **自动路由**：按主要目标选择学习、检索或行动交付；歧义会实质改变结果时才澄清。
-- **会话连续性**：在当前对话内沿用用户已给出的目标、约束与进度；跨会话读取或保存仍须用户明确要求并遵守隐私规则。
-- **交付模式**：学习辅导、带来源的信息检索、可执行的计划/检查点按任务自动选择，不要求用户先选模式。
-- **反馈闭环**：用户可要求更简洁、更详细、核对来源或指出错误；默认只在当前对话修订，不收集原话、不自动持久化评价。
-- **可编辑结构化内容**：按需输出表格、清单、时间线或概念层级，便于复制和继续修改。
-
-以上能力由宿主对话与文本资产承载；本仓库不是独立 Web 应用，不提供图形界面、自动跨会话数据库或真实图像渲染。
-
-**个人配置默认留空**：`config.yaml` 中校区、学院、年级、学期、课程、考试周和作息均未预设。`null` / 空列表表示未知；不得据此推断用户身份或经历。用户可自行确认后填写，任务无关时不追问。
-
-## 3. 完整域库（核心 + 可选扩展）
-
-| 大类 | 域 |
+| 情形 | 联系方式 |
 |---|---|
-| **核心：S 学习（6）** | S1 课程答疑 ｜ S2 课堂与笔记 ｜ S3 作业与考核 ｜ S4 备考与记忆 ｜ S5 学术表达 ｜ S6 语言能力 |
-| **F 生活（8）** | F1 校园事务 ｜ F2 作息与专注 ｜ F3 身心与社交 ｜ F4 财务与安全 ｜ F5 健康与运动 ｜ F6 军训与志愿 ｜ F7 升学深造 ｜ F8 求职与竞赛 |
-| **核心：R6 信息搜集** | 学校/课程/通知/机构等公开资料，优先官方来源并标注时效 |
-| **专项扩展：R 科研（R1–R5）** | R1 文献检索与管理 ｜ R2 实验与数据 ｜ R3 科研工具与代码 ｜ R4 学术产出与投稿 ｜ R5 学术规范与伦理 |
+| 自伤 / 轻生念头 | **12356**（24 小时）、**010-82951332**；已有具体计划 → **110 / 120** |
+| 转账被骗 | 挂失银行卡 + **96110** + **110** |
+| 急症、外伤、意识异常 | **120**，不诊断、不给药 |
 
-**完整资产规模**：20 个域、92 个库内 skill。默认聚焦 7 个核心域（S1–S6、R6）；13 个生活与专项科研域保持可选。来源口径为 **80 个自建 + 12 个有来源记录**；其中 10 个基于 MIT 许可项目骨架重写，另 2 个仅参考方法论、零内容摘录。细目见 `THIRD_PARTY_NOTICES.md`。
+---
 
-> 92 个 skill 是提示词与流程资产的数量，不代表 92 项能力都经过目标平台实测。当前 `runcheck.py` 只做结构、示例和输出契约检查，不调用模型或 LearnBuddy。建议按高频、低风险场景分阶段验证后再扩大对外承诺。
+## 4. 校内平台代操作
 
-## 4. 安装与使用
+`portal-operator` 在用户明确授权后**直接打开目标平台并执行操作**，然后回报结果，而不是给一个链接让用户自己去。
 
-```bash
-# 1) 放进 skills 目录
-cp -r qihang-pack ~/.learnbuddy/skills/qihang
-# 2) LearnBuddy 无需斜杠命令：22 张 commands/ 域入口卡随包提供，直接读即可
-# 3) 查看状态（库内 skill 开箱即用，无任何外部依赖）
-bash ~/.learnbuddy/skills/qihang/scripts/qihang.sh status
-```
+**只在两处停下确认**：
 
-```bash
-bash scripts/selfcheck.sh         # 结构与计数自检
-bash scripts/audit.sh             # 安全审计 + L3 门禁实测
-bash scripts/regress.sh 3         # 行为回归（连跑 3 轮验证确定性）
-python scripts/aligncheck.py . 5  # 全量对齐审计（连跑 5 轮）
-python scripts/runcheck.py . 3    # 静态契约检查（连跑 3 轮，非模型端到端测试）
-python scripts/checkall.py .       # 自检单入口（静态校验器 + 计时摘要）
-bash scripts/qihang.sh quick      # 快速入口（自然语言起始句型示例）
-bash scripts/qihang.sh status     # 三级结构完整度
-bash scripts/qihang.sh domains    # 20 域清单
-bash scripts/qihang.sh registry   # DUT 信息库统计
-bash scripts/qihang.sh new-term   # 换学期重置
-```
+| 类别 | 处理 |
+|---|---|
+| 涉及支付金额 | 复述金额与用途，用户确认后再继续 |
+| 不可撤销操作（提交报名、退课、退宿申请等） | 复述操作内容与后果，用户确认后再提交 |
+
+其余查询类操作直接执行。凭证（用户名 / 密码 / 验证码）只留在浏览器会话里，不写入任何文件、日志或回复正文。页面上的身份证号、银行卡、家庭信息不主动读取也不转述。
+
+平台入口见 [`references/dlut-login-sites.md`](references/dlut-login-sites.md)，字段映射见 [`references/dlut-field-map.md`](references/dlut-field-map.md)。
+
+---
 
 ## 5. DUT 融入
 
-| 类型 | 文件 | 融入方式 |
+| 类型 | 文件 | 内容 |
 |---|---|---|
-| 公开站 | `references/dlut-official-sites.md` | **142 条**条目（表格行 162），20 个域的 `_domain.md` 各自标注绑定点 |
-| 私密站 | `references/dlut-login-sites.md` | 45 个需登录站点（§1 主表 19 + §1.1 补充 26），**方案 A 受控浏览器 + 只读**，分 L1/L2/L3 授权 |
-| 校内信息搜集 | `domains/R6-info-retrieval/` | 导师/教师公开资料（`faculty.dlut.edu.cn`、`gs.dlut.edu.cn`）+ 公开信息检索与路由 |
+| 公开站 | `references/dlut-official-sites.md` | 学校主站、校区、教学资源、学部学院、职能部门、官方新媒体；含域名规律与未核实清单 |
+| 需登录站 | `references/dlut-login-sites.md` | 45 个需登录站点；含 WebVPN 注意事项与易混淆系统对照 |
+| 字段映射 | `references/dlut-field-map.md` | 门户聚合点可取的 6 类数据 + 逐站字段 + 归哪个 skill 消费 |
 
-**私密站安全边界**：访问脚本只打开用户可见的本机浏览器，不采集或输出网页内容；使用随机会话和一次性 Profile，退出后清理，不关闭用户的其他浏览器会话。用户自行查看页面，并可选择只分享回答必需的信息。L3 级（缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细）**一律不读取**。
+**使用纪律**：涉及校情、教务、学院、校区、职能部门的问题，先查表定位入口；表未命中时回复「信息库未收录，建议访问 https://www.dlut.edu.cn/ 核实」，不臆造 URL。
 
-## 6. 复用
+---
+
+## 6. 复用与扩展
 
 | 换什么 | 改哪里 | 成本 |
 |---|---|---|
-| 换课程/学期 | `config.yaml` 的 `courses` / `term` / `exam_weeks` | 3 行 |
-| 加/改域 | 在 `domains/` 下新增 `<域ID>-<slug>/` 目录，并在 `domains/_registry.md` 登记 | 1 个目录 |
-| 加库内 skill | 对应域 `skills/local/<name>/SKILL.md` | 1 个文件 |
+| 换学期 / 课程 | `config.yaml` 的 `term` / `courses` / `exam_weeks` | 3 行 |
+| 加 skill | 新建 `skills/<name>/SKILL.md`，frontmatter 只写 `name` + `description` | 1 个文件 |
 | 扩 DUT 信息库 | `references/dlut-*.md` | 1 行 |
+| 换学校 | `config.yaml` 的 `school` 段 + `references/dlut-*.md` | 4 处 |
+
+---
 
 ## 7. 免责
 
-- 本包为 **DUT 特化规则与 skill 库**：核心文本资产离线可读；实际执行依赖宿主平台的模型和工具能力，外部桥接为**可选增强**。
-- 来源口径为 80 个自建 skill 与 12 个有来源记录的 skill（其中 10 个基于 MIT 项目重写、2 个仅参考方法论且零内容摘录）；详见 `THIRD_PARTY_NOTICES.md`。
+- 本包为 **DUT 特化 skill 包**：skill 文本离线可读；实际执行依赖宿主平台的模型与工具能力。
 - DUT 信息库中标 ⚠️ 的条目未经核验，请勿直接使用。
+- 第三方来源与许可归属见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
 - 本包自身：MIT。
+
+---
 
 ## 8. 版本记录
 
 | 版本 | 修订号 | 主要变更 |
 |---|---|---|
-| **v3.4** | `3.4.0` | **第一阶段体验增强**：新增 `bash scripts/qihang.sh quick` 统一快速入口与自然语言起始句型；入口与 README 增补「第一阶段体验增强」「第二、三阶段体验能力」两节（自然语言入口、软件感知原则、三种交付方式、会话连续性、反馈闭环）；`library/memory.md` 增补「当前会话的连续性」口径 —— 沿用当前会话上下文不等于写入档案，跨会话读取或保存仍须用户明确要求。 |
-| v3.3 | `3.3.0` – `3.3.9` | 外部 skill 桥接（降级链两档 → 三档）、外部来源清单扩充与适配判据可执行化、触发门词表同源与域锁定加固、移除强制自我身份声明。 |
-
-> **版本口径**：**包版本 = 两位**（`3.4`，用于包名与展示位）｜**修订号 = 三位**（`3.4.0`，用于 frontmatter / `plugin.json` / 校验断言）。两者同一条线，修订号前两位即包版本。
-> 本表只记录**交付给使用者的版本线**；生成链的逐层变更记录见开发侧 `_build/` 内的构建侧文档（不随包分发，故此处不写其完整路径）。
+| **v4.0** | `4.0.0` | **系统性重构**：三级结构（`domains/` 92 skill）→ 扁平结构（`skills/` 25 skill）；取消澄清门 / 域审查 / 输出规范 / 记忆落点 / 外部桥接；`portal-operator` 支持用户授权后代为操作校内平台；`config.yaml` 精简为学校绑定 + 学期参数；新增 `agents/`、`commands/`、`docs/`、`plugin.json`。 |
+| v3.4 | `3.4.0` | 第一阶段体验增强：统一快速入口与自然语言起始句型。 |
+| v3.3 | `3.3.0` – `3.3.9` | 外部 skill 桥接、外部来源清单扩充、触发门词表同源与域锁定加固。 |

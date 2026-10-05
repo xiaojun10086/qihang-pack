@@ -1,6 +1,6 @@
-# DUT 私密站 · 字段映射表
+# 校内平台 · 字段映射
 
-> 用途：为用户自行查看的门户区块提供字段分类与域映射参考。`scripts/dlut-read.sh` 不读取、复制或输出页面内容。
+> 用途：说明各平台能取到哪些字段，以及这些字段归哪个 skill 消费。
 > 依据：2026-10-01 实测（`portal.dlut.edu.cn` 首页）。
 
 ---
@@ -9,66 +9,53 @@
 
 **首页单页即可拿到 6 类数据**，无需逐站登录。
 
-| 区块 | 实测字段 | 结构化键 | 归属域 | 级别 |
-|---|---|---|---|---|
-| 我的课表 | 课程名 + 时间格（周 1–12） | `schedule.courses[]` | S1 S2 S4 F1 | **L1** |
-| 我的借阅 | 当前借阅册数 | `library.on_loan_count` | S2 S5 R1 | **L1** |
-| 一卡通 | 账户余额、有效期（不含消费金额与流水） | `card.balance`, `card.expires` | F1 F4 | **L1** |
-| 网络自助 | 网费余额、当月已用/剩余流量 | `net.balance`, `net.used`, `net.left` | F1 | **L1** |
-| 我的日程 | 日期、日程条目 | `agenda[]` | F1 F2 | **L1** |
-| 校内通知 | 通知标题 + 日期 | `notices[]` | F1 | **L1** |
-| 我的邮件 | 未读条数（不含邮件主题与正文） | `mail.unread_count` | 通用 | **L2** |
-| 我的数据 / 我的收藏 | 收藏项 | `favs[]` | 通用 | L2 |
+| 区块 | 实测字段 | 消费方 |
+|---|---|---|
+| 我的课表 | 课程名 + 时间格（周 1–12） | `lecture-to-notes` `exam-sprint` |
+| 我的借阅 | 当前借阅册数 | `lit-fetch` `notice-track` |
+| 一卡通 | 账户余额、有效期 | `portal-operator` |
+| 网络自助 | 网费余额、当月已用 / 剩余流量 | `portal-operator` `notice-track` |
+| 我的日程 | 日期、日程条目 | `notice-track` |
+| 校内通知 | 通知标题 + 日期 | `notice-track` |
+| 我的邮件 | 未读条数 | `portal-operator` |
+| 我的数据 / 我的收藏 | 收藏项 | `portal-operator` |
 
 **实测可用入口**（导航栏）：
-我的首页 ｜ 事务中心 ｜ 新闻资讯 ｜ 智能广场 ｜ **一网通办** ｜ **学期校历** ｜ 模型广场 ｜ 我的数据 ｜ 我的日程 ｜ 我的收藏
+我的首页 ｜ 事务中心 ｜ 新闻资讯 ｜ 智能广场 ｜ 一网通办 ｜ 学期校历 ｜ 模型广场 ｜ 我的数据 ｜ 我的日程 ｜ 我的收藏
 
 ---
 
 ## 二、逐站字段（按需深挖时）
 
-| 站点 | URL | 可获取字段 | 归属域 | 级别 |
+| 站点 | URL | 可获取字段 | 消费方 | 备注 |
 |---|---|---|---|---|
-| 综合教务系统 | `jxgl.dlut.edu.cn` | 课表、考试安排、培养方案、选课结果 | S1 S3 S4 F1 | L1（**成绩等级可读；成绩明细 L3 禁读**） |
-| 图书馆 | `lib.dlut.edu.cn` | 借阅清单、续借、座位/研讨间预约 | S2 S5 R1 | L1 |
-| 一卡通 | `ecard.dlut.edu.cn` | 余额（不含消费金额与流水） | F1 F4 | L1（**金额明细 L3**） |
-| 校园门户 | `portal.dlut.edu.cn` | 待办、日程、校内通知、信息专栏 | F1 | L1 |
-| 办事大厅（一网通办） | `ehall.dlut.edu.cn` | 申请、办理进度（**与门户 SPA 是两个系统**） | F1 | L1 |
-| 学生工作系统 | `xsc.dlut.edu.cn` | 资助状态、评奖、请假、第二课堂 | F1 F3 F4 F6 | L2 |
-| 就业信息网 | `job.dlut.edu.cn` | 招聘、宣讲会、投递记录 | F8 | L2 |
-| 研究生系统 | `gs.dlut.edu.cn` | 培养、导师、开题 | R4 R5 F7 | L2 |
-| 数字书院（超星） | `dlutzqsy.mh.chaoxing.com` | 课程资源、作业、测验 | S2 S3 S4 | L1 |
-| 大工金课平台 | `dlut.fanya.chaoxing.com` | 课程资源 | S2 | L1 |
-| 雨课堂 | `www.yuketang.cn` | 课件、随堂测验 | S2 S3 | L1 |
-| 离校系统 | `lx.dlut.edu.cn` | 离校流程 | F1 | L1 |
-| 统一支付平台 | `pay.dlut.edu.cn` | 缴费状态 | F4 | **L3 禁读** |
-| 财务处 | `cw.dlut.edu.cn` | 缴费、报销进度 | F4 | **L3 禁读** |
-| 校园邮箱 | `mail.dlut.edu.cn` | 通知、导师往来 | 通用 | **L3（正文禁读）** |
-| 网络与信息化中心 | `its.dlut.edu.cn` | 网费、VPN、软件正版化 | R3 F1 | L2 |
-| i大工 APP | 应用商店 | 场馆/心理/浴室/校车预约 | F1 F2 F3 F5 | **仅 APP，无网页版** |
+| 综合教务系统 | `jxgl.dlut.edu.cn` | 课表、考试安排、培养方案、选课结果、成绩 | `course-select` `exam-sprint` `portal-operator` | 成绩明细只在用户明确要求时读取 |
+| 图书馆 | `lib.dlut.edu.cn` | 借阅清单、续借、座位 / 研讨间预约 | `lit-fetch` `portal-operator` | — |
+| 一卡通 | `ecard.dlut.edu.cn` | 余额 | `portal-operator` | 消费流水走 `ecardv8` |
+| 校园门户 | `portal.dlut.edu.cn` | 待办、日程、校内通知、信息专栏 | `notice-track` `portal-operator` | 聚合点 |
+| 办事大厅（一网通办） | `ehall.dlut.edu.cn` | 申请、办理进度 | `campus-desk` `portal-operator` | **与门户 SPA 是两个系统** |
+| 学生工作系统 | `xsc.dlut.edu.cn` | 资助状态、评奖、请假、第二课堂 | `notice-track` `campus-desk` | 心理记录不读取 |
+| 就业信息网 | `job.dlut.edu.cn` | 招聘、宣讲会、投递记录 | `notice-track` | — |
+| 研究生系统 | `gs.dlut.edu.cn` | 培养、导师、开题 | `campus-desk` `advisor-finder` | — |
+| 数字书院（超星） | `dlutzqsy.mh.chaoxing.com` | 课程资源、作业、测验 | `lecture-to-notes` | — |
+| 大工金课平台 | `dlut.fanya.chaoxing.com` | 课程资源 | `lecture-to-notes` | — |
+| 雨课堂 | `www.yuketang.cn` | 课件、随堂测验 | `lecture-to-notes` | — |
+| 离校系统 | `lx.dlut.edu.cn` | 离校流程 | `dorm-life` | — |
+| 统一支付平台 | `pay.dlut.edu.cn` | 缴费状态 | `portal-operator` | 涉金额，操作前先复述 |
+| 财务处 | `cw.dlut.edu.cn` | 缴费、报销进度 | `portal-operator` | — |
+| 校园邮箱 | `mail.dlut.edu.cn` | 通知、导师往来 | `portal-operator` | 默认不读正文 |
+| 网络与信息化中心 | `its.dlut.edu.cn` | 网费、VPN、软件正版化 | `portal-operator` | — |
+| i大工 APP | 应用商店 | 场馆 / 心理 / 浴室 / 校车预约 | `portal-operator` `dorm-life` | **仅 APP，无网页版** |
 
 ---
 
-## 三、字段 → 域 的消费方式
+## 三、字段 → skill 的消费方式
 
-| 域 | 消费哪些字段 | 用途 |
+| skill | 消费哪些字段 | 用途 |
 |---|---|---|
-| S2 课堂与笔记 | `schedule.courses[]` | 按课表归档笔记，标注待补章节 |
-| S4 备考与记忆 | `schedule.courses[]` + 考试安排 | 倒排冲刺计划 |
-| F1 校园事务 | `card.balance` `net.*` `agenda[]` `notices[]` | 事务提醒（欠费/借阅逾期/待办；不记录交易金额） |
-| F2 作息与专注 | `agenda[]` | 把日程转成专注块 |
-| R1 文献检索 | `library.on_loan_count` | 提醒还书，避免影响借阅额度 |
-
----
-
-> **成绩口径**：**成绩等级/是否通过 = L1 可读**；**成绩明细（单科分数、绩点计算）= L3 禁读**。
-
-## 四、硬约束
-
-1. **只读**：用户自行查看页面，不触发任何写操作（不选课、不缴费、不提交）；脚本不读取页面。
-2. **最少披露**：用户可选择只在聊天中提供回答必需的信息；不得提供原始页面、凭证或无关敏感数据。
-3. **L3 一律拒绝**：缴费金额 / 银行卡 / 身份证 / 家庭信息 / 邮件正文 / 心理记录 / 成绩明细。
-   匹配口径为**关键词包含**（见 `scripts/dlut-read.sh`），故「缴费金额」「银行卡号」等变体同样被拒。
-4. **Profile 强制隔离**：每次使用随机命名会话和一次性 Profile，绝不复用真实 Chrome profile。
-5. **会话结束即关闭**：只关闭本次会话并清理临时 Profile；不得关闭用户的其他会话。
-6. 课表标注「数据来源于本科、研究生教务系统，仅供参考」→ 与 `jxgl` 有时差，**以教务系统为准**。
+| `lecture-to-notes` | `schedule.courses[]` | 按课表归档笔记，标注待补章节 |
+| `exam-sprint` | `schedule.courses[]` + 考试安排 | 倒排冲刺计划 |
+| `notice-track` | `card.balance` `net.*` `agenda[]` `notices[]` | 事务提醒（欠费 / 借阅逾期 / 待办） |
+| `lit-fetch` | `library.on_loan_count` | 提醒还书，避免影响借阅额度 |
+| `course-select` | 培养方案 + 选课结果 + 成绩 | 学分缺口对照 |
+| `dorm-life` | 离校流程节点 | 离校清单 |
