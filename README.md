@@ -45,6 +45,13 @@ qihang-pack/
 
 **只要交付内容**（不含 README、INSTALL 等仓库说明文档及维护脚本，保留结构规范）：
 
+直接下载整包（zip / tar.gz，解压即用）：
+
+- [release.zip](https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/release.zip)
+- [release.tar.gz](https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/release.tar.gz)
+
+或克隆交付分支：
+
 ```bash
 git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 ```
