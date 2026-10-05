@@ -8,6 +8,9 @@ release 是给使用者直接 clone 的交付分支，只保留 skill 运行所�
 白名单是唯一真相源：以后新增的开发文件默认不会进 release，只有显式
 加进 WHITELIST 才会被交付。
 
+校验项：白名单覆盖完整、引用不悬空（指向仓库维护文件的引用须登记于
+REPO_ONLY_REFS）、skill 名与目录一致、交付文件版本号一致。
+
 用法：
     python scripts/sync_release.py            # 只校验并打印交付清单
     python scripts/sync_release.py --push     # 重建 release 并推送
@@ -15,6 +18,7 @@ release 是给使用者直接 clone 的交付分支，只保留 skill 运行所�
 
 import argparse
 import fnmatch
+import json
 import os
 import posixpath
 import re
@@ -45,8 +49,26 @@ WHITELIST = (
 BOT_NAME = "github-actions[bot]"
 BOT_EMAIL = "41898282+github-actions[bot]@users.noreply.github.com"
 
-REF = re.compile(r"`([A-Za-z0-9_./*<>-]+\.md)`|\[[^\]]*\]\(([^)#\s]+\.md)\)")
+# 引用检查覆盖的扩展名：只收代码 / 配置 / 文档类，避免把域名（*.edu.cn）误判成文件路径。
+REF_EXT = "md|py|ya?ml|json|sh|toml|html|txt"
+REF = re.compile(r"`([A-Za-z0-9_./*<>-]+\.(?:%s))`"
+                 r"|\[[^\]]*\]\(([^)#\s]+\.(?:%s))\)" % (REF_EXT, REF_EXT))
 FM_NAME = re.compile(r"^---\s*$(.*?)^---\s*$", re.M | re.S)
+
+# 有意引用、但不随包交付的仓库维护文件：交付树内的引用必须精确命中这些路径才算
+# 已登记。任何新出现的、指向未交付文件的引用都会直接报错，必须在此登记才放行。
+# 以 "/" 结尾表示整个目录，但默认逐条列举，避免整目录豁免把新引用一并放过。
+REPO_ONLY_REFS = (
+    "scripts/sync_release.py",
+    ".github/workflows/sync-release.yml",
+)
+
+# 版本必须一致的交付文件：(路径, 解析方式)。多源副本靠断言保持一致，避免手工同步漂移。
+VERSION_FILES = (
+    ("plugin.json", "json"),
+    (".codebuddy-plugin/plugin.json", "json"),
+    ("config.yaml", "yaml"),
+)
 
 
 def resolve_source(env):
@@ -83,6 +105,23 @@ def wanted(path):
     return any(path == w or (w.endswith("/") and path.startswith(w)) for w in WHITELIST)
 
 
+def repo_only(path):
+    """是否属于「有意引用但不交付」的仓库维护路径。"""
+    return any(path == r or (r.endswith("/") and path.startswith(r)) for r in REPO_ONLY_REFS)
+
+
+def read_version(kind, text):
+    """从交付文件里取出声明的版本号；取不到或格式非法返回 None。"""
+    if kind == "json":
+        try:
+            data = json.loads(text)
+        except ValueError:
+            return None
+        return data.get("version") if isinstance(data, dict) else None
+    m = re.search(r"^version:\s*(\S+)\s*$", text, re.M)
+    return m.group(1) if m else None
+
+
 def source_entries(env, ref):
     out = git("ls-tree", "-r", "-z", ref, env=env)
     entries = []
@@ -115,8 +154,9 @@ def blob(sha):
 
 
 def verify(kept):
-    """校验交付树自洽：白名单覆盖、无悬空 md 引用、skill 名与目录一致。"""
+    """校验交付树自洽：白名单覆盖、引用不悬空、skill 名与目录一致、版本号一致。"""
     errs = []
+    repo_refs = []
     paths = {p for _s, p in kept}
     fileset = list(paths)
     by_path = {p: s for s, p in kept}
@@ -134,15 +174,21 @@ def verify(kept):
             target = m.group(1) or m.group(2)
             if target.startswith("http") or "<" in target or ">" in target:
                 continue
-            for cand in {posixpath.normpath(posixpath.join(base, target)),
-                         posixpath.normpath(target)}:
+            cands = {posixpath.normpath(posixpath.join(base, target)),
+                     posixpath.normpath(target)}
+            for cand in cands:
                 if "*" in cand:
                     if any(fnmatch.fnmatch(f, cand) for f in fileset):
                         break
                 elif cand in paths:
                     break
             else:
-                errs.append("%s 引用不存在的文件：%s" % (path, target))
+                # 指向仓库维护文件（有意不交付）→ 登记后放行，避免静默误判为悬空。
+                hit = sorted(c for c in cands if repo_only(c))
+                if hit:
+                    repo_refs.append("%s → %s" % (path, hit[0]))
+                else:
+                    errs.append("%s 引用不存在的文件：%s" % (path, target))
 
     skill_names = sorted(p.split("/")[1] for p in paths
                          if p.startswith("skills/") and p.endswith("/SKILL.md"))
@@ -159,7 +205,22 @@ def verify(kept):
             errs.append("skills/%s/SKILL.md frontmatter 缺 name" % name)
         elif got.group(1) != name:
             errs.append("skills/%s/SKILL.md 的 name=%s 与目录名不一致" % (name, got.group(1)))
-    return errs, skill_names
+
+    versions = {}
+    for vpath, kind in VERSION_FILES:
+        if vpath not in by_path:
+            errs.append("版本一致性：%s 不在交付树中" % vpath)
+            continue
+        v = read_version(kind, blob(by_path[vpath]))
+        if v is None:
+            errs.append("版本一致性：%s 里没有可解析的 version 字段" % vpath)
+        else:
+            versions[vpath] = v
+    if len(set(versions.values())) > 1:
+        errs.append("版本一致性：交付文件版本号不一致 —— "
+                    + "、".join("%s=%s" % (p, v) for p, v in sorted(versions.items())))
+
+    return errs, skill_names, repo_refs
 
 
 def main():
@@ -173,7 +234,7 @@ def main():
         "+refs/heads/%s:refs/remotes/origin/%s" % (TARGET, TARGET), env=env, check=False)
 
     tree, kept = build_tree(ref)
-    errs, skills = verify(kept)
+    errs, skills, repo_refs = verify(kept)
     src = git("rev-parse", "--short", ref, env=env).strip()
 
     print("源分支 %s @ %s" % (ref, src))
@@ -181,12 +242,17 @@ def main():
     for _sha, path in sorted(kept, key=lambda x: x[1]):
         print("  " + path)
 
+    if repo_refs:
+        print("\n有意引用仓库维护文件（不交付，已登记，不计为悬空）：")
+        for r in sorted(set(repo_refs)):
+            print("  [i] " + r)
+
     if errs:
         print("\n交付树校验失败：")
         for e in errs:
             print("  [E] " + e)
         return 1
-    print("\n交付树校验通过：白名单覆盖完整、无悬空引用、skill 名与目录一致")
+    print("\n交付树校验通过：白名单覆盖完整、无未登记悬空引用、skill 名与目录一致、版本号一致")
 
     parent = git("rev-parse", "--verify", "--quiet",
                  "refs/remotes/origin/%s^{commit}" % TARGET, env=env).strip()

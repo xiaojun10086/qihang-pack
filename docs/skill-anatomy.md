@@ -38,6 +38,8 @@ scripts/   .github/    .gitattributes           .gitignore
 
 清单以 `scripts/sync_release.py` 的 `WHITELIST` 为唯一真相源；main 有新提交时由 `.github/workflows/sync-release.yml` 自动重建并推送。
 
+重建时 `verify()` 强制四项断言：白名单条目必须命中文件、引用不得指向未交付文件、skill 的 `name` 必须与目录名一致、交付文件版本号必须一致。上面两条维护文件引用属于有意保留，已逐条登记在 `scripts/sync_release.py` 的 `REPO_ONLY_REFS`；以后新增任何指向未交付文件的引用都必须先登记，否则校验失败。
+
 ## Frontmatter
 
 只允许以下字段：

@@ -155,6 +155,7 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 
 | 版本 | 修订号 | 主要变更 |
 |---|---|---|
+| **v4.0.1** | `4.0.1` | **交付闸门加固**：`verify()` 新增版本一致性断言（`plugin.json` / `.codebuddy-plugin/plugin.json` / `config.yaml` 三处副本必须相同，不一致即校验失败）；引用检查从只认 `.md` 扩到 `.py` / `.yml` / `.yaml` / `.json` 等代码与配置文件，指向未交付文件的引用须逐条登记于 `REPO_ONLY_REFS`，否则校验失败。 |
 | **v4.0** | `4.0.0` | **系统性重构**：三级结构（`domains/` 92 skill）→ 扁平结构（`skills/` 25 skill）；取消澄清门 / 域审查 / 输出规范 / 记忆落点 / 外部桥接；`portal-operator` 支持用户授权后代为操作校内平台；`config.yaml` 精简为学校绑定 + 学期参数；新增 `agents/`、`commands/`、`docs/`、`plugin.json`。 |
 | v3.4 | `3.4.0` | 第一阶段体验增强：统一快速入口与自然语言起始句型。 |
 | v3.3 | `3.3.0` – `3.3.9` | 外部 skill 桥接、外部来源清单扩充、触发门词表同源与域锁定加固。 |
