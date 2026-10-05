@@ -14,7 +14,7 @@ cp -r qihang-pack ~/.learnbuddy/skills/qihang
 # ② 项目级（仅当前工作区）
 mkdir -p .learnbuddy/skills && cp -r qihang-pack .learnbuddy/skills/qihang
 
-# ③ 或从 release 分支直接下载
+# ③ 或从 release 分支直接下载（只含交付内容，无仓库说明文档与维护脚本）
 git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 ```
 

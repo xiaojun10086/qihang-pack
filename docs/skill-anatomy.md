@@ -15,8 +15,28 @@ qihang-pack/
 ├── agents/               # 人格（persona）
 ├── commands/             # 斜杠命令
 ├── docs/                 # 文档
-└── references/           # 跨 skill 共享的可核验信息源
+├── references/           # 跨 skill 共享的可核验信息源
+└── scripts/ .github/     # 仓库维护用，不进 release
 ```
+
+## 分发分支
+
+`release` 是给使用者直接 clone 的交付分支，只保留运行所需内容：
+
+```
+SKILL.md  plugin.json  config.yaml  .codebuddy-plugin/
+skills/   references/  agents/      commands/
+docs/skill-anatomy.md   LICENSE      THIRD_PARTY_NOTICES.md
+```
+
+以下属于仓库自身的维护文件，不进 release：
+
+```
+README.md  INSTALL.md  docs/getting-started.md  docs/agents.md
+scripts/   .github/    .gitattributes           .gitignore
+```
+
+清单以 `scripts/sync_release.py` 的 `WHITELIST` 为唯一真相源；main 有新提交时由 `.github/workflows/sync-release.yml` 自动重建并推送。
 
 ## Frontmatter
 

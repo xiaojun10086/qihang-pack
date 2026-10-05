@@ -34,8 +34,17 @@ qihang-pack/
 ├── agents/               # 3 个人格：study-coach / research-librarian / campus-concierge
 ├── commands/             # 7 个斜杠命令：/learn /notes /exam /paper /code /search /campus
 ├── docs/                 # skill-anatomy / getting-started / agents
-└── references/           # 可核验信息源：dlut-official-sites / dlut-login-sites / dlut-field-map
+├── references/           # 可核验信息源：dlut-official-sites / dlut-login-sites / dlut-field-map
+└── scripts/ .github/     # 仓库维护用（发布对齐），不进 release
 ```
+
+**只要交付内容**（无仓库说明文档、无维护脚本）：
+
+```bash
+git clone -b release https://github.com/xiaojun10086/qihang-pack.git
+```
+
+`release` 分支由 `.github/workflows/sync-release.yml` 在 main 每次提交后自动重建，清单见 `scripts/sync_release.py`。
 
 **加载机制**：启动时只有每个 skill 的 `name` + `description` 进入上下文，`SKILL.md` 正文按需加载。因此 description 决定能不能被发现。
 

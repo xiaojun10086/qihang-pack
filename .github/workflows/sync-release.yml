@@ -1,0 +1,28 @@
+name: sync-release
+
+# 每次 main 有新提交，就按 scripts/sync_release.py 的白名单重建 release 交付分支。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 仓库默认 token 是只读的，推送 release 必须显式申请写权限。
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-release
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: 同步 release 交付分支
+        run: python scripts/sync_release.py --push

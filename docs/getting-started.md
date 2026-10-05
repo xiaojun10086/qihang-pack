@@ -34,7 +34,7 @@ mkdir -p .learnbuddy/skills && cp -r qihang-pack .learnbuddy/skills/qihang
 学习 ──→ 巩固 ──→ 产出 ──→ 数据代码 ──→ 检索 ──→ 校务
 ```
 
-包内 `using-qihang` 是入口，负责把你的说法路由到下面 24 个 skill；多数时候不必点名它。
+包内 `using-qihang` 是入口，负责把你的说法路由到下面六个阶段的 skill；多数时候不必点名它。
 
 - **学习**：`explain-stepwise` `error-diagnose` `faster-cycle` `lecture-to-notes` `reading-note` `lang-drill`
 - **巩固**：`exam-sprint` `recall-schedule`
