@@ -1,29 +1,38 @@
 # 安装与使用
 
-> 「启航」v4.0.2 是 DUT 特化的扁平 skill 包，25 个 skill 位于 `skills/<name>/SKILL.md`。
+> 「启航」v4.1.0 是 DUT 特化的扁平 skill 包，25 个 skill 位于 `skills/<name>/SKILL.md`。
 > 文本资产离线可读；实际执行依赖宿主平台的模型、发现机制与工具能力。
 
 ---
 
 ## 一、安装
 
-**先查目标宿主的技能 / 插件发现规范**：确认支持的安装目录、清单格式、子目录发现方式，再按该宿主规范安装。本包不声明所有宿主采用相同约定，也不声明已完成各宿主实测。
+本包**宿主无关**，不绑定单一宿主约定。可移植核心是 `skills/<name>/SKILL.md`（`name` + `description` frontmatter）与 `agents/*.md`；入口由包根 `plugin.json` 描述（`"skills": "./skills"`，并声明 `agents` / `commands`），`config.yaml` 与 `references/` 为宿主无关数据。安装方式统一为：**把整包放入目标宿主的技能目录**，不改包内结构、不拆包、不改名。
 
-以下目录示例**仅适用于明确支持 `.learnbuddy` 约定的宿主**，不能据此认定 WorkBuddy 或其他宿主即装即用；不要未经核对就套用其他插件或专家目录。
+**先查目标宿主的技能 / 插件发现规范**：确认支持的安装目录、清单格式、子目录发现方式与作用域，再按该宿主规范安装。本包不声明所有宿主采用相同约定，也不声明已完成各宿主实测。
+
+常见宿主约定（**示例，须以宿主规范为准**）：
+
+| 宿主 | 技能目录 | 人格 / 命令 |
+|---|---|---|
+| 通用（本包清单） | 依 `plugin.json` 的 `"skills": "./skills"` | `agents/*.md`、`commands/*.toml` |
+| Claude Code | `~/.claude/skills/qihang/` 或项目 `.claude/skills/qihang/` | `~/.claude/agents/`、`.claude/commands/`（Markdown） |
+| GitHub Copilot | `.github/skills/qihang/` | `.github/agents/`、`.github/prompts/` |
+| LearnBuddy 约定 | `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/` | 依宿主规范 |
+| CodeBuddy / WorkBuddy | 依 `.codebuddy-plugin/plugin.json` 及宿主规范 | 依宿主规范 |
 
 ```bash
-# 用户级：仅在宿主明确支持该目录时使用
-cp -r qihang-pack ~/.learnbuddy/skills/qihang
-
-# 项目级：也须确认宿主支持该目录及作用域
-mkdir -p .learnbuddy/skills && cp -r qihang-pack .learnbuddy/skills/qihang
+# 通用做法：克隆后按上表（或宿主规范）复制到该宿主的技能目录
+git clone https://github.com/xiaojun10086/qihang-pack.git
 
 # 获取 release 交付内容；下载本身不等于已注册到宿主
 # 不含 README、INSTALL 等仓库说明文档与维护脚本，保留结构规范
 git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 ```
 
-**插件清单不是通用安装保证**：包根 `plugin.json` 声明 `"skills": "./skills"`，同时含 `.codebuddy-plugin/plugin.json`。宿主是否识别这些清单、如何发现技能，须按其规范确认；不能自行推定未知插件格式。
+**插件清单不是通用安装保证**：包根 `plugin.json` 声明 `"skills": "./skills"` 及 `agents` / `commands`，同时含 `.codebuddy-plugin/plugin.json`。宿主是否识别这些清单、如何发现技能，须按其规范确认；不能自行推定未知插件格式或专家目录。
+
+**命令格式提示**：`commands/*.toml` 为宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`，不影响 `skills/` 与 `agents/` 使用。
 
 **安装验收**：
 

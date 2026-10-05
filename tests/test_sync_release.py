@@ -41,7 +41,7 @@ class ValidationTests(unittest.TestCase):
                                  for p in self.base))
 
     def test_version_copies(self):
-        self.assertEqual({"4.0.2"}, {release.read_version(k, self.base[p])
+        self.assertEqual({"4.1.0"}, {release.read_version(k, self.base[p])
                                     for p, k in release.VERSION_FILES})
 
     def test_version_mismatch(self):

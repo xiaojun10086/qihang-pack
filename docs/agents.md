@@ -10,7 +10,9 @@
 
 ## 宿主发现
 
-先核对目标宿主的技能 / 插件及 agent 发现规范，再选择安装方式；不要推定目录或清单存在就可用。`~/.learnbuddy` 仅对明确支持该约定的宿主有效，不是 WorkBuddy 或所有宿主的通用路径，也不应未经确认改套专家目录。
+本包**宿主无关**：人格与技能的可移植核心是 `agents/*.md` 与 `../skills/<name>/SKILL.md`（均为 `name` + `description` frontmatter），入口由包根 `../plugin.json` 的 `skills` / `agents` / `commands` 声明。安装时按目标宿主的技能 / 插件及 agent 发现规范把整包放入其目录，不改包内结构。
+
+先核对目标宿主的发现规范，再选择安装方式；不要推定目录或清单存在就可用。常见约定（**示例，须以宿主规范为准**）：Claude Code 用 `~/.claude/agents/` 或项目 `.claude/agents/`，GitHub Copilot 用 `.github/agents/`，LearnBuddy 约定为 `~/.learnbuddy/skills/qihang/`；CodeBuddy / WorkBuddy 依 `../.codebuddy-plugin/plugin.json`。`~/.learnbuddy` 不是所有宿主的通用路径，也不应未经确认改套专家目录。
 
 根 `../SKILL.md` 兼容读取**不等于 25 个子 skill 已注册**，更不等于 `../agents/` 的 3 个人格或 `../commands/` 的 7 个命令已被发现。应分别验收人格与命令发现、业务正文读取和共享依赖加载；本文不声明已经宿主实测。宿主未发现人格时，不能声称已切换到该人格。
 

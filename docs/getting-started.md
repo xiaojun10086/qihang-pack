@@ -2,17 +2,11 @@
 
 ## 安装
 
-「启航」v4.0.2 是 DUT 特化包。先查目标宿主的技能 / 插件发现规范，确认目录约定、清单格式与子目录发现方式，再安装；不假定 WorkBuddy 或其他宿主通用。
+「启航」v4.1.0 是 DUT 特化包，但**安装宿主无关**：可移植核心是 `skills/<name>/SKILL.md`（`name` + `description` frontmatter）与 `agents/*.md`，入口由包根 `../plugin.json` 声明（`skills` / `agents` / `commands`），`../config.yaml` 与 `../references/` 为宿主无关数据。安装即**按目标宿主规范把整包放入其技能目录**，不改包内结构、不拆包。
 
-以下复制示例**仅适用于明确支持 `.learnbuddy` 约定的宿主**，并非通用安装路径。
+先查目标宿主的技能 / 插件发现规范，确认目录约定、清单格式与子目录发现方式，再安装；不假定 WorkBuddy 或其他宿主通用。
 
-```bash
-# 用户级：须先确认宿主支持该目录及作用域
-cp -r qihang-pack ~/.learnbuddy/skills/qihang
-
-# 项目级：也须先确认宿主支持
-mkdir -p .learnbuddy/skills && cp -r qihang-pack .learnbuddy/skills/qihang
-```
+常见宿主约定（**示例，须以宿主规范为准**）：通用宿主依 `../plugin.json` 的 `"skills": "./skills"`；Claude Code 为 `~/.claude/skills/qihang/` 或项目 `.claude/skills/qihang/`；GitHub Copilot 为 `.github/skills/qihang/`；LearnBuddy 约定为 `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/`；CodeBuddy / WorkBuddy 依 `../.codebuddy-plugin/plugin.json`。`../commands/*.toml` 为宿主相关格式，宿主只识别 Markdown 命令时按其规范转换或暂不安装。
 
 包根 `../plugin.json` 声明 `"skills": "./skills"`，但清单是否被识别由宿主决定；不推定未知插件格式或专家目录。根 `../SKILL.md` 兼容单入口读取，**不等于 25 个子 skill 已注册**。安装后分别验收：
 

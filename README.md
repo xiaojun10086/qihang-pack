@@ -1,4 +1,4 @@
-# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.0.2
+# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.1.0
 
 > 面向大连理工大学（大工 / DUT）学生 ｜ 强绑定 DUT 公开站与需登录的校内平台
 > 结构：**扁平 skill 包，25 个 skill**，按「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段组织
@@ -8,15 +8,25 @@
 
 ## 0. 快速开始
 
-先查目标宿主的技能 / 插件发现规范，确认目录约定、清单格式及子目录发现方式，再按该宿主规范安装。以下复制方式**仅适用于明确支持 `.learnbuddy` 约定的宿主**，不能据此认定 WorkBuddy 或其他宿主即装即用。
+本包**宿主无关**：可移植核心是 `skills/<name>/SKILL.md`（`name` + `description` frontmatter）与 `agents/*.md`，入口由 `plugin.json` 的 `"skills": "./skills"`（并声明 `agents` / `commands`）描述，`config.yaml` 与 `references/` 为宿主无关数据。安装时**按目标宿主的发现规范把整包放入该宿主的技能目录**，不改包内结构、不拆包、不改名。
 
 ```bash
 git clone https://github.com/xiaojun10086/qihang-pack.git
-# 仅在宿主明确支持该约定时使用；项目级目录同样须核对宿主规范
-cp -r qihang-pack ~/.learnbuddy/skills/qihang
 ```
 
-根 `SKILL.md` 能作为单入口兼容读取，**不等于 25 个子 skill 已注册**。还需验收子 skill 是否被发现、正文及共享资料是否可读；`commands/` 的 7 个命令和 `agents/` 的 3 个人格也需分别验收，不能由清单或目录存在推定可用。安装说明见 [`INSTALL.md`](INSTALL.md)。
+常见宿主约定（**示例，安装前须核对宿主规范**，以宿主实际目录与清单格式为准）：
+
+| 宿主 | 技能目录 | 人格 / 命令 |
+|---|---|---|
+| 通用（本包清单） | 依 `plugin.json` 的 `"skills": "./skills"` | `agents/*.md`、`commands/*.toml` |
+| Claude Code | `~/.claude/skills/qihang/` 或项目 `.claude/skills/qihang/` | `~/.claude/agents/`、`.claude/commands/`（Markdown） |
+| GitHub Copilot | `.github/skills/qihang/` | `.github/agents/`、`.github/prompts/` |
+| LearnBuddy 约定 | `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/` | 依宿主规范 |
+| CodeBuddy / WorkBuddy | 依 `.codebuddy-plugin/plugin.json` 及宿主规范 | 依宿主规范 |
+
+- 上表是**常见约定，不是各宿主实测结论**；目录或清单存在不等于宿主已注册该包。
+- `commands/*.toml` 是宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`。
+- 根 `SKILL.md` 能作为单入口兼容读取，**不等于 25 个子 skill 已注册**。还需验收子 skill 是否被发现、正文及共享资料是否可读；`commands/` 的 7 个命令和 `agents/` 的 3 个人格也需分别验收，不能由清单或目录存在推定可用。安装说明见 [`INSTALL.md`](INSTALL.md)。
 
 **发现与加载验收通过后怎么开始**：直接说需求即可。
 
@@ -198,6 +208,7 @@ python -B scripts/sync_release.py --ref main --push
 
 | 版本 | 修订号 | 主要变更 |
 |---|---|---|
+| **v4.1.0** | `4.1.0` | **通用宿主适配**：安装说明改为宿主无关模型，给出常见宿主（通用清单 / Claude Code / GitHub Copilot / LearnBuddy / CodeBuddy · WorkBuddy）约定对照与命令格式提示；`plugin.json` 增声明 `agents` / `commands` 入口；包结构与 DUT 定位不变。 |
 | **v4.0.2** | `4.0.2` | **校验与加载契约修复**：默认离线只读检查工作树，显式 ref 检查与发布分离；补齐 Markdown / YAML / semver / 共享加载依赖校验及回归要求，CI 先测试、校验再发布；统一入口与业务正文加载前置、平台站点限制及授权边界；明确宿主发现和 DUT 迁校验收范围。 |
 | **v4.0.1** | `4.0.1` | **交付闸门加固**：`verify()` 新增版本一致性断言（`plugin.json` / `.codebuddy-plugin/plugin.json` / `config.yaml` 三处副本必须相同，不一致即校验失败）；引用检查从只认 `.md` 扩到 `.py` / `.yml` / `.yaml` / `.json` 等代码与配置文件，指向未交付文件的引用须逐条登记于 `REPO_ONLY_REFS`，否则校验失败。 |
 | **v4.0** | `4.0.0` | **系统性重构**：三级结构（`domains/` 92 skill）→ 扁平结构（`skills/` 25 skill）；取消澄清门 / 域审查 / 输出规范 / 记忆落点 / 外部桥接；`portal-operator` 支持用户授权后代为操作校内平台；`config.yaml` 精简为学校绑定 + 学期参数；新增 `agents/`、`commands/`、`docs/`、`plugin.json`。 |
