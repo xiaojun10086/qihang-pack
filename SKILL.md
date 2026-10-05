@@ -9,13 +9,15 @@ description: 大连理工大学（大工/DUT）学生的学习、信息搜集与
 
 **路由入口与共享行为准则**：见 `skills/using-qihang/SKILL.md`。
 
+**共享行为准则**（所有 skill 遵守）：① 先给可用的答案；② 区分「解释」与「代做」；③ 涉及事实必须给来源。完整定义见 `skills/using-qihang/SKILL.md`。
+
 ```
 skills/
 ├── using-qihang         总入口与路由
 ├── explain-stepwise     分步讲解          ├── exam-sprint        考前冲刺
 ├── error-diagnose       错因归因          ├── recall-schedule    记忆与间隔重复
 ├── faster-cycle         整门课系统学习     ├── assignment-plan    作业与小组任务拆解
-├── lecture-to-notes     课堂与笔记整理     ├── lab-report         实验报告与课程论文骨架
+├── lecture-to-notes     课堂与笔记整理     ├── lab-report         实验报告骨架
 ├── reading-note         文献精读笔记       ├── paper-outline      论文结构与答辩
 ├── lang-drill           语言能力练习       ├── cite-normalize     引用格式与文献管理
 ├── data-lab             实验数据与统计     ├── campus-search      校园公开信息检索

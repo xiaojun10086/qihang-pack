@@ -57,7 +57,7 @@ qihang-pack/
 | 巩固 | `exam-sprint` | 考前冲刺排程 |
 | 巩固 | `recall-schedule` | 记忆与间隔重复排程 |
 | 产出 | `assignment-plan` | 大作业与小组任务拆解 |
-| 产出 | `lab-report` | 实验报告与课程论文骨架 |
+| 产出 | `lab-report` | 实验报告骨架与自查 |
 | 产出 | `paper-outline` | 论文结构与答辩准备 |
 | 产出 | `cite-normalize` | 参考文献格式与文献管理 |
 | 数据代码 | `data-lab` | 实验数据处理与统计 |

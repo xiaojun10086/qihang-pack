@@ -21,7 +21,7 @@ description: 大连理工大学（大工/DUT）学生的学习、信息搜集与
     ├── 快考试了怎么复习？ ─────────→ exam-sprint
     ├── 长期背记排程？ ─────────────→ recall-schedule
     ├── 大作业/小组任务拆解？ ──────→ assignment-plan
-    ├── 写实验报告/课程论文？ ──────→ lab-report
+    ├── 写实验报告？ ───────────────→ lab-report
     ├── 论文结构/摘要/答辩？ ───────→ paper-outline
     ├── 参考文献格式？ ─────────────→ cite-normalize
     ├── 实验数据/统计/画图？ ───────→ data-lab
