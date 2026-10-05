@@ -4,7 +4,7 @@
 
 | 人格 | 面向 | 常用 skill |
 |---|---|---|
-| `study-coach` | 学习方法与备考 | `explain-stepwise` `error-diagnose` `faster-cycle` `exam-sprint` `recall-schedule` |
+| `study-coach` | 学习方法与备考 | `explain-stepwise` `error-diagnose` `faster-cycle` `lecture-to-notes` `exam-sprint` `recall-schedule` `reading-note` `lang-drill` |
 | `research-librarian` | 科研检索与写作 | `lit-fetch` `citation-verify` `reading-note` `paper-outline` `cite-normalize` `data-lab` `code-mentor` |
 | `campus-concierge` | 校务与平台代办 | `campus-search` `advisor-finder` `notice-track` `campus-desk` `course-select` `campus-proof-guide` `dorm-life` `portal-operator` |
 

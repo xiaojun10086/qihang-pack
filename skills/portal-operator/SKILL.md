@@ -26,7 +26,7 @@ description: 在用户已授权的范围内代替用户打开校内平台并执�
 | 图书馆 | 见 `references/dlut-official-sites.md` | 借阅、续借、文献 |
 | 一卡通 | 见 `references/dlut-official-sites.md` | 余额、消费记录 |
 
-**不适用**：用户只是问办理路径 → `campus-desk`；只是问培养方案怎么对照 → `course-select`；只是查公开信息 → `campus-search`。
+**不适用**：用户只是问办理路径 → `campus-desk`；只是问培养方案怎么对照 → `course-select`；只是查公开信息、电话或平台入口（不必登录）→ `campus-search`。
 
 ## 执行流程
 

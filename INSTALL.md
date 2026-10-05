@@ -40,7 +40,7 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 | 查文献 | 「帮我找关于柔性传感器的综述」 |
 | 代操作平台 | 「帮我上教务系统查一下这学期课表」 |
 
-**斜杠命令**（可选，`commands/`）：`/learn` `/notes` `/exam` `/paper` `/search` `/campus`
+**斜杠命令**（可选，`commands/`）：`/learn` `/notes` `/exam` `/paper` `/code` `/search` `/campus`
 
 ---
 
