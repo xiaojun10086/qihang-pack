@@ -50,8 +50,9 @@ description: 在用户已授权的范围内、接入用户已登录的浏览器�
 
    - 请打开你自己的浏览器，进入目标入口，本人完成登录。入口读 `../../config.yaml`：教务 `school.entry_jwgl`、门户 `school.entry_portal`；需要认证时即 `school.entry_sso` 统一认证入口。
    - 若要本 skill **直接操作**这个页面（而不只是给你路径），请让浏览器带调试端口启动，例如：
-     `msedge.exe --remote-debugging-port=9222 --user-data-dir="<你的配置目录>" <目标入口>`
+     `msedge.exe --remote-debugging-port=9222 --user-data-dir="<独立配置目录>" <目标入口>`
      Chrome 同形命令（`chrome.exe --remote-debugging-port=9222 ...`）；端口可用 9222 / 9223 等空闲端口。
+   - **必须指定独立配置目录**：Chrome / Edge 136 起出于安全会**忽略默认用户配置目录上的调试端口**，直接对默认配置加 `--remote-debugging-port` 不会生效；用 `--user-data-dir` 指向一个独立目录即可。
    - 登录窗口必须**可见**，由用户本人在窗口内完成认证；不代填用户名、密码、验证码。
    - WebVPN 仅在用户明确要求校外访问时使用，从 WebVPN 门户资源卡进入，不手拼代理 URL；仅 APP 可办的环节由用户本人操作。
 
