@@ -1,28 +1,13 @@
-# 自检脚本历史遗留的临时文件
-.selfcheck.tmp
-.selfcheck.tmp.refs
-
 # 构建缓存
 __pycache__/
+*.pyc
 
 # IDE
 .idea/
 .vscode/
-*.pyc
 
-# 开发侧过程文档（评审 / 审计 / 验收 / 需求书）—— 未随包分发，仅本机留存
-# v2.11：移出版本控制但保留在磁盘，使生成器链与四项校验器仍可完整重跑。
-# 交付物不含这些文件；对外引用已同步收敛（见 build_phase19.py）。
-references/validation-report.md
-references/acceptance-v2.md
-references/review-report-v2.2.md
-references/review-report-v2.3.md
-references/review-report-v2.4.md
-references/stress-test-v3.md
-references/alignment-audit-v3.md
-references/需求确认书-v2三级结构.md
-
-# 项目记忆（含本机路径等信息）—— **不随包分发、永不入库**。
-# 2026-10-03：由「跟踪」改为「不跟踪」—— 此前它被跟踪并已推送到公开仓库，
-# 导致本机路径外泄（详见 巡检报告/风险自检-2026-10-03.md R-1）。
+# 项目记忆（含本机路径等信息）—— 不随包分发、永不入库
 .learnbuddy/
+
+# 会话临时脚本
+tmp/

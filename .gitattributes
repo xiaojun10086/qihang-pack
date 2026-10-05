@@ -1,24 +1,17 @@
-# Auto detect text files and perform LF normalization
+# 自动识别文本文件并做 LF 归一
 * text=auto
 
-# ── 强制 LF（2026-10-03 加固）─────────────────────────────────────────────
-# 本机 core.autocrlf=true：fresh clone / checkout 会把文本文件写成 CRLF，后果：
-#   1) `*.sh` 带 \r → bash 报 `$'\r': command not found`，五个校验脚本全废；
-#   2) 文档与规则文件变 CRLF → 与仓库基线不再逐字节一致，比对与 diff 全乱。
-# 故对代码与文档显式锁定 LF。
-# ⚠️ **本文件随包分发**（交付树必需）：用户 clone 后同样要靠它保证 LF；
-#    实测把它移出交付树 → 交付包 160 个文件变 CRLF、`*.sh` 直接不可执行。
-*.sh    text eol=lf
-*.py    text eol=lf
+# ── 强制 LF ─────────────────────────────────────────────────
+# 本机与用户机器上 core.autocrlf 可能为 true，checkout 时会把文本文件写成 CRLF，
+# 导致 skill 文本与仓库基线不再逐字节一致（diff 全乱）。故对文本显式锁定 LF。
 *.md    text eol=lf
 *.json  text eol=lf
-*.jsonl text eol=lf
 *.yaml  text eol=lf
 *.yml   text eol=lf
-*.csv   text eol=lf
+*.toml  text eol=lf
 *.txt   text eol=lf
+*.csv   text eol=lf
+*.py    text eol=lf
+*.sh    text eol=lf
 .gitattributes  text eol=lf
 LICENSE         text eol=lf
-# 无扩展名的可执行脚本（git 钩子等）：不匹配上面的 *.xx 规则，
-# 若不显式锁定，checkout 时会被写成 CRLF → 钩子在 sh 下不可执行（实测踩到）。
-scripts/_build/hooks/*   text eol=lf

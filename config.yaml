@@ -1,51 +1,5 @@
-# 「启航」学伴包 v3.4 · 唯一需要按学期 / 课程修改的文件
-# 新学期执行 `bash scripts/qihang.sh new-term` 会先备份再提示重置。
-# version 字段 = **修订号**（三位，与 frontmatter / plugin.json 一致）；
-# 包版本为两位形态（见 README 标题）。改版本时两处同改。
-version: 3.4.0
-
-# ============ 触发门（强制 · **单一真相源**） ============
-# 触发只表示进入本包的判定；不等于必须锁定某个域或 skill。
-# 任一明确 DUT 标记都会进入本包；具体任务仍按对象与目标选域/skill，无匹配则走通用兜底。
-# 默认先走学习与公开信息搜集快路径；不要求每次执行完整流程、模板或记录。
-# 由 scripts/selfcheck.sh [8d] 断言本段字段齐全，且 SKILL.md 的触发门与之一致。
-#
-# ⚠️ **词表同源铁律（v3.3.7）**：`learning_markers` 是 **20 域触发词的并集**，
-#    由构建层 scripts/_build/v3/step67_gate_align.py 从 `_registry.md` 与各域 `_domain.md` 的
-#    `## 触发词` 段**派生**，**不手工维护**。理由（实测）：门曾另起一套窄词表（50 词）而域表有 199 词
-#    → 交集仅 16 个 → 出现 **「域能锁定、门却不放行」** 的 39 处矛盾（干跑查出）。
-#    **判据：能锁定到 20 域之一，就放行。** 覆盖边界交给 `out_of_scope_markers`。
-trigger:
-  when_any:
-    - 明确涉及大连理工大学          # 校名/简称/校区/校内系统/校内事务（见 dlut_markers）
-    - 学习或校园生活诉求            # == 能锁定到 20 域之一（见 learning_markers，域表并集）
-    - 对方自述为大连理工大学学生     # "我是大工的学生""我们学校…"等自述
-  # 中文标记按包含匹配；DUT 为大小写不敏感的独立缩写；dlut 可匹配域名与常见写法。
-  dlut_markers:   [大连理工大学, 大连理工, 大工, DUT, dlut, 凌水, 开发区校区, 盘锦校区, i大工, 本校, 校内, 宿舍, 一卡通, 校园卡, 报修, 图书馆, 教务系统, 课表, 成绩查询, 培养方案, 转专业, 军训, 志愿, 志愿时长, 社会实践, 助学金, 奖学金, 校医院, 医保, 校历, 选课, 离校, 办证明, 学籍]
-  # ↓ 20 域触发词并集（派生；勿手改，改域表后重跑 step67）
-  learning_markers: [讲一下, 这题, 为什么, 推导, 证明, 笔记, 讲义, 录音, 整理, 概念图, 作业, 实验报告, 课程设计, 平时分, 大作业, 考试, 复习, 背诵, 整门课, 整本书, 整本教材, 从零学, 从零入门, 系统学, 论文, 综述, 答辩, PPT, 引用, 英语, 四六级, 雅思, 托福, 口语, 选课, 学籍, 一卡通, 报修, 图书馆, 教务系统, 拖延, 作息, 专注, 番茄钟, 时间管理, 焦虑, 压力, emo, 室友, 社团, 不想活, 生活费, 奖学金, 助学金, 兼职, 诈骗, 生病, 就医, 医保, 锻炼, 饮食, 军训, 国防, 志愿, 社会实践, 志愿时长, 保研, 考研, 留学, 申博, 导师, 推免, 简历, 面试, 实习, 竞赛, 证书, 文献, Zotero, 知网, 实验, 数据, 统计, 显著性, 图表, Python, MATLAB, 仿真, Git, 环境, 投稿, 期刊, 专利, 会议, 基金, 查重, 降重, 引用规范, 学术诚信, AI 声明, 数据合规, 学校信息, 教师主页, 联系方式, 通知, 公告, 宿舍, 离校, 校园卡, 办事, 网费, 学费, 缴费入口, 报名时间, 课表, 成绩查询, 失眠, 睡不着, 熬夜, 起不来, 效率, 人际, 想家, 孤独, 适应, 轻生, 自杀, 丢卡, 借钱, 花呗, 缴费金额, 欠费, 体检, 运动, 受伤, 感冒, 发烧, 校医院, 第二课堂, 三下乡, 志愿者, 夏令营, 绩点, 秋招, 大创, 创新创业, 参考文献, 查文献, DOI, 误差, 拟合, 样本, 报错, 脚本, 代码, 依赖, 环境配置, 大创结题, 审稿意见, 返修, 署名, 伦理, AI 使用, 查资料, 找来源, 搜集信息, 比较信息, 课程资料, 导师信息, 老师是谁, 部门电话, 信息公开, 官网是什么, 查电话, 培养方案, 不会做, 求解, 求证, 解释一下, 听不懂, 卡住, 怎么做, 区别, 辨析, 没听懂, 再讲一遍, 思维导图, 听课, 这节课, 板书, 听漏, 论文作业, 提交, 报告怎么写, 自查, 分工, 小组, 突击, 卡组, 刷题, 期末, 期中, 背单词, 记忆, 遗忘, 临时抱佛脚, 模拟题, 出题, 模拟卷, 文献综述, 开题, 结题, 课程论文, 四级, 六级, 听力, 翻译, 单词, 作文批改]
-  # 学习意图表述（名词之外的口语说法；裸词「学」刻意不放，会被「同学/学校/学期」误命中）
-  learning_intents: [想学, 自学, 怎么学, 如何学, 入门, 学会, 学不会, 教我, 讲解一下, 帮我理解, 搞懂, 弄懂, 刷题, 做题, 背单词, 补习, 教程]
-  # **越界信号**：与 DUT、学习、校园生活均无关的通用事务 → 只抑制泛学习词触发，不覆盖明确 DUT 标记
-  # ⚠️ **互斥不变式**：本表必须与 learning_markers / dlut_markers / learning_intents **零交集**，
-  #    否则越界硬停会吞掉合法域路由（实例：「基金」既在 R4 触发词、又曾在本表 → R4 grant-apply 永不可达）。
-  #    多义词（金融基金 / 面试用途）不入本表，归属交由**主键 T+O** 判定（同 boundary_note 的「面试」先例）。
-  #    本表内部亦不得含互为子串的冗余项（子串匹配下前者恒被后者覆盖）。
-  out_of_scope_markers:   [电影, 电视剧, 综艺, 追星, 游戏, 天气, 机票, 火车票, 酒店, 外卖, 股票, 彩票, 购物, 旅游, 星座, 算命, 菜谱, 减肥药]
-  # **越界仲裁顺序**（唯一副本）：`out_of_scope_markers` 只做**初筛**，不具终判效力。归属按以下顺序判：
-  #   1. **需求主键 T(任务) + O(对象)** 落在 20 域之一 → **接管**（越界词只是用途或背景）；
-  #   2. 主键落不到任何域 → 再看是否命中越界词 → 命中则**不接管**；
-  #   3. 两者都不成立 → **不接管**（宁可不接管，也不硬塞域）。
-  #   顺序**不可交换**；多义词归属**只由主键决定**，不得由单词命中决定。
-  arbitration: [需求主键 T+O, 越界词命中, 都不成立则不接管]
-  boundary_note: 单词命中不等于该接管 —— 判据是**需求主键 T(任务)+O(对象)**。
-    # 例：「帮我写个冒泡排序（面试用）」对象是「冒泡排序」（不属任何域），「面试」只是用途 → **不接管**；
-    #     「面试怎么准备」对象就是面试本身 → **接管（F8）**。token 命中只做初筛，归属由主键定。
-  not_triggered_behavior: 不接管      # 直接按普通助手回答：不套输出模板 / 不写学习档案 / 不标 [已降级] / 不做域审查
-  lock_after_trigger: true           # 触发后按任务选择核心 skill；不是强制执行完整 8 步流程
-  ladder: [匹配的库内 skill, 按需使用的外部工具, 通用方法或来源入口]   # 不要求先检索外部 skill 平台
-  self_generate_requires: 无匹配 skill 时说明边界并提供有用的一般方法
-  skip_ladder_when_redline_or_offline: true    # 红线与工具不可用时直接提供安全替代/可信入口
+# 「启航」v4.0 · 唯一需要按学期 / 课程修改的文件
+version: 4.0.0
 
 # ============ 学校绑定（强绑定） ============
 school:
@@ -55,75 +9,18 @@ school:
   official: https://www.dlut.edu.cn/
   entry_sso: https://sso.dlut.edu.cn/
   entry_portal: https://portal.dlut.edu.cn/
-  entry_jwgl: http://jxgl.dlut.edu.cn/student/ucas-sso/login
+  entry_jwgl: http://jxgl.dlut.edu.cn/student/home
   webvpn: https://webvpn.dlut.edu.cn/
   app: i大工
   sites_public: references/dlut-official-sites.md
-  sites_private: references/dlut-login-sites.md
+  sites_login: references/dlut-login-sites.md
 
 student:
   # 未经用户确认的个人信息留空；null 表示未知，不得作为事实使用。
   campus: null            # 凌水主校区 / 开发区校区 / 盘锦校区
-  college: null           # 用户确认后填写
-  grade: null             # 用户确认后填写
+  college: null
+  grade: null
 
-# ============ 学期配置 ============
-term: null                # 用户确认当前学期后填写
-courses: []               # 用户确认修读课程后填写
-exam_weeks: []            # 用户提供考试周后填写
-sleep_window: null        # 用户确认作息后填写
-
-# ============ 1 级库参数 ============
-library:
-  clarity:
-    threshold: 0.30
-    max_rounds: 3
-    max_questions_per_round: 3
-    weights: {O: 1.5, T: 1.5, D: 1.5, W: 0.8, C: 0.6, B: 0.2}
-    ask_priority: {W: 3.0, O: 2.5, D: 2.0, C: 1.5, B: 1.0, T: 0.5}
-    # 需求确定门（见 library/clarity.md §3.1）：C = 1 − U 为「理解准确率」
-    #   C >= 0.95 → 直接执行（免复述）
-    #   0.70 <= C < 0.95 → **仅当存在实质歧义时**一句话复述（并入【结论】首行）；无实质歧义 → 直接执行
-    #   C < 0.70 → 仅当澄清门本就要追问时才追问；澄清门已放行 → 直接执行
-    confirm_threshold: 0.95        # 免复述阈值
-    restate_floor: 0.70            # 复述档下界（低于此值走追问，本门不改变追问判定）
-    skip_when:                        # 与 library/clarity.md §5 六条例外一一对应；优先级 4 > 6 > 1 > 2 > 5 > 3
-      - 命中校情横切且对象明确                        # 例外 1
-      - O/T/D 三关键槽齐全且均 c_i >= 0.8            # 例外 2
-      - 用户显式要求「直接给结果」（输出首行须标假设） # 例外 3
-      - 触发红线（先拦红线，再视情况澄清）            # 例外 4
-      - 紧急场景豁免（最多追问 1 问）                # 例外 5
-      - 通用知识型（与个人情况、DUT 校内资源均无关）  # 例外 6
-  policy:
-    local_first: true          # 库内优先（硬规则，永不变）
-    external_bridge: true      # 外部桥接（可选增强）：库内与同域降级都接不住时才走；未命中即回落
-    forbid_fabricate_url: true # 禁止编造 DUT URL
-    write_learning_records: false # default off; only save when the user explicitly asks
-    never_write_sensitive: [F3, F5]   # 整域不写入档案（F3 身心 / F5 健康）
-    partial_write_sensitive: [F4, F6] # 排除敏感字段后写入（金额债务 / 伤病）
-
-# ============ 私密站接入（方案 A · 受控浏览器） ============
-private_sites:
-  mode: controlled_browser     # A 受控浏览器 | B 手动投喂 | C 仅登记
-  user_authorized: false        # consent is per use; do not treat installation as blanket authorization
-  read_only: true
-  persist_cookies: false       # scripts/dlut-read.sh uses a one-time profile and removes it at exit
-  persist_pages: false         # the script never captures or prints page content
-  level_rules:
-    L1_auto: [课表, 成绩等级, 考试安排, 借阅, 一卡通余额, 场馆预约状态, 网费, 日程]
-    L2_confirm: [资助申请状态, 就业投递记录, 培养进度, 邮箱未读提示]
-    L3_forbidden: [缴费金额, 银行卡, 身份证, 家庭信息, 邮件正文, 心理记录, 成绩明细]
-    # 裸词「成绩」「消费」不得直接判级 —— 必须先让用户区分（见 library/login-policy.md「裸词澄清」）
-
-# ============ 能力域开关（20 域） ============
-domains:
-  S1: true   # 课程答疑        S2: true   # 课堂与笔记
-  S3: true   # 作业与考核      S4: true   # 备考与记忆
-  S5: true   # 学术表达        S6: true   # 语言能力
-  F1: true   # 校园事务        F2: true   # 作息与专注
-  F3: true   # 身心与社交      F4: true   # 财务与安全
-  F5: true   # 健康与运动      F6: true   # 军训与志愿
-  F7: true   # 升学深造        F8: true   # 求职与竞赛
-  R1: true   # 文献检索与管理  R2: true   # 实验与数据
-  R3: true   # 科研工具与代码  R4: true   # 学术产出与投稿
-  R5: true   # 学术规范与伦理  R6: true   # 信息搜集与输出
+term: null                # 当前学期
+courses: []               # 修读课程
+exam_weeks: []            # 考试周
