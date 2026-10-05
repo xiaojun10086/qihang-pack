@@ -5,6 +5,13 @@ description: 大连理工大学（大工/DUT）学生的学习、信息搜集与
 
 # 启航
 
+## 执行前置
+
+- 本文所有包内相对路径均以本 `SKILL.md` 所在目录为基准，不以用户当前工作目录（cwd）为基准。
+- 路由或执行任何业务步骤前，先完整读取 `skills/using-qihang/SKILL.md`，遵守其中的共享行为准则及安全兜底，再完整读取 `config.yaml`；完成后才按总入口路由，不得只凭 description 执行。
+- 本会话已完整加载上述文件时可复用；必需文件不可读时，停止本包执行并说明缺失或不可读的文件，不猜测规则。
+- 每次调用业务 skill 前，完整读取对应的 `skills/<name>/SKILL.md` 正文并遵守其执行前置，不得只凭名称或 description 执行。
+
 本包是扁平 skill 包，25 个 skill 全部位于 `skills/<name>/SKILL.md`。
 
 **路由入口与共享行为准则**：见 `skills/using-qihang/SKILL.md`。
