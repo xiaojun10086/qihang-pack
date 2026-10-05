@@ -8,6 +8,10 @@ __pycache__/
 
 # 项目记忆（含本机路径等信息）—— 不随包分发、永不入库
 .learnbuddy/
+.workbuddy-ai/
+
+# 本地检查报告与输出产物
+outputs/
 
 # 会话临时脚本
 tmp/

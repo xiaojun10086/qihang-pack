@@ -1,4 +1,4 @@
-# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.0
+# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.0.2
 
 > 面向大连理工大学（大工 / DUT）学生 ｜ 强绑定 DUT 公开站与需登录的校内平台
 > 结构：**扁平 skill 包，25 个 skill**，按「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段组织
@@ -8,12 +8,17 @@
 
 ## 0. 快速开始
 
+先查目标宿主的技能 / 插件发现规范，确认目录约定、清单格式及子目录发现方式，再按该宿主规范安装。以下复制方式**仅适用于明确支持 `.learnbuddy` 约定的宿主**，不能据此认定 WorkBuddy 或其他宿主即装即用。
+
 ```bash
 git clone https://github.com/xiaojun10086/qihang-pack.git
-cp -r qihang-pack ~/.learnbuddy/skills/qihang     # 或项目级 .learnbuddy/skills/qihang
+# 仅在宿主明确支持该约定时使用；项目级目录同样须核对宿主规范
+cp -r qihang-pack ~/.learnbuddy/skills/qihang
 ```
 
-**装完怎么开始**：直接说需求即可。
+根 `SKILL.md` 能作为单入口兼容读取，**不等于 25 个子 skill 已注册**。还需验收子 skill 是否被发现、正文及共享资料是否可读；`commands/` 的 7 个命令和 `agents/` 的 3 个人格也需分别验收，不能由清单或目录存在推定可用。安装说明见 [`INSTALL.md`](INSTALL.md)。
+
+**发现与加载验收通过后怎么开始**：直接说需求即可。
 
 - 「这步怎么来的，没听懂」→ 分步讲解
 - 「下周考高数，怎么复习」→ 考前冲刺
@@ -28,7 +33,7 @@ cp -r qihang-pack ~/.learnbuddy/skills/qihang     # 或项目级 .learnbuddy/ski
 qihang-pack/
 ├── SKILL.md              # 包入口（兼容单 skill 装载）
 ├── plugin.json           # 插件清单，"skills": "./skills"
-├── config.yaml           # 学校绑定与学期参数（唯一需要按学期修改的文件）
+├── config.yaml           # 学校绑定与学期参数（常规学期配置入口）
 ├── skills/               # 25 个扁平 skill
 │   └── <skill-name>/SKILL.md
 ├── agents/               # 3 个人格：study-coach / research-librarian / campus-concierge
@@ -38,15 +43,15 @@ qihang-pack/
 └── scripts/ .github/     # 仓库维护用（发布对齐），不进 release
 ```
 
-**只要交付内容**（无仓库说明文档、无维护脚本）：
+**只要交付内容**（不含 README、INSTALL 等仓库说明文档及维护脚本，保留结构规范）：
 
 ```bash
 git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 ```
 
-`release` 分支由 `.github/workflows/sync-release.yml` 在 main 每次提交后自动重建，清单见 `scripts/sync_release.py`。
+`release` 分支的交付白名单见 `scripts/sync_release.py`。main 提交触发 `.github/workflows/sync-release.yml` 后，CI 必须先通过维护测试及交付校验，才从指定已提交版本构建并推送 release；失败不得发布。
 
-**加载机制**：启动时只有每个 skill 的 `name` + `description` 进入上下文，`SKILL.md` 正文按需加载。因此 description 决定能不能被发现。
+**加载机制**：在支持渐进加载的宿主中，`name` + `description` 用于发现与匹配，正文按需加载；具体发现行为以宿主规范和验收结果为准。名称或 description 不能替代执行指令：选中业务 skill 后，必须完整读取其 `SKILL.md` 正文再执行。
 
 结构规范见 [`docs/skill-anatomy.md`](docs/skill-anatomy.md)。
 
@@ -86,7 +91,9 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 
 ## 3. 三条共享行为准则
 
-所有 skill 都遵守，正文不再重复声明：
+共享规则统一维护在 `skills/using-qihang/SKILL.md`，不在各业务正文中复制规则全文，但必须显式加载：根 `SKILL.md` 在路由前先完整读取共享规则与 `config.yaml`；24 个业务 skill、3 个 agent、7 个 command 也必须先完整读取这两份文件，才能执行。本会话已完整加载的共享规则与配置可复用；业务 skill、agent 与 command 的前置只加载共享规则，不重新执行总入口路由。任何必需文件不可读时，停止本包执行并说明原因，不猜规则或配置。
+
+各文件中的包内相对路径都以**该文件所在目录**为基准，不以当前工作目录为基准；每次调用业务 skill 都要先完整读取其正文。三条共享行为准则如下。
 
 1. **先给可用的答案** —— 结论放最前面；只追问会改变答案、安全边界或下一步行动的信息，一轮内一次问完。
 2. **区分「解释」与「代做」** —— 讲方法、给结构、给路径、给同类练习可以；不产出用于提交的成品（作业答案、论文正文、可提交代码、文书）。判据是用途：说「交上去」不给成品，说「自己对着学」就讲透。
@@ -104,18 +111,20 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 
 ## 4. 校内平台代操作
 
-`portal-operator` 在用户明确授权后**直接打开目标平台并执行操作**，然后回报结果，而不是给一个链接让用户自己去。
+`portal-operator` 仅在确需登录查询或实际代办、用户明确授权且站点限制允许时，打开目标平台执行操作并回报结果。公开信息查询和办理路径咨询不登录；「帮我查一下」「帮我办一下」等礼貌措辞本身不等于登录或代办授权，范围不明时先问必要问题。
 
-**只在两处停下确认**：
+打开平台前，先完整读取 `config.yaml`、[`references/dlut-login-sites.md`](references/dlut-login-sites.md)、[`references/dlut-official-sites.md`](references/dlut-official-sites.md) 及 [`references/dlut-field-map.md`](references/dlut-field-map.md)，核对站点限制与允许读取的字段。配置已定义的入口以配置为准，不用硬编码覆盖，也不拼接未登记地址。必需文件不可读、入口缺失或限制无法确认时，停止本包相关执行，不猜测。
+
+**授权及站点限制核对通过后，以下操作仍须复述确认**：
 
 | 类别 | 处理 |
 |---|---|
 | 涉及支付金额 | 复述金额与用途，用户确认后再继续 |
 | 不可撤销操作（提交报名、退课、退宿申请等） | 复述操作内容与后果，用户确认后再提交 |
 
-其余查询类操作直接执行。凭证（用户名 / 密码 / 验证码）只留在浏览器会话里，不写入任何文件、日志或回复正文。页面上的身份证号、银行卡、家庭信息不主动读取也不转述。
+**心理服务 / 心理预约只给入口**，不登录读取或代办预约内容，用户确认也不解除站点限制。
 
-平台入口见 [`references/dlut-login-sites.md`](references/dlut-login-sites.md)，字段映射见 [`references/dlut-field-map.md`](references/dlut-field-map.md)。
+其余查询只在授权范围及站点限制内执行；身份认证、验证码、人脸识别等本人环节须暂停交给用户。凭证不主动保存或输出到文件、日志或回复正文，操作前须核对浏览器及工具记录设置，不能保证宿主缓存或 trace 绝不留存；不满足隐私边界时不启动登录。无关身份证号、银行卡、家庭信息不主动读取也不转述。浏览器能力不可用时说明未执行，不把提供入口说成已经办完。
 
 ---
 
@@ -127,18 +136,45 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 | 需登录站 | `references/dlut-login-sites.md` | 45 个需登录站点；含 WebVPN 注意事项与易混淆系统对照 |
 | 字段映射 | `references/dlut-field-map.md` | 门户聚合点可取的 6 类数据 + 逐站字段 + 归哪个 skill 消费 |
 
-**使用纪律**：涉及校情、教务、学院、校区、职能部门的问题，先查表定位入口；表未命中时回复「信息库未收录，建议访问 https://www.dlut.edu.cn/ 核实」，不臆造 URL。
+**使用纪律**：涉及校情、教务、学院、校区、职能部门的问题，先查表定位入口；表未命中时说明「信息库未收录」，从 `config.yaml` 的 `school.official` 引导核实，不臆造 URL。配置不可读或入口缺失时停止相关执行，请用户恢复配置或提供官方材料，不猜地址。
 
 ---
 
 ## 6. 复用与扩展
 
-| 换什么 | 改哪里 | 成本 |
-|---|---|---|
-| 换学期 / 课程 | `config.yaml` 的 `term` / `courses` / `exam_weeks` | 3 行 |
-| 加 skill | 新建 `skills/<name>/SKILL.md`，frontmatter 只写 `name` + `description` | 1 个文件 |
-| 扩 DUT 信息库 | `references/dlut-*.md` | 1 行 |
-| 换学校 | `config.yaml` 的 `school` 段 + `references/dlut-*.md` | 4 处 |
+本包定位是 **DUT 特化包**，不是只改几行配置即可迁移的通用多校模板。
+
+| 换什么 | 修改与验收范围 |
+|---|---|
+| 换学期 / 课程 | 常规参数集中在 `config.yaml` 的 `term` / `courses` / `exam_weeks`；核对相关规则与站点资料是否也有变化，不承诺固定行数 |
+| 加 skill | 增加业务正文与必需的 `name`、`description`，声明共享规则及配置加载前置，并补齐发现、依赖、引用和回归验收 |
+| 扩 DUT 信息库 | 更新 `references/dlut-*.md`，核对来源、站点限制、字段归属及使用方引用 |
+| 换学校 | 全面核对所有发现描述、正文中的学校绑定、插件元数据、配置与站点资料，并重新验收宿主发现、路由、引用及授权 / 隐私边界；不只是改配置与三份资料 |
+
+### 维护与发布
+
+**使用交付技能包自身不需要 Python 依赖**；实际执行仍依赖宿主模型及工具。以下仅针对维护完整源码仓库：Python **>= 3.11**，依赖由 `requirements-dev.txt` 固定为 **PyYAML==6.0.3**、**markdown-it-py==4.0.0**。
+
+在仓库根目录使用以下命令（依赖准备与只读检查是不同步骤）。
+
+```bash
+# 维护环境准备；使用交付包不需要此步骤
+python -m pip install -r requirements-dev.txt
+# 维护回归测试
+python -B -m unittest discover -s tests -v
+# 默认离线、只读检查当前工作树
+python -B scripts/sync_release.py
+# 离线、只读检查指定已提交版本
+python -B scripts/sync_release.py --ref HEAD
+python -B scripts/sync_release.py --ref main
+# 仅在确需发布时执行：先校验指定提交，再联网、构建并推送
+python -B scripts/sync_release.py --ref main --push
+```
+
+- 默认检查包含交付白名单内的未提交修改，以及未被忽略的新文件；不 fetch、不构建交付树、不写 Git 对象或引用，也不创建临时索引。
+- `--ref HEAD` 或 `--ref main` 只检查相应已提交版本，不包含未提交修改，同样离线只读；不能用它代替工作树检查。
+- `--push` 只发布明确解析出的已提交 ref；未传 `--ref` 时默认选 main，main 缺失才回退 HEAD。校验通过后才能联网、构建和推送，绝不包含未提交改动。
+- CI 必须先运行维护测试及交付校验，再发布对应提交。校验规范与回归要求见 [`docs/skill-anatomy.md`](docs/skill-anatomy.md)。
 
 ---
 
@@ -155,6 +191,7 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 
 | 版本 | 修订号 | 主要变更 |
 |---|---|---|
+| **v4.0.2** | `4.0.2` | **校验与加载契约修复**：默认离线只读检查工作树，显式 ref 检查与发布分离；补齐 Markdown / YAML / semver / 共享加载依赖校验及回归要求，CI 先测试、校验再发布；统一入口与业务正文加载前置、平台站点限制及授权边界；明确宿主发现和 DUT 迁校验收范围。 |
 | **v4.0.1** | `4.0.1` | **交付闸门加固**：`verify()` 新增版本一致性断言（`plugin.json` / `.codebuddy-plugin/plugin.json` / `config.yaml` 三处副本必须相同，不一致即校验失败）；引用检查从只认 `.md` 扩到 `.py` / `.yml` / `.yaml` / `.json` 等代码与配置文件，指向未交付文件的引用须逐条登记于 `REPO_ONLY_REFS`，否则校验失败。 |
 | **v4.0** | `4.0.0` | **系统性重构**：三级结构（`domains/` 92 skill）→ 扁平结构（`skills/` 25 skill）；取消澄清门 / 域审查 / 输出规范 / 记忆落点 / 外部桥接；`portal-operator` 支持用户授权后代为操作校内平台；`config.yaml` 精简为学校绑定 + 学期参数；新增 `agents/`、`commands/`、`docs/`、`plugin.json`。 |
 | v3.4 | `3.4.0` | 第一阶段体验增强：统一快速入口与自然语言起始句型。 |

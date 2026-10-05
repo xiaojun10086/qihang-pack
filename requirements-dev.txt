@@ -1,0 +1,4 @@
+# 仅仓库维护与发布校验使用；不进入 release 技能包。
+PyYAML==6.0.3
+markdown-it-py==4.0.0
+mdurl==0.1.2

@@ -1,28 +1,53 @@
 name: sync-release
 
-# 每次 main 有新提交，就按 scripts/sync_release.py 的白名单重建 release 交付分支。
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
-# 仓库默认 token 是只读的，推送 release 必须显式申请写权限。
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: sync-release
+  group: sync-release-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
-  sync:
+  validate:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: 安装维护依赖
+        run: python -m pip install -r requirements-dev.txt
+      - name: 回归测试（仅隔离本地仓库）
+        run: python -B -m unittest discover -s tests -v
+      - name: 离线校验本次提交
+        run: python -B scripts/sync_release.py --ref HEAD
+
+  sync:
+    needs: validate
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
-      - name: 同步 release 交付分支
-        run: python scripts/sync_release.py --push
+          python-version: "3.11"
+          cache: pip
+      - name: 安装维护依赖
+        run: python -m pip install -r requirements-dev.txt
+      - name: 发布已通过测试的提交
+        run: python -B scripts/sync_release.py --ref "$GITHUB_SHA" --push
