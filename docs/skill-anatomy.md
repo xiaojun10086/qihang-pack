@@ -1,6 +1,6 @@
 # Skill 结构规范
 
-「启航」v4.0.2 是 DUT 特化包，每个 skill 的正文位于 `../skills/<skill-name>/SKILL.md`。该文件是单个 skill 的必需正文，但本包执行还依赖共享规则、配置及相应资料，不能孤立复制正文后假定可用。
+「启航」v4.1.0 是 DUT 特化包，每个 skill 的正文位于 `../skills/<skill-name>/SKILL.md`。该文件是单个 skill 的必需正文，但本包执行还依赖共享规则、配置及相应资料，不能孤立复制正文后假定可用。
 
 本文包内相对引用以本文所在目录为基准；其他文件中的相对路径也以各自文件所在目录为基准，不回退到仓库根目录或用户当前工作目录。
 
@@ -24,7 +24,21 @@ qihang-pack/
 
 ## 发现与加载
 
-先核对目标宿主的技能 / 插件发现规范，再确定安装目录与清单使用方式。`~/.learnbuddy` 及项目级 `.learnbuddy` 仅适用于明确支持该约定的宿主，不能据此认定 WorkBuddy 或所有其他宿主即装即用。清单存在不等于宿主识别，不推定未知插件格式，也不套用未经确认的专家目录。
+本包**宿主无关**：可移植核心是 `../skills/<name>/SKILL.md` 与 `../agents/*.md`（均为 `name` + `description` frontmatter），入口由 `../plugin.json` 的 `skills` / `agents` / `commands` 声明，`../config.yaml` 与 `../references/` 为宿主无关数据。安装即按目标宿主规范把整包放入其技能目录，不改变包内结构、不拆包。
+
+先核对目标宿主的技能 / 插件发现规范，再确定安装目录与清单使用方式。`~/.learnbuddy` 及项目级 `.learnbuddy` 只是明确支持该约定的宿主的示例，不是所有宿主的通用路径；清单存在不等于宿主识别，不推定未知插件格式，也不套用未经确认的专家目录。
+
+常见宿主约定（**示例，须以宿主规范为准**）：
+
+```text
+通用（本包清单）      依 ../plugin.json 的 "skills": "./skills"
+Claude Code          ~/.claude/skills/qihang/ 或项目 .claude/skills/qihang/
+GitHub Copilot       .github/skills/qihang/
+LearnBuddy           ~/.learnbuddy/skills/qihang/ 或项目 .learnbuddy/skills/qihang/
+CodeBuddy / WorkBuddy  依 ../.codebuddy-plugin/plugin.json 及宿主规范
+```
+
+`../commands/*.toml` 是宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `../commands/`，不影响 `../skills/` 与 `../agents/`。
 
 根 `../SKILL.md` 可兼容单入口读取，**不等于 25 个子 skill 已注册**；需分别验收子 skill 的发现、正文与依赖读取。`../commands/` 和 `../agents/` 的发现能力也须独立验收，本文不代表已完成宿主实测。
 
@@ -81,7 +95,7 @@ python -B scripts/sync_release.py --ref main --push
 2. **Markdown 引用**：用 Markdown 解析器识别真实链接（包括引用式链接、带标题或片段的链接）及正文行内代码中的本地路径，不用正则扫描整篇文档代替解析。围栏 / 缩进代码块里的示例不算真实引用，不能因示例中的虚拟路径报悬空，也不能漏掉实际引用。远程链接不作为本地文件处理，离线校验不访问站点。
 3. **路径解析**：本地目标按引用所在文件目录解析，不能通过尝试仓库根路径来掩盖错误。真实引用须指向交付文件；有意指向仓库维护文件的引用须逐条登记到 `../scripts/sync_release.py` 的 `REPO_ONLY_REFS`，不能随意豁免未登记引用。本节对同步脚本及 CI 工作流的引用属于此类。
 4. **YAML frontmatter**：使用 YAML 解析器检查必填字段、允许键、字段类型及 description 长度，并验证子 skill 名称与目录一致，要求见下节。
-5. **版本 SemVer 一致性**：`../plugin.json`、`../.codebuddy-plugin/plugin.json`、`../config.yaml` 的版本必须是相同的合法 SemVer 字符串，当前为 `4.0.2`；不能仅接受三个相同但不合法的任意文本。
+5. **版本 SemVer 一致性**：`../plugin.json`、`../.codebuddy-plugin/plugin.json`、`../config.yaml` 的版本必须是相同的合法 SemVer 字符串，当前为 `4.1.0`；不能仅接受三个相同但不合法的任意文本。
 6. **共享加载依赖**：检查根入口、24 个业务 skill、3 个 agent 和 7 个 command 的共享规则 / 配置加载前置、相对路径及依赖文件存在性；同时检查业务正文执行前读取和平台所需站点资料依赖。共享加载不等于重新路由，缺失依赖必须停止而不是猜测。
 7. **执行模式隔离**：用回归测试区分工作树检查、显式 ref 检查和推送；验证只读检查不 fetch、不建树、不写 Git / 临时索引，校验失败不进入发布，推送不夹带未提交改动。
 
