@@ -78,7 +78,7 @@ git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
 ```
 
-`release` 分支的交付白名单见 `scripts/sync_release.py`，DSH 交付树见 `dsh/build_dsh_pack.py`。main 提交触发 `.github/workflows/sync-release.yml`、`dsh-qihang` 提交触发 `.github/workflows/sync-dsh-release.yml`；CI 必须先通过维护测试及交付校验，才从指定已提交版本构建并推送对应交付分支，失败不得发布。
+`release` 分支的交付白名单见 `scripts/sync_release.py`，DSH 交付树见 `dsh/build_dsh_pack.py`。main 提交分别触发 `.github/workflows/sync-release.yml`（发布 `release`）与 `.github/workflows/sync-dsh-release.yml`（发布 `dsh-qihang-release`）；CI 必须先通过维护测试及交付校验，才从指定已提交版本构建并推送对应交付分支，失败不得发布。
 
 **加载机制**：在支持渐进加载的宿主中，`name` + `description` 用于发现与匹配，正文按需加载；具体发现行为以宿主规范和验收结果为准。名称或 description 不能替代执行指令：选中业务 skill 后，必须完整读取其 `SKILL.md` 正文再执行。
 

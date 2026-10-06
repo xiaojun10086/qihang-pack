@@ -301,7 +301,7 @@ class ContractTests(unittest.TestCase):
             self.assertFalse(pack.wanted(path), path)
 
     def test_branch_names(self):
-        self.assertEqual("dsh-qihang", pack.SOURCE)
+        self.assertEqual("main", pack.SOURCE)
         self.assertEqual("dsh-qihang-release", pack.TARGET)
 
 

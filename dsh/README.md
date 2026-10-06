@@ -37,7 +37,7 @@
 git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git qihang-pack
 ```
 
-或直接用 `dsh-qihang` 分支的开发树，或由 `python -B dsh/build_dsh_pack.py --out dist/dsh` 落盘一份。
+或直接用 `main` 分支的开发树，或由 `python -B dsh/build_dsh_pack.py --out dist/dsh` 落盘一份。
 
 把整包放到任意固定位置，**路径中避免空格**。
 
@@ -117,7 +117,7 @@ py -3.13 -B -m unittest discover -s dsh/tests      # 适配层回归测试
 - 正文里每个 `../`、`./` 相对引用都能在交付树里解析到真实文件；
 - preset 片段是合法 YAML，persona 行有非空 `prefix` 且不含 `{{...}}`。
 
-发布流程见 `dsh/sync_dsh_release.py`：从 `dsh-qihang` 装配并推送到 `dsh-qihang-release`。
+发布流程见 `dsh/sync_dsh_release.py`：从 `main` 装配并推送到 `dsh-qihang-release`。
 CI 见 `.github/workflows/sync-dsh-release.yml`。
 
 ## 已知限制

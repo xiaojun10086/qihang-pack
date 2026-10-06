@@ -40,7 +40,7 @@ except ImportError as exc:  # pragma: no cover - 依赖缺失时的显式提示
     ) from exc
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = "dsh-qihang"
+SOURCE = "main"
 TARGET = "dsh-qihang-release"
 
 #: 原样搬运的路径；目录以 `/` 结尾。dsh/ 下只有对外文档与配置样例进入交付。

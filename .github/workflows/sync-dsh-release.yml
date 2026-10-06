@@ -2,9 +2,9 @@ name: sync-dsh-release
 
 on:
   push:
-    branches: [dsh-qihang]
+    branches: [main]
   pull_request:
-    branches: [dsh-qihang]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -40,7 +40,7 @@ jobs:
 
   sync:
     needs: validate
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/dsh-qihang'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write

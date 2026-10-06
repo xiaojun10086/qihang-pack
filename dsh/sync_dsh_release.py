@@ -6,10 +6,10 @@
 
     python -B dsh/sync_dsh_release.py             # 校验当前工作树，离线只读
     python -B dsh/sync_dsh_release.py --ref HEAD  # 校验指定已提交版本
-    python -B dsh/sync_dsh_release.py --push      # 从 dsh-qihang 装配并联网推送
+    python -B dsh/sync_dsh_release.py --push      # 从 main 装配并联网推送
 
 装配规则与校验契约的唯一真相源是 dsh/build_dsh_pack.py；本脚本只负责取源、建树、推送。
-推送模式绝不包含未提交修改，且只接受 dsh-qihang 分支或显式 --ref。
+推送模式绝不包含未提交修改，且只接受 main 分支或显式 --ref。
 """
 
 import argparse
@@ -36,7 +36,7 @@ REMOTE_REF = "refs/heads/" + pack.TARGET
 
 
 def resolve_source(env, ref=None):
-    """默认只接受 dsh-qihang 分支，不把同名 tag 错当成源分支。"""
+    """默认只接受 main 分支，不把同名 tag 错当成源分支。"""
     candidates = (ref,) if ref is not None else ("refs/heads/" + pack.SOURCE, "HEAD")
     for candidate in candidates:
         commit = release.probe_commit(candidate, env)
