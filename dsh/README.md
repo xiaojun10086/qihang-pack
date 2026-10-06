@@ -5,6 +5,11 @@
 适配原则：**不改动原有结构**。`skills/`、`agents/`、`commands/`、`config.yaml`、`plugin.json`
 一个字节都不动，原有目录几何与包内相对路径全部保持成立；DSH 专属产物只新增在 `dsh/` 之下。
 
+> **读者区分**：本文同时服务两类读者。**交付树用户**（`dsh-qihang-release` 分支或下载包）看
+> 「安装」「包内相对路径在 DSH 下的行为」「已知限制」三节即可。标有 `main 分支专用` 的段落引用
+> `dsh/build_dsh_pack.py`、`dsh/sync_dsh_release.py`、`dsh/tests/`，这三个**不在交付树中**，
+> 只有包维护者（`main` 分支）能执行。
+
 ## 为什么需要适配层
 
 启航是宿主无关的扁平技能包：`skills/<name>/SKILL.md`。DSH 的发现规则与它有两处硬差异：
@@ -37,7 +42,8 @@
 git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git qihang-pack
 ```
 
-或直接用 `main` 分支的开发树，或由 `python -B dsh/build_dsh_pack.py --out dist/dsh` 落盘一份。
+或直接用 `main` 分支的开发树；包维护者也可用 `python -B dsh/build_dsh_pack.py --out dist/dsh`
+落盘一份交付树（`main 分支专用`，该脚本不在交付树中）。
 
 把整包放到任意固定位置，**路径中避免空格**。
 
@@ -99,7 +105,9 @@ DSH 每个技能只有一个 `resourceBase`（即技能目录），目录本身�
 若某个 DSH 版本改为只允许 `resourceBase` 内解析，需把 `config.yaml` 与 `references/`
 复制进各技能目录，或改用 `whenToUse` + 技能内联。届时 `build_dsh_pack.py --check` 会暴露断链。
 
-## 维护
+## 维护（`main 分支专用`）
+
+交付树不含 `dsh/build_dsh_pack.py`、`dsh/sync_dsh_release.py`、`dsh/tests/`，以下命令只在 `main` 分支可执行。
 
 ```bash
 py -3.13 -B dsh/build_dsh_pack.py --check          # 校验当前工作树
