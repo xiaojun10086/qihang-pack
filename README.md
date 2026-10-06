@@ -26,6 +26,7 @@ git clone https://github.com/xiaojun10086/qihang-pack.git
 | DSH（DeepSeek Harness） | `dsh/config.example.yaml` 的 `customSkillDirs` 指向本包 `skills/` 与生成的 `dsh/commands/` | 命令技能、人格与 preset 由 `dsh/build_dsh_pack.py` 生成，详见 [`dsh/README.md`](dsh/README.md) |
 
 - 上表是**常见约定，不是各宿主实测结论**；目录或清单存在不等于宿主已注册该包。
+- **`~/.learnbuddy` 下可能已有另一谱系的「启航」**（v3.4.0：20 域 `domains/` 结构、无 `skills/` 目录），与本包 v4.2.0 的扁平 `skills/<name>/SKILL.md` 不是同一版式；不按其目录结构推定本包已安装或可用。
 - **DSH 必须走适配层**：它只在扫描根直属子目录找 `<name>/SKILL.md`，不支持递归发现，且不读 `commands/*.toml`。适配产物全在 `dsh/` 下（原包结构不变），安装见 [`dsh/README.md`](dsh/README.md)。
 - `commands/*.toml` 是宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`。
 - 根 `SKILL.md` 能作为单入口兼容读取，**不等于 25 个子 skill 已注册**。还需验收子 skill 是否被发现、正文及共享资料是否可读；`commands/` 的 7 个命令和 `agents/` 的 3 个人格也需分别验收，不能由清单或目录存在推定可用。安装说明见 [`INSTALL.md`](INSTALL.md)。
