@@ -7,7 +7,7 @@
 
 1. 12 个查询型 skill 各含一行以 `**登录判断**：` 开头的正文，给出「公开可查 / 需登录」双向分流；
 2. 该行自「需登录时按」起的后段是**逐字一致**的共享样板（只有前段按 skill 定制；
-   样板自 v4.2.0 起含「Chrome / Edge 136 起必须用独立配置目录」的前提说明）；
+   样板自 v4.2.1 起含「Chrome / Edge 136 起必须用独立配置目录」的前提说明）；
 3. 样板声明用**用户自己的浏览器**登录，本包不代开浏览器、不代填凭证；
 4. 样板把完整流程指向 `../portal-operator/SKILL.md`；
 5. 总入口确实定义了第四条，且声明了共享准则的条数；
@@ -190,7 +190,7 @@ PORT_FILE = "DevToolsActivePort"
 
 
 def fastest_login_errors(files):
-    """files 为 {相对路径: 正文}。返回 v4.2.0 最快捷登入路径的违背清单。"""
+    """files 为 {相对路径: 正文}。返回 v4.2.1 最快捷登入路径的违背清单。"""
     errors = []
     for path in (ENTRY, "skills/portal-operator/SKILL.md"):
         text = files.get(path, "")
@@ -212,7 +212,7 @@ def fastest_login_errors(files):
 
 
 class FastestLoginPathTests(unittest.TestCase):
-    """v4.2.0：登录要求必须先给「专用配置目录 + 自动端口」的最快捷做法。"""
+    """v4.2.1：登录要求必须先给「独立配置目录 + 自动端口」的最快捷做法。"""
 
     @classmethod
     def setUpClass(cls):

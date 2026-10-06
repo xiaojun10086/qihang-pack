@@ -1,6 +1,6 @@
 # 安装与使用
 
-> 「启航」v4.2.0 是 DUT 特化的扁平 skill 包，25 个 skill 位于 `skills/<name>/SKILL.md`。
+> 「启航」v4.2.1 是 DUT 特化的扁平 skill 包，25 个 skill 位于 `skills/<name>/SKILL.md`。
 > 文本资产离线可读；实际执行依赖宿主平台的模型、发现机制与工具能力。
 
 ---
@@ -38,7 +38,7 @@ git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
 
 **插件清单不是通用安装保证**：包根 `plugin.json` 声明 `"skills": "./skills"` 及 `agents` / `commands`，同时含 `.codebuddy-plugin/plugin.json`。宿主是否识别这些清单、如何发现技能，须按其规范确认；不能自行推定未知插件格式或专家目录。
 
-**不要按既有 `.learnbuddy` 目录推定安装成功**：`~/.learnbuddy` 下可能已存在本包旧版「启航」（v3.4.0：20 域 `domains/` 三级结构、无 `skills/` 目录）。它与本包同源，是本包自己的历史版本而非另一产品，但版式与本包 v4.2.0 的扁平 `skills/<name>/SKILL.md` 不同，两者目录不可互推。
+**不要按既有 `.learnbuddy` 目录推定安装成功**：`~/.learnbuddy` 下可能已存在本包旧版「启航」（v3.4.0：20 域 `domains/` 三级结构、无 `skills/` 目录）。它与本包同源，是本包自己的历史版本而非另一产品，但版式与本包 v4.2.1 的扁平 `skills/<name>/SKILL.md` 不同，两者目录不可互推。
 
 **命令格式提示**：`commands/*.toml` 为宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`，不影响 `skills/` 与 `agents/` 使用。DSH 侧已由 `dsh/build_dsh_pack.py` 自动转成「仅用户可调用」的技能，无需手工转换。
 

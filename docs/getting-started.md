@@ -2,13 +2,13 @@
 
 ## 安装
 
-「启航」v4.2.0 是 DUT 特化包，但**安装宿主无关**：可移植核心是 `skills/<name>/SKILL.md`（`name` + `description` frontmatter）与 `agents/*.md`，入口由包根 `../plugin.json` 声明（`skills` / `agents` / `commands`），`../config.yaml` 与 `../references/` 为宿主无关数据。安装即**按目标宿主规范把整包放入其技能目录**，不改包内结构、不拆包。
+「启航」v4.2.1 是 DUT 特化包，但**安装宿主无关**：可移植核心是 `skills/<name>/SKILL.md`（`name` + `description` frontmatter）与 `agents/*.md`，入口由包根 `../plugin.json` 声明（`skills` / `agents` / `commands`），`../config.yaml` 与 `../references/` 为宿主无关数据。安装即**按目标宿主规范把整包放入其技能目录**，不改包内结构、不拆包。
 
 先查目标宿主的技能 / 插件发现规范，确认目录约定、清单格式与子目录发现方式，再安装；不假定 WorkBuddy 或其他宿主通用。
 
 常见宿主约定（**示例，须以宿主规范为准**）：通用宿主依 `../plugin.json` 的 `"skills": "./skills"`；Claude Code 为 `~/.claude/skills/qihang/` 或项目 `.claude/skills/qihang/`；GitHub Copilot 为 `.github/skills/qihang/`；LearnBuddy 约定为 `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/`；CodeBuddy / WorkBuddy 依 `../.codebuddy-plugin/plugin.json`。`../commands/*.toml` 为宿主相关格式，宿主只识别 Markdown 命令时按其规范转换或暂不安装。
 
-包根 `../plugin.json` 声明 `"skills": "./skills"`，但清单是否被识别由宿主决定；不推定未知插件格式或专家目录。`~/.learnbuddy` 下可能已存在本包旧版「启航」（v3.4.0：20 域 `domains/` 三级结构、无 `skills/`）——与本包同源，是本包自己的历史版本，但版式与本包 v4.2.0 的扁平结构不同，不按其目录推定本包已安装。根 `../SKILL.md` 兼容单入口读取，**不等于 25 个子 skill 已注册**。安装后分别验收：
+包根 `../plugin.json` 声明 `"skills": "./skills"`，但清单是否被识别由宿主决定；不推定未知插件格式或专家目录。`~/.learnbuddy` 下可能已存在本包旧版「启航」（v3.4.0：20 域 `domains/` 三级结构、无 `skills/`）——与本包同源，是本包自己的历史版本，但版式与本包 v4.2.1 的扁平结构不同，不按其目录推定本包已安装。根 `../SKILL.md` 兼容单入口读取，**不等于 25 个子 skill 已注册**。安装后分别验收：
 
 - 子 skill 是否被发现，选中后的完整正文、共享规则、配置和必需资料是否可读。
 - `../commands/` 的 7 个命令、`../agents/` 的 3 个人格是否各自被发现；目录存在不等于可用。

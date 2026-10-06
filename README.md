@@ -1,4 +1,4 @@
-# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.2.0
+# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.2.1
 
 > 面向大连理工大学（大工 / DUT）学生 ｜ 强绑定 DUT 公开站与需登录的校内平台
 > 结构：**扁平 skill 包，25 个 skill**，按「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段组织
@@ -26,7 +26,7 @@ git clone https://github.com/xiaojun10086/qihang-pack.git
 | DSH（DeepSeek Harness） | `dsh/config.example.yaml` 的 `customSkillDirs` 指向本包 `skills/` 与生成的 `dsh/commands/` | 命令技能、人格与 preset 由 `dsh/build_dsh_pack.py` 生成，详见 [`dsh/README.md`](dsh/README.md) |
 
 - 上表是**常见约定，不是各宿主实测结论**；目录或清单存在不等于宿主已注册该包。
-- **`~/.learnbuddy` 下可能已有本包旧版「启航」**（v3.4.0：20 域 `domains/` 三级结构、无 `skills/` 目录）。它与本包**同源**，是本包自己的历史版本而非另一产品，但与本包 v4.2.0 的扁平 `skills/<name>/SKILL.md` 版式不同；不按其目录结构推定本包已安装或可用。
+- **`~/.learnbuddy` 下可能已有本包旧版「启航」**（v3.4.0：20 域 `domains/` 三级结构、无 `skills/` 目录）。它与本包**同源**，是本包自己的历史版本而非另一产品，但与本包 v4.2.1 的扁平 `skills/<name>/SKILL.md` 版式不同；不按其目录结构推定本包已安装或可用。
 - **DSH 必须走适配层**：它只在扫描根直属子目录找 `<name>/SKILL.md`，不支持递归发现，且不读 `commands/*.toml`。适配产物全在 `dsh/` 下（原包结构不变），安装见 [`dsh/README.md`](dsh/README.md)。
 - `commands/*.toml` 是宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`。
 - 根 `SKILL.md` 能作为单入口兼容读取，**不等于 25 个子 skill 已注册**。还需验收子 skill 是否被发现、正文及共享资料是否可读；`commands/` 的 7 个命令和 `agents/` 的 3 个人格也需分别验收，不能由清单或目录存在推定可用。安装说明见 [`INSTALL.md`](INSTALL.md)。
@@ -226,6 +226,7 @@ python -B scripts/sync_release.py --ref main --push
 
 | 版本 | 修订号 | 主要变更 |
 |---|---|---|
+| **v4.2.1** | `4.2.1` | **第三方独立复核订正**：按 3 轮相互独立复核的 40 条候选缺陷（撤回 1 条）修订 25 个 skill 与信息库——登录样板统一为「独立配置目录 + 自动端口」并注明 Chrome / Edge 136 起忽略默认配置目录；补齐信息库字段口径、访问日期与「已核验 / 未核验（来源已登记）/ 信息库未收录」状态词口径；修正跨 skill 去向点名、路由歧义与判定顺序；补全校务平台 URL 与联系电话；包结构与 DUT 定位不变。 |
 | **v4.2.0** | `4.2.0` | **登录流程提速与浏览器接入**：共享行为准则第四条与 `portal-operator` 的登录要求改为「专用配置目录 + `--remote-debugging-port=0` 自动端口」的复制即用命令，登录一次长期免登录，端口经 `DevToolsActivePort` 自动发现；新增仓库维护用零依赖接入工具 `scripts/browser-bridge/`（不进 release）；包结构与 DUT 定位不变。 |
 | **v4.1.0** | `4.1.0` | **通用宿主适配**：安装说明改为宿主无关模型，给出常见宿主（通用清单 / Claude Code / GitHub Copilot / LearnBuddy / CodeBuddy · WorkBuddy）约定对照与命令格式提示；`plugin.json` 增声明 `agents` / `commands` 入口；包结构与 DUT 定位不变。 |
 | **v4.0.2** | `4.0.2` | **校验与加载契约修复**：默认离线只读检查工作树，显式 ref 检查与发布分离；补齐 Markdown / YAML / semver / 共享加载依赖校验及回归要求，CI 先测试、校验再发布；统一入口与业务正文加载前置、平台站点限制及授权边界；明确宿主发现和 DUT 迁校验收范围。 |
