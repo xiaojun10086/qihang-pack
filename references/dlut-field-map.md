@@ -46,7 +46,7 @@
 | 财务处 | `cw.dlut.edu.cn` | 缴费、报销进度 | `portal-operator` | — |
 | 校园邮箱 | `mail.dlut.edu.cn` | 通知、导师往来 | `portal-operator` | 默认不读正文 |
 | 网络与信息化中心 | `its.dlut.edu.cn` | 网费、VPN、软件正版化 | `portal-operator` | — |
-| i大工 APP | 应用商店 | 场馆 / 心理 / 浴室 / 校车预约 | `portal-operator` `dorm-life` | **仅 APP，无网页版** |
+| i大工 APP | 应用商店 | 场馆 / 心理 / 浴室 / 校车预约 | `portal-operator` `dorm-life` | 场馆 / 浴室 / 校车仅 APP；心理另有网页入口（`dlut-login-sites.md` #29） |
 
 ---
 
