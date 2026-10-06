@@ -19,7 +19,7 @@
 | 3 | 综合教务系统 | http://jxgl.dlut.edu.cn/student/ucas-sso/login | 课表、成绩、选课、考试安排、培养方案完成情况、全校开课查询 | 高频；**仅 HTTP**；页面路径与字段见 `dlut-field-map.md` 第四～七节 |
 | 4 | 图书馆 | https://lib.dlut.edu.cn/ | 借阅、续借、座位/研讨间预约 | — |
 | 5 | 一卡通 / 玉兰卡 | https://ecard.dlut.edu.cn/ | 余额 | 卡内充值入口 https://ecard.dlut.edu.cn/info/1013/1139.htm （「一卡通充值说明」，2024-08-31 发布，正文为图片、无文字步骤，细则须人工核对）；消费流水见 #38 |
-| 6 | 学生工作系统 | https://xsc.dlut.edu.cn/ | 资助、评奖、请假、第二课堂 | 心理记录不读取 |
+| 6 | 学生工作系统 | https://xsc.dlut.edu.cn/ | 资助、评奖、请假、第二课堂 | 心理记录不读取；**调宿入口未在本系统登记**，调宿走学生公寓服务中心（挂靠 https://houqin.dlut.edu.cn/），入口未登记时按「信息库未收录」处理 |
 | 7 | 统一支付平台 | http://pay.dlut.edu.cn/ | 缴费状态 | 涉金额，操作前先复述 |
 | 8 | 财务处 | http://cw.dlut.edu.cn/ | 缴费、报销进度 | 个人数据需登录 |
 | 9 | 就业信息网 | https://job.dlut.edu.cn/ | 招聘、宣讲会、投递记录 | — |
