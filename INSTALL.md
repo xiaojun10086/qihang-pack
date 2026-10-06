@@ -1,6 +1,6 @@
 # 安装与使用
 
-> 「启航」v4.1.0 是 DUT 特化的扁平 skill 包，25 个 skill 位于 `skills/<name>/SKILL.md`。
+> 「启航」v4.2.0 是 DUT 特化的扁平 skill 包，25 个 skill 位于 `skills/<name>/SKILL.md`。
 > 文本资产离线可读；实际执行依赖宿主平台的模型、发现机制与工具能力。
 
 ---

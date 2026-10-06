@@ -1,6 +1,6 @@
 {
   "name": "qihang",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "「启航」大连理工大学学生学习、信息搜集与校务助手。扁平 skill 包（25 个 skill），按「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段组织，可代为操作校内平台。",
   "description_en": "Qihang: a flat skill pack (25 skills) for DUT students covering study, information retrieval and campus affairs, with authorized on-behalf operation of campus portals.",
   "skills": "./skills",

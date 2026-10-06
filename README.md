@@ -1,4 +1,4 @@
-# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.1.0
+# 「启航」大连理工大学学习 · 信息搜集 · 校务助手 v4.2.0
 
 > 面向大连理工大学（大工 / DUT）学生 ｜ 强绑定 DUT 公开站与需登录的校内平台
 > 结构：**扁平 skill 包，25 个 skill**，按「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段组织
@@ -53,7 +53,7 @@ qihang-pack/
 ├── docs/                 # skill-anatomy / getting-started / agents
 ├── references/           # 可核验信息源：dlut-official-sites / dlut-login-sites / dlut-field-map
 ├── dsh/                  # DSH 适配层：装配脚本 / 命令技能 / 人设 / preset / 配置样例
-└── scripts/ .github/     # 仓库维护用（发布对齐），不进 release
+└── scripts/ .github/     # 仓库维护用（发布对齐、浏览器接入工具），不进 release
 ```
 
 **只要交付内容**（不含 README、INSTALL 等仓库说明文档及维护脚本，保留结构规范）：
@@ -127,7 +127,7 @@ git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
 1. **先给可用的答案** —— 结论放最前面；只追问会改变答案、安全边界或下一步行动的信息，一轮内一次问完。
 2. **区分「解释」与「代做」** —— 讲方法、给结构、给路径、给同类练习可以；不产出用于提交的成品（作业答案、论文正文、可提交代码、文书）。判据是用途：说「交上去」不给成品，说「自己对着学」就讲透。
 3. **涉及事实必须给来源** —— 校内信息优先官方来源，附出处与日期；未实时核验就明说「未核验」，不编造 URL、电话、单位名、时间。
-4. **涉及查询先判是否需要登录** —— 公开站直接查；只在统一认证后可见的（门户、教务系统、一卡通、图书馆账户、离校系统、报名与审批表单），先给出登录要求再转 `portal-operator`：由用户本人用**自己的浏览器**登录，本包不代开浏览器、不代填用户名 / 密码 / 验证码；要本包直接操作页面时浏览器需带调试端口启动，用户确认已登录后本包才接入。完整流程见 `skills/portal-operator/SKILL.md`。
+4. **涉及查询先判是否需要登录** —— 公开站直接查；只在统一认证后可见的（门户、教务系统、一卡通、图书馆账户、离校系统、报名与审批表单），先给出登录要求再转 `portal-operator`：由用户本人用**自己的浏览器**登录，本包不代开浏览器、不代填用户名 / 密码 / 验证码；要本包直接操作页面时浏览器需带调试端口启动——**最快捷做法**是用专用配置目录加 `--remote-debugging-port=0` 启动一次，登录一次即长期免登录，端口写入该目录的 `DevToolsActivePort`——用户确认已登录后本包才接入。完整流程见 `skills/portal-operator/SKILL.md`。
 
 ### 安全兜底（高于以上全部）
 
@@ -144,6 +144,8 @@ git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
 ## 4. 校内平台代操作
 
 `portal-operator` 仅在确需登录查询或实际代办、用户明确授权且站点限制允许时，打开目标平台执行操作并回报结果。公开信息查询和办理路径咨询不登录；「帮我查一下」「帮我办一下」等礼貌措辞本身不等于登录或代办授权，范围不明时先问必要问题。
+
+**最快捷登入路径**（要本包直接操作页面时先给这一条）：让用户用自己的浏览器，以**专用配置目录 + `--remote-debugging-port=0`** 启动一次并登录，登录一次即长期免登录；实际端口写入该目录的 `DevToolsActivePort`，本包据此接入，不猜端口、不撞已占用端口。仓库内另有零依赖接入工具 `scripts/browser-bridge/`（维护用，不进 release）。
 
 打开平台前，先完整读取 `config.yaml`、[`references/dlut-login-sites.md`](references/dlut-login-sites.md)、[`references/dlut-official-sites.md`](references/dlut-official-sites.md) 及 [`references/dlut-field-map.md`](references/dlut-field-map.md)，核对站点限制与允许读取的字段。配置已定义的入口以配置为准，不用硬编码覆盖，也不拼接未登记地址。必需文件不可读、入口缺失或限制无法确认时，停止本包相关执行，不猜测。
 
@@ -223,6 +225,7 @@ python -B scripts/sync_release.py --ref main --push
 
 | 版本 | 修订号 | 主要变更 |
 |---|---|---|
+| **v4.2.0** | `4.2.0` | **登录流程提速与浏览器接入**：共享行为准则第四条与 `portal-operator` 的登录要求改为「专用配置目录 + `--remote-debugging-port=0` 自动端口」的复制即用命令，登录一次长期免登录，端口经 `DevToolsActivePort` 自动发现；新增仓库维护用零依赖接入工具 `scripts/browser-bridge/`（不进 release）；包结构与 DUT 定位不变。 |
 | **v4.1.0** | `4.1.0` | **通用宿主适配**：安装说明改为宿主无关模型，给出常见宿主（通用清单 / Claude Code / GitHub Copilot / LearnBuddy / CodeBuddy · WorkBuddy）约定对照与命令格式提示；`plugin.json` 增声明 `agents` / `commands` 入口；包结构与 DUT 定位不变。 |
 | **v4.0.2** | `4.0.2` | **校验与加载契约修复**：默认离线只读检查工作树，显式 ref 检查与发布分离；补齐 Markdown / YAML / semver / 共享加载依赖校验及回归要求，CI 先测试、校验再发布；统一入口与业务正文加载前置、平台站点限制及授权边界；明确宿主发现和 DUT 迁校验收范围。 |
 | **v4.0.1** | `4.0.1` | **交付闸门加固**：`verify()` 新增版本一致性断言（`plugin.json` / `.codebuddy-plugin/plugin.json` / `config.yaml` 三处副本必须相同，不一致即校验失败）；引用检查从只认 `.md` 扩到 `.py` / `.yml` / `.yaml` / `.json` 等代码与配置文件，指向未交付文件的引用须逐条登记于 `REPO_ONLY_REFS`，否则校验失败。 |

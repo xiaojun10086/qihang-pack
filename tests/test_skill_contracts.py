@@ -32,7 +32,9 @@ MARKER = "**登录判断**："
 SUFFIX_START = "需登录时按"
 SHARED_SUFFIX = (
     "需登录时按 `../using-qihang/SKILL.md` 共享行为准则第四条给出登录要求"
-    "（用户本人用**自己的浏览器**登录，本包不代开浏览器、不代填凭证；"
+    "（**先给最快捷做法**：让用户用专用配置目录加 `--remote-debugging-port=0` 启动一次，"
+    "登录一次即长期免登录，端口写入该目录的 `DevToolsActivePort`；"
+    "用户本人用**自己的浏览器**登录，本包不代开浏览器、不代填凭证；"
     "要本包直接操作页面需带调试端口启动，用户确认已登录后本包才接入）；"
     "完整流程见 `../portal-operator/SKILL.md`。"
 )
@@ -178,6 +180,61 @@ class LoginJudgmentContractTests(unittest.TestCase):
     def test_undeclared_principle_count_is_detected(self):
         files = self.mutate(ENTRY, SHARED_COUNT, "统一若干条共享行为准则")
         self.assertTrue(any("未声明共享行为准则的条数" in e for e in contract_errors(files)))
+
+
+FASTEST_COMMAND = "--remote-debugging-port=0"
+PORT_FILE = "DevToolsActivePort"
+
+
+def fastest_login_errors(files):
+    """files 为 {相对路径: 正文}。返回 v4.2.0 最快捷登入路径的违背清单。"""
+    errors = []
+    for path in (ENTRY, "skills/portal-operator/SKILL.md"):
+        text = files.get(path, "")
+        if FASTEST_COMMAND not in text:
+            errors.append("%s 未给出 %s 的最快捷启动命令" % (path, FASTEST_COMMAND))
+        if PORT_FILE not in text:
+            errors.append("%s 未说明端口从 %s 自动发现" % (path, PORT_FILE))
+    if "browser/edge" not in files.get(ENTRY, "") or "browser/chrome" not in files.get(ENTRY, ""):
+        errors.append("%s 未给出 Edge / Chrome 两套专用配置目录" % ENTRY)
+    if "先给最快捷做法" not in SHARED_SUFFIX or FASTEST_COMMAND not in SHARED_SUFFIX:
+        errors.append("共享样板未要求先给最快捷做法")
+    if PORT_FILE not in SHARED_SUFFIX:
+        errors.append("共享样板未说明端口从 %s 自动发现" % PORT_FILE)
+    for name in QUERY_SKILLS:
+        text = files.get(skill_path(name), "")
+        if "9222" in text:
+            errors.append("%s 仍写死调试端口 9222" % skill_path(name))
+    return errors
+
+
+class FastestLoginPathTests(unittest.TestCase):
+    """v4.2.0：登录要求必须先给「专用配置目录 + 自动端口」的最快捷做法。"""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.files = {path.relative_to(PROJECT).as_posix(): path.read_text(encoding="utf-8")
+                     for path in sorted(SKILLS.glob("*/SKILL.md"))}
+        cls.files[ENTRY] = (PROJECT / ENTRY).read_text(encoding="utf-8")
+        cls.files["skills/portal-operator/SKILL.md"] = (
+            PROJECT / "skills/portal-operator/SKILL.md").read_text(encoding="utf-8")
+
+    def test_current_tree_satisfies_fastest_login_contract(self):
+        self.assertEqual([], fastest_login_errors(self.files))
+
+    def test_no_hardcoded_debug_port_in_any_skill(self):
+        offenders = sorted(path for path, text in self.files.items() if "9222" in text)
+        self.assertEqual([], offenders)
+
+    def test_dropped_zero_port_command_is_detected(self):
+        files = dict(self.files)
+        files[ENTRY] = files[ENTRY].replace(FASTEST_COMMAND, "--remote-debugging-port=9222")
+        self.assertIn("未给出", " ".join(fastest_login_errors(files)))
+
+    def test_dropped_port_file_discovery_is_detected(self):
+        files = dict(self.files)
+        files[ENTRY] = files[ENTRY].replace(PORT_FILE, "端口文件")
+        self.assertIn("未说明端口", " ".join(fastest_login_errors(files)))
 
 
 if __name__ == "__main__":

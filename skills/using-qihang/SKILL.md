@@ -80,8 +80,16 @@ description: 大连理工大学（大工/DUT）学生的学习、信息搜集与
 
 需登录时给出的登录要求（完整流程、隐私边界与安全兜底见 `../portal-operator/SKILL.md`；需登录站清单见 `../../references/dlut-login-sites.md`）：
 
+**最快捷路径（先给这一条，再给其余要求）**：让用户用**专用配置目录 + 自动端口**启动一次浏览器，登录一次即可长期免登录。
+
+- 复制即用，把 `<目标入口>` 换成实际入口（入口读 `../../config.yaml`）：
+  `msedge.exe --remote-debugging-port=0 --user-data-dir="%USERPROFILE%\.qihang\browser\edge" <目标入口>`
+  Chrome 同形：`chrome.exe --remote-debugging-port=0 --user-data-dir="%USERPROFILE%\.qihang\browser\chrome" <目标入口>`；macOS / Linux 用 `~/.qihang/browser/edge` 或 `~/.qihang/browser/chrome`。
+- `--remote-debugging-port=0` 让浏览器**自选空闲端口**，不会与已占用端口冲突；实际端口写在该配置目录下的 `DevToolsActivePort` 第一行，本包据此接入。该文件缺失、或修改时间早于本次启动时刻，即视为无效，请用户重新启动。
+- **必须用独立配置目录**：Chrome / Edge 136 起会忽略默认配置目录上的调试端口，直接给默认配置加 `--remote-debugging-port` 不生效；独立目录也避开用户日常浏览器的单实例锁。
+- 用户本人在弹出的窗口里登录一次；登录态存在该专用目录，之后免登录。须**正常关窗**（或由本包优雅关闭）才会落盘 cookie，强制结束进程会丢登录态。
+- 用户**已有**带调试端口且已登录的实例时，按该端口直接接入更省事，不必重开；只读查询不接管其当前页面，需要新页面时另开标签页。
 - 由用户本人用**自己的浏览器**打开目标入口完成登录；本包不代开浏览器、不代填用户名 / 密码 / 验证码。入口读 `../../config.yaml`：门户 `school.entry_portal`、教务 `school.entry_jwgl`、需认证时 `school.entry_sso`；校外访问图书馆电子资源用 `school.webvpn`。
-- 要本包直接在该页面上操作时，浏览器需带调试端口启动：`msedge.exe --remote-debugging-port=9222 --user-data-dir="<独立配置目录>" <目标入口>`（Chrome 同形，端口取 9222 / 9223 等空闲端口）。必须指定独立配置目录——Chrome / Edge 136 起会忽略默认配置目录上的调试端口。
 - 登录窗口保持可见；短信验证码、人脸识别等本人环节由用户在该窗口完成。
 - 用户确认已登录后本包才接入；是否已登录以用户确认为准，不预先探测、不轮询登录态、不为确认而重复导航。接入失败只给开启方式，不改为由本包代开浏览器。
 - 涉及支付金额或不可撤销操作（提交报名、退课、退宿）时，先复述确认再执行。
