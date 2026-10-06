@@ -204,7 +204,7 @@ class ContentConsistencyTests(unittest.TestCase):
     """内容一致性回归。
 
     发布校验只做存在性 / 依赖 / 白名单检查，不做内容一致性检查，因此同一事实
-    可以在多份文档里分叉。这里对三类已修复的矛盾加断言，防止改写时再次分叉。
+    可以在多份文档里分叉。这里对四类已修复的矛盾加断言，防止改写时再次分叉。
     """
 
     @classmethod
@@ -255,6 +255,16 @@ class ContentConsistencyTests(unittest.TestCase):
             # campus-concierge 用「遇到诈骗」措辞，本身已含未遂。
             self.assertTrue("未遂" in line or "遇到诈骗" in line,
                             "%s 的反诈兜底未覆盖未遂：%s" % (path, line.strip()))
+
+    def test_data_lab_requires_multiple_comparison_correction(self):
+        """多组比较必须要求多重比较校正，否则假阳性随比较次数膨胀。"""
+        text = self.base["skills/data-lab/SKILL.md"]
+        self.assertIn("多重比较校正", text)
+        for line in text.splitlines():
+            if "事后比较" in line:
+                self.assertIn("校正", line,
+                              "提「事后比较」的行必须同时给出多重比较校正要求：%s"
+                              % line.strip())
 
 
 class GitBoundaryTests(unittest.TestCase):
