@@ -200,6 +200,63 @@ class ValidationTests(unittest.TestCase):
         self.assertNotIn("http://jxgl.dlut.edu.cn", portal)
 
 
+class ContentConsistencyTests(unittest.TestCase):
+    """内容一致性回归。
+
+    发布校验只做存在性 / 依赖 / 白名单检查，不做内容一致性检查，因此同一事实
+    可以在多份文档里分叉。这里对三类已修复的矛盾加断言，防止改写时再次分叉。
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.base = delivery_contents()
+        # 这三份是仓库侧文档，不在交付白名单内，须直接读盘。
+        cls.repo_only = {
+            rel: (PROJECT / rel).read_text(encoding="utf-8")
+            for rel in ("README.md", "INSTALL.md", "docs/getting-started.md")
+        }
+
+    def test_psychology_booking_entry_is_consistent(self):
+        """心理预约另有网页入口（#29），不得再被整类断言为「无网页版」。"""
+        login = self.base["references/dlut-login-sites.md"]
+        field = self.base["references/dlut-field-map.md"]
+        official = self.base["references/dlut-official-sites.md"]
+        self.assertIn("xinlixlt.dlut.edu.cn", login)
+        for name, text in (("dlut-login-sites.md", login),
+                           ("dlut-field-map.md", field),
+                           ("dlut-official-sites.md", official)):
+            for line in text.splitlines():
+                if "心理" in line and ("无网页版" in line or "仅 APP" in line):
+                    self.assertIn("#29", line,
+                                  "%s 把心理预约断言为无网页版却未指向 #29：%s"
+                                  % (name, line.strip()))
+
+    def test_error_diagnose_uses_one_taxonomy(self):
+        """错因分类只保留一套判据，「粗心」不得另立类别。"""
+        text = self.base["skills/error-diagnose/SKILL.md"]
+        self.assertNotIn("错因四分类与回炉顺序", text)
+        self.assertIn("模拟卷错因分布与回炉顺序", text)
+        for contradiction in ("知识 / 方法 / 粗心 / 时间", "知识、方法、粗心、时间",
+                              "| 粗心（算错） |"):
+            self.assertNotIn(contradiction, text)
+        self.assertIn("粗心必须落到计算或审题", text)
+
+    def test_safety_fallback_covers_attempted_fraud(self):
+        """反诈兜底必须覆盖未遂，不能只写「已经转账被骗」。"""
+        copies = dict(self.base)
+        copies.update(self.repo_only)
+        for path in ("SKILL.md", "skills/using-qihang/SKILL.md",
+                     "agents/campus-concierge.md", "README.md", "INSTALL.md",
+                     "docs/getting-started.md"):
+            text = copies[path]
+            self.assertNotIn("已经转账被骗", text, path)
+            line = next((l for l in text.splitlines() if "96110" in l), None)
+            self.assertIsNotNone(line, "%s 缺少 96110 反诈兜底行" % path)
+            # campus-concierge 用「遇到诈骗」措辞，本身已含未遂。
+            self.assertTrue("未遂" in line or "遇到诈骗" in line,
+                            "%s 的反诈兜底未覆盖未遂：%s" % (path, line.strip()))
+
+
 class GitBoundaryTests(unittest.TestCase):
     def test_missing_main_falls_back_to_head(self):
         def run(*args, **kwargs):
