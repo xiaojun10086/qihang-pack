@@ -38,7 +38,7 @@ LearnBuddy           ~/.learnbuddy/skills/qihang/ 或项目 .learnbuddy/skills/q
 CodeBuddy / WorkBuddy  依 ../.codebuddy-plugin/plugin.json 及宿主规范
 ```
 
-> **`~/.learnbuddy` 已有内容 ≠ 本包已安装**：该目录下可能已存在另一谱系的「启航」（v3.4.0：20 域 `domains/` 结构、`library/` 与 L1/L2/L3 隐私分级，**没有 `skills/` 目录**）。那是本包的历史版式，与本包 v4.2.0 的扁平 `skills/<name>/SKILL.md` 不是同一版式，两者目录不可互推。安装与验收一律以本包 `../plugin.json` 与本文件为准，不按既有 `.learnbuddy` 目录结构推定本包已被宿主识别或可用。
+> **`~/.learnbuddy` 已有内容 ≠ 本包已安装**：该目录下可能已存在本包 **v3.4.0 旧版**「启航」（20 域 `domains/` 三级结构、`library/` 与 L1/L2/L3 隐私分级，**没有 `skills/` 目录**）。它与本包**同源**——是本包自己的历史版式，而非另一产品，但与本包 v4.2.0 的扁平 `skills/<name>/SKILL.md` 版式不同，两者目录不可互推。安装与验收一律以本包 `../plugin.json` 与本文件为准，不按既有 `.learnbuddy` 目录结构推定本包已被宿主识别或可用。
 
 `../commands/*.toml` 是宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `../commands/`，不影响 `../skills/` 与 `../agents/`。
 

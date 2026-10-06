@@ -12,7 +12,9 @@
 3. 业务 skill 的执行前置显式声明完整加载 `../using-qihang/SKILL.md` 与
    `../../config.yaml`；总入口是共享规则的唯一权威，不把自己当共享规则来源加载；
 4. `## 常见误判` 至少 4 条 `- ❌`，且每条都给出 `✅` 正确做法；
-5. 正文建议少于 500 行，超过时考虑拆分。
+5. 正文建议少于 500 行，超过时考虑拆分；
+6. 根 `SKILL.md` 不是 skill，不适用四段式，但它的执行前置同样要声明相对路径
+   基准、复用与停止规则，并完整加载 `skills/using-qihang/SKILL.md` 与 `config.yaml`。
 
 第 1 条若失效，后四条就只是散落在文件里的句子，所以一并锁定。
 """
@@ -23,6 +25,7 @@ import unittest
 
 PROJECT = Path(__file__).resolve().parents[1]
 SKILLS = PROJECT / "skills"
+ROOT = "SKILL.md"
 ENTRY = "skills/using-qihang/SKILL.md"
 
 PRE = "## 执行前置"
@@ -34,6 +37,8 @@ REUSE_RULE = ("本会话已完整加载上述文件时可复用；必需文件�
               "停止本包执行并说明缺失或不可读的文件，不猜测规则。")
 SHARED_RULE_REF = "`../using-qihang/SKILL.md`"
 CONFIG_REF = "`../../config.yaml`"
+ROOT_SHARED_RULE_REF = "`skills/using-qihang/SKILL.md`"
+ROOT_CONFIG_REF = "`config.yaml`"
 
 BAD = "- ❌"
 GOOD = "✅"
@@ -61,6 +66,23 @@ def body_of(sections, title):
                      for line in body)
 
 
+def preamble_of(text):
+    """返回 `## 执行前置` 下紧邻的连续 `- ` 列表（遇首个非列表行即停止）。
+
+    根 `SKILL.md` 的执行前置之后没有下一个 `##` 标题，按章节取正文会把整篇文档
+    都算进来；统一只认紧邻的列表块，技能与根入口口径一致。
+    """
+    lines, started = [], False
+    for line in body_of(split_h2(text), PRE).split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            started = True
+            lines.append(stripped)
+        elif started and stripped:
+            break
+    return "\n".join(lines)
+
+
 def structure_errors(files):
     """files 为 {相对路径: 正文}。返回结构违背清单，空列表表示全部成立。"""
     errors = []
@@ -84,8 +106,7 @@ def structure_errors(files):
         elif "## Overview" in titles and titles.index(PRE) > titles.index("## Overview"):
             errors.append("%s 的 `%s` 必须排在 `## Overview` 之前" % (path, PRE))
 
-        preamble = "\n".join(line for line in body_of(sections, PRE).split("\n")
-                             if line.strip())
+        preamble = preamble_of(text)
         if PATH_BASELINE not in preamble:
             errors.append("%s 的执行前置未声明相对路径基准" % path)
         if REUSE_RULE not in preamble:
@@ -122,11 +143,32 @@ def structure_errors(files):
     return errors
 
 
+def root_errors(files):
+    """根 `SKILL.md` 的执行前置契约。files 为 {相对路径: 正文}，须含 `SKILL.md`。"""
+    text = files.get(ROOT)
+    if text is None:
+        return ["交付树里没有根 `%s`" % ROOT]
+    sections = split_h2(text)
+    if PRE not in [title for title, _ in sections]:
+        return ["`%s` 缺少 `%s` 章节" % (ROOT, PRE)]
+    preamble = preamble_of(text)
+    errors = []
+    if PATH_BASELINE not in preamble:
+        errors.append("`%s` 的执行前置未声明相对路径基准" % ROOT)
+    if REUSE_RULE not in preamble:
+        errors.append("`%s` 的执行前置未声明「已加载可复用 / 不可读则停止」" % ROOT)
+    for target in (ROOT_SHARED_RULE_REF, ROOT_CONFIG_REF):
+        if target not in preamble:
+            errors.append("`%s` 的执行前置未声明完整加载 %s" % (ROOT, target))
+    return errors
+
+
 class SkillStructureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.files = {path.relative_to(PROJECT).as_posix(): path.read_text(encoding="utf-8")
                      for path in sorted(SKILLS.glob("*/SKILL.md"))}
+        cls.root = {ROOT: (PROJECT / ROOT).read_text(encoding="utf-8")}
 
     def mutate(self, relative, old, new, count=1):
         files = dict(self.files)
@@ -134,8 +176,13 @@ class SkillStructureTests(unittest.TestCase):
         files[relative] = files[relative].replace(old, new, count)
         return files
 
+    def mutate_root(self, old, new, count=1):
+        self.assertIn(old, self.root[ROOT])
+        return {ROOT: self.root[ROOT].replace(old, new, count)}
+
     def test_current_tree_satisfies_structure_contract(self):
         self.assertEqual([], structure_errors(self.files))
+        self.assertEqual([], root_errors(self.root))
 
     def test_every_skill_declares_the_four_sections_in_order(self):
         for path, text in sorted(self.files.items()):
@@ -156,14 +203,21 @@ class SkillStructureTests(unittest.TestCase):
             if path == ENTRY:
                 continue
             with self.subTest(path=path):
-                preamble = body_of(split_h2(text), PRE)
+                preamble = preamble_of(text)
                 self.assertIn(SHARED_RULE_REF, preamble)
                 self.assertIn(CONFIG_REF, preamble)
 
     def test_entry_is_the_authority_and_does_not_load_itself(self):
-        preamble = body_of(split_h2(self.files[ENTRY]), PRE)
+        preamble = preamble_of(self.files[ENTRY])
         self.assertIn(CONFIG_REF, preamble)
         self.assertNotIn(SHARED_RULE_REF, preamble)
+
+    def test_root_entry_preamble_loads_shared_rules_and_config(self):
+        self.assertEqual([], root_errors(self.root))
+
+    def test_root_entry_is_not_required_to_declare_the_four_sections(self):
+        self.assertNotIn("## Overview", self.root[ROOT])
+        self.assertEqual([], root_errors(self.root))
 
     def test_mistakes_pair_a_failure_with_a_correct_action(self):
         for path, text in sorted(self.files.items()):
@@ -248,6 +302,22 @@ class SkillStructureTests(unittest.TestCase):
     def test_wrong_declared_skill_count_is_detected(self):
         files = self.mutate(ENTRY, "本包共 25 个 skill", "本包共 26 个 skill")
         self.assertIn("实际有", " ".join(structure_errors(files)))
+
+    def test_root_entry_missing_preamble_is_detected(self):
+        files = self.mutate_root(PRE, "## 前置说明")
+        self.assertIn("缺少 `%s` 章节" % PRE, " ".join(root_errors(files)))
+
+    def test_root_entry_dropped_shared_rule_load_is_detected(self):
+        files = self.mutate_root(ROOT_SHARED_RULE_REF, "总入口")
+        self.assertIn("未声明完整加载", " ".join(root_errors(files)))
+
+    def test_root_entry_dropped_config_load_is_detected(self):
+        files = self.mutate_root(ROOT_CONFIG_REF, "配置文件")
+        self.assertIn("未声明完整加载", " ".join(root_errors(files)))
+
+    def test_root_entry_dropped_reuse_rule_is_detected(self):
+        files = self.mutate_root(REUSE_RULE, "可复用。")
+        self.assertIn("已加载可复用", " ".join(root_errors(files)))
 
 
 if __name__ == "__main__":
