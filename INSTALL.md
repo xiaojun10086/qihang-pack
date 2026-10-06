@@ -20,7 +20,7 @@
 | GitHub Copilot | `.github/skills/qihang/` | `.github/agents/`、`.github/prompts/` |
 | LearnBuddy 约定 | `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/` | 依宿主规范 |
 | CodeBuddy / WorkBuddy | 依 `.codebuddy-plugin/plugin.json` 及宿主规范 | 依宿主规范 |
-| DSH（DeepSeek Harness） | `dsh/config.example.yaml` 的 `customSkillDirs` 指向本包 `skills/` 与 `dsh/commands/` | 转成 `dsh/personas/` + `dsh/preset.example.yaml` |
+| DSH（DeepSeek Harness） | `dsh/config.example.yaml` 的 `customSkillDirs` 指向本包 `skills/` 与生成的 `dsh/commands/` | 命令技能、人格与 preset 由 `dsh/build_dsh_pack.py` 生成，详见 [`dsh/README.md`](dsh/README.md) |
 
 **DSH 需要适配层**：DSH 只在扫描根的**直属**子目录里找 `<name>/SKILL.md`，不支持递归 `**/SKILL.md`，把包根交给它只会发现 0 个技能；它的命令是插件注册的 TS 对象，不读 `commands/*.toml`。适配产物（命令技能、人设、preset、配置样例）都在 `dsh/` 下，原包结构不变，详见 [`dsh/README.md`](dsh/README.md)。
 
