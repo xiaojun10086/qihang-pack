@@ -20,6 +20,9 @@
 | GitHub Copilot | `.github/skills/qihang/` | `.github/agents/`、`.github/prompts/` |
 | LearnBuddy 约定 | `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/` | 依宿主规范 |
 | CodeBuddy / WorkBuddy | 依 `.codebuddy-plugin/plugin.json` 及宿主规范 | 依宿主规范 |
+| DSH（DeepSeek Harness） | `dsh/config.example.yaml` 的 `customSkillDirs` 指向本包 `skills/` 与 `dsh/commands/` | 转成 `dsh/personas/` + `dsh/preset.example.yaml` |
+
+**DSH 需要适配层**：DSH 只在扫描根的**直属**子目录里找 `<name>/SKILL.md`，不支持递归 `**/SKILL.md`，把包根交给它只会发现 0 个技能；它的命令是插件注册的 TS 对象，不读 `commands/*.toml`。适配产物（命令技能、人设、preset、配置样例）都在 `dsh/` 下，原包结构不变，详见 [`dsh/README.md`](dsh/README.md)。
 
 ```bash
 # 通用做法：克隆后按上表（或宿主规范）复制到该宿主的技能目录
@@ -28,11 +31,14 @@ git clone https://github.com/xiaojun10086/qihang-pack.git
 # 获取 release 交付内容；下载本身不等于已注册到宿主
 # 不含 README、INSTALL 等仓库说明文档与维护脚本，保留结构规范
 git clone -b release https://github.com/xiaojun10086/qihang-pack.git
+
+# DSH 适配版：含 dsh/ 适配层，可直接按 dsh/README.md 挂载
+git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
 ```
 
 **插件清单不是通用安装保证**：包根 `plugin.json` 声明 `"skills": "./skills"` 及 `agents` / `commands`，同时含 `.codebuddy-plugin/plugin.json`。宿主是否识别这些清单、如何发现技能，须按其规范确认；不能自行推定未知插件格式或专家目录。
 
-**命令格式提示**：`commands/*.toml` 为宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`，不影响 `skills/` 与 `agents/` 使用。
+**命令格式提示**：`commands/*.toml` 为宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`，不影响 `skills/` 与 `agents/` 使用。DSH 侧已由 `dsh/build_dsh_pack.py` 自动转成「仅用户可调用」的技能，无需手工转换。
 
 **安装验收**：
 

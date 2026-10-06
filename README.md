@@ -23,8 +23,10 @@ git clone https://github.com/xiaojun10086/qihang-pack.git
 | GitHub Copilot | `.github/skills/qihang/` | `.github/agents/`、`.github/prompts/` |
 | LearnBuddy 约定 | `~/.learnbuddy/skills/qihang/` 或项目 `.learnbuddy/skills/qihang/` | 依宿主规范 |
 | CodeBuddy / WorkBuddy | 依 `.codebuddy-plugin/plugin.json` 及宿主规范 | 依宿主规范 |
+| DSH（DeepSeek Harness） | `dsh/config.example.yaml` 的 `customSkillDirs` 指向本包 `skills/` 与 `dsh/commands/` | 转成 `dsh/personas/` + `dsh/preset.example.yaml` |
 
 - 上表是**常见约定，不是各宿主实测结论**；目录或清单存在不等于宿主已注册该包。
+- **DSH 必须走适配层**：它只在扫描根直属子目录找 `<name>/SKILL.md`，不支持递归发现，且不读 `commands/*.toml`。适配产物全在 `dsh/` 下（原包结构不变），安装见 [`dsh/README.md`](dsh/README.md)。
 - `commands/*.toml` 是宿主相关命令格式；宿主只识别 Markdown 命令时，按其规范转换或暂不安装 `commands/`。
 - 根 `SKILL.md` 能作为单入口兼容读取，**不等于 25 个子 skill 已注册**。还需验收子 skill 是否被发现、正文及共享资料是否可读；`commands/` 的 7 个命令和 `agents/` 的 3 个人格也需分别验收，不能由清单或目录存在推定可用。安装说明见 [`INSTALL.md`](INSTALL.md)。
 
@@ -50,6 +52,7 @@ qihang-pack/
 ├── commands/             # 7 个斜杠命令：/learn /notes /exam /paper /code /search /campus
 ├── docs/                 # skill-anatomy / getting-started / agents
 ├── references/           # 可核验信息源：dlut-official-sites / dlut-login-sites / dlut-field-map
+├── dsh/                  # DSH 适配层：装配脚本 / 命令技能 / 人设 / preset / 配置样例
 └── scripts/ .github/     # 仓库维护用（发布对齐），不进 release
 ```
 
@@ -66,7 +69,16 @@ qihang-pack/
 git clone -b release https://github.com/xiaojun10086/qihang-pack.git
 ```
 
-`release` 分支的交付白名单见 `scripts/sync_release.py`。main 提交触发 `.github/workflows/sync-release.yml` 后，CI 必须先通过维护测试及交付校验，才从指定已提交版本构建并推送 release；失败不得发布。
+**DSH 适配版**（在 `release` 之上叠加 `dsh/` 适配层，原包结构不变）：
+
+- [dsh-qihang-release.zip](https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/dsh-qihang-release.zip)
+- [dsh-qihang-release.tar.gz](https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/dsh-qihang-release.tar.gz)
+
+```bash
+git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
+```
+
+`release` 分支的交付白名单见 `scripts/sync_release.py`，DSH 交付树见 `dsh/build_dsh_pack.py`。main 提交触发 `.github/workflows/sync-release.yml`、`dsh-qihang` 提交触发 `.github/workflows/sync-dsh-release.yml`；CI 必须先通过维护测试及交付校验，才从指定已提交版本构建并推送对应交付分支，失败不得发布。
 
 **加载机制**：在支持渐进加载的宿主中，`name` + `description` 用于发现与匹配，正文按需加载；具体发现行为以宿主规范和验收结果为准。名称或 description 不能替代执行指令：选中业务 skill 后，必须完整读取其 `SKILL.md` 正文再执行。
 

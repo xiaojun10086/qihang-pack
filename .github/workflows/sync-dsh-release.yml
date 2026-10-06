@@ -1,0 +1,59 @@
+name: sync-dsh-release
+
+on:
+  push:
+    branches: [dsh-qihang]
+  pull_request:
+    branches: [dsh-qihang]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-dsh-release-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: 安装维护依赖
+        run: python -m pip install -r requirements-dev.txt
+      - name: 原包回归测试（仅隔离本地仓库）
+        run: python -B -m unittest discover -s tests -v
+      - name: DSH 适配层回归测试
+        run: python -B -m unittest discover -s dsh/tests -v
+      - name: 离线校验原包交付范围
+        run: python -B scripts/sync_release.py --ref HEAD
+      - name: 离线校验 DSH 交付树
+        run: python -B dsh/sync_dsh_release.py --ref HEAD
+
+  sync:
+    needs: validate
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/dsh-qihang'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: 安装维护依赖
+        run: python -m pip install -r requirements-dev.txt
+      - name: 发布已通过测试的提交到 dsh-qihang-release
+        run: python -B dsh/sync_dsh_release.py --ref "$GITHUB_SHA" --push

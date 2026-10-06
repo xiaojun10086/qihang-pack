@@ -1,0 +1,20 @@
+# DSH（DeepSeek Harness）skill 发现配置片段。
+#
+# 把下面的插件行并入 DSH 的 Cordis 组合（composition），两个目录一起挂：
+#   skills/        25 个业务技能（原包原样，DSH 直接发现）
+#   dsh/commands/  7 个命令技能（由 commands/*.toml 转换而来）
+#
+# 为什么必须分开挂：DSH 只在扫描根的**直属**子目录里找 <name>/SKILL.md，
+# 不支持递归 **/SKILL.md。把包根交给它只会发现 0 个技能。
+#
+# 路径必须写绝对路径：customSkillDirs 的相对路径按 DSH 进程的工作目录解析。
+# Windows 路径在 YAML 里用单引号包住，反斜杠不会被转义：
+#   - 'C:\Users\me\qihang-pack\skills'
+#   - 'C:\Users\me\qihang-pack\dsh\commands'
+#
+# 挂载后可用 DSH 的技能目录核对：应出现 25 个业务技能 + 7 个命令技能。
+- name: '@deepseek-ai/dsh-skill-filesystem'
+  config:
+    customSkillDirs:
+      - /absolute/path/to/qihang-pack/skills
+      - /absolute/path/to/qihang-pack/dsh/commands
