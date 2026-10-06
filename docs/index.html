@@ -194,6 +194,21 @@
     安装时按目标宿主的技能目录规范放入整包，不改包内结构。
   </p>
 
+  <h3 style="margin-top:32px">DSH 适配版</h3>
+  <div class="actions">
+    <a class="btn" href="https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/dsh-qihang-release.zip">下载 dsh-qihang-release.zip</a>
+    <a class="btn" href="https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/dsh-qihang-release.tar.gz">下载 dsh-qihang-release.tar.gz</a>
+  </div>
+  <div class="cmd">
+    <code>git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git</code>
+    <button type="button" data-copy="git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git">复制</button>
+  </div>
+  <p style="margin-top:14px;color:var(--muted);font-size:14px">
+    在 <code>release</code> 之上叠加 <code>dsh/</code> 适配层，原包结构不变。DSH（DeepSeek Harness）只在扫描根直属子目录发现
+    <code>&lt;name&gt;/SKILL.md</code>，因此需按 <code>dsh/config.example.yaml</code> 用 <code>customSkillDirs</code> 挂载
+    <code>skills/</code> 与 <code>dsh/commands/</code>；安装与验收见包内 <code>dsh/README.md</code>。
+  </p>
+
   <footer>
     <p><a href="https://github.com/xiaojun10086/qihang-pack">github.com/xiaojun10086/qihang-pack</a> · MIT</p>
     <p>DUT 特化技能包：skill 文本离线可读，实际执行依赖宿主平台的模型与工具能力。信息库中标注未核验的条目请勿直接使用。</p>
