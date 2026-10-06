@@ -191,7 +191,7 @@
 | 心理健康教育与咨询中心 | https://xinli.dlut.edu.cn/ | ✅ |
 | 就业指导中心 | https://job.dlut.edu.cn/ | ✅ |
 | 学生公寓服务中心 | 挂靠 https://houqin.dlut.edu.cn/ | ✅ |
-| 校园卡服务中心 | https://ecard.dlut.edu.cn/ | ✅ |
+| 校园卡服务中心 | https://ecard.dlut.edu.cn/ | ✅ 卡内充值入口 https://ecard.dlut.edu.cn/info/1013/1139.htm （2024-08-31 发布，正文为图片，细则须人工核对） |
 | 人力资源处 | https://perdep.dlut.edu.cn/ | ✅ |
 | 科学技术研究院 | https://scidep.dlut.edu.cn/ | ✅ |
 | 财务处 | http://cw.dlut.edu.cn/ | ✅ **站点公开可达**（2026-10-03 复测 200「财务处(内控办)」）；个人缴费 / 报销数据需登录 |

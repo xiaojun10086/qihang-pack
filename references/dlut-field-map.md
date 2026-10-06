@@ -32,7 +32,7 @@
 | 综合教务系统 | `jxgl.dlut.edu.cn` | 课表、考试安排、培养方案（完成情况）、选课结果、成绩 | `course-select` `exam-sprint` `portal-operator` | 成绩明细只在用户明确要求时读取；页面细节见第五、六节 |
 | 全校开课查询（同在教务系统） | `jxgl.dlut.edu.cn` | 本学期全部开课：课程性质、课程类型、开课单位、任课教师、时间地点、选课人数与容量 | `course-select` | 独立标签页；入口 ID 每次不同，不写死；字段见第四节 |
 | 图书馆 | `lib.dlut.edu.cn` | 借阅清单、续借、座位 / 研讨间预约 | `lit-fetch` `portal-operator` | — |
-| 一卡通 | `ecard.dlut.edu.cn` | 余额 | `portal-operator` | 消费流水走 `ecardv8` |
+| 一卡通 | `ecard.dlut.edu.cn` | 余额 | `portal-operator` | 卡内充值入口 https://ecard.dlut.edu.cn/info/1013/1139.htm （正文为图片，细则须人工核对）；消费流水走 `ecardv8` |
 | 校园门户 | `portal.dlut.edu.cn` | 待办、日程、校内通知、信息专栏 | `notice-track` `portal-operator` | 聚合点 |
 | 办事大厅（一网通办） | `ehall.dlut.edu.cn` | 申请、办理进度 | `campus-desk` `portal-operator` | **与门户 SPA 是两个系统** |
 | 学生工作系统 | `xsc.dlut.edu.cn` | 资助状态、评奖、请假、第二课堂 | `notice-track` `campus-desk` | 心理记录不读取 |
