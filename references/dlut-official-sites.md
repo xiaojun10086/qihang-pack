@@ -77,7 +77,7 @@
 | 教学运行保障中心（选课/考试/自习） | https://jxyxbzzx.dlut.edu.cn/ | ✅ |
 | 土木水利国家级实验教学示范中心 | http://tmslsyzx.dlut.edu.cn/ | ✅ 建设工程学院依托 |
 | 图书馆（伯川馆/令希馆） | https://lib.dlut.edu.cn/ | ✅ |
-| 图书馆电子资源校外访问 | https://lib.dlut.edu.cn/wxzy1/xwfw.htm | ✅ |
+| 图书馆电子资源校外访问 | https://lib.dlut.edu.cn/wxzy1/xwfw.htm | ✅ 需机构订阅的数据库（**知网 / 万方等**）全文须经 WebVPN 访问，校外直连无效 |
 | 图书馆开发区校区分馆 | http://kfqlib.dlut.edu.cn/ | ✅ |
 | 图书馆盘锦校区分馆 | https://pjlib.dlut.edu.cn/ | ✅ |
 | 网络与信息化中心 | https://its.dlut.edu.cn/ | ✅ |
