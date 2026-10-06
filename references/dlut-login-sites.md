@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | 1 | 统一身份认证 | https://sso.dlut.edu.cn/ | 单点登录入口 | 其他站点的前置登录 |
 | 2 | 校园门户 | https://portal.dlut.edu.cn/ | 待办、日程、通知、信息专栏 | 最佳聚合点，首页单页可拿多类数据 |
-| 3 | 综合教务系统 | http://jxgl.dlut.edu.cn/student/ucas-sso/login | 课表、成绩、选课、考试安排 | 高频；**仅 HTTP** |
+| 3 | 综合教务系统 | http://jxgl.dlut.edu.cn/student/ucas-sso/login | 课表、成绩、选课、考试安排、培养方案完成情况、全校开课查询 | 高频；**仅 HTTP**；页面路径与字段见 `dlut-field-map.md` 第四～七节 |
 | 4 | 图书馆 | https://lib.dlut.edu.cn/ | 借阅、续借、座位/研讨间预约 | — |
 | 5 | 一卡通 / 玉兰卡 | https://ecard.dlut.edu.cn/ | 余额 | 消费流水见 #38 |
 | 6 | 学生工作系统 | https://xsc.dlut.edu.cn/ | 资助、评奖、请假、第二课堂 | 心理记录不读取 |

@@ -15,5 +15,6 @@
 *.sh    text eol=lf
 *.html  text eol=lf
 *.mjs   text eol=lf
+*.js    text eol=lf
 .gitattributes  text eol=lf
 LICENSE         text eol=lf

@@ -145,7 +145,7 @@ git clone -b dsh-qihang-release https://github.com/xiaojun10086/qihang-pack.git
 
 `portal-operator` 仅在确需登录查询或实际代办、用户明确授权且站点限制允许时，打开目标平台执行操作并回报结果。公开信息查询和办理路径咨询不登录；「帮我查一下」「帮我办一下」等礼貌措辞本身不等于登录或代办授权，范围不明时先问必要问题。
 
-**最快捷登入路径**（要本包直接操作页面时先给这一条）：让用户用自己的浏览器，以**专用配置目录 + `--remote-debugging-port=0`** 启动一次并登录，登录一次即长期免登录；实际端口写入该目录的 `DevToolsActivePort`，本包据此接入，不猜端口、不撞已占用端口。仓库内另有零依赖接入工具 `scripts/browser-bridge/`（维护用，不进 release）。
+**最快捷登入路径**（要本包直接操作页面时先给这一条）：让用户用自己的浏览器，以**专用配置目录 + `--remote-debugging-port=0`** 启动一次并登录，登录一次即长期免登录；实际端口写入该目录的 `DevToolsActivePort`，本包据此接入，不猜端口、不撞已占用端口。仓库内另有零依赖接入工具 `scripts/browser-bridge/` 与教务系统页面内取数脚本 `scripts/jxgl/`（均为维护用，不进 release）。
 
 打开平台前，先完整读取 `config.yaml`、[`references/dlut-login-sites.md`](references/dlut-login-sites.md)、[`references/dlut-official-sites.md`](references/dlut-official-sites.md) 及 [`references/dlut-field-map.md`](references/dlut-field-map.md)，核对站点限制与允许读取的字段。配置已定义的入口以配置为准，不用硬编码覆盖，也不拼接未登记地址。必需文件不可读、入口缺失或限制无法确认时，停止本包相关执行，不猜测。
 

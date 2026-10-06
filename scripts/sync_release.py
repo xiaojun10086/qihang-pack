@@ -45,7 +45,7 @@ BOT_NAME = "github-actions[bot]"
 BOT_EMAIL = "41898282+github-actions[bot]@users.noreply.github.com"
 REPO_ONLY_REFS = (
     "scripts/sync_release.py", ".github/workflows/sync-release.yml",
-    "requirements-dev.txt", "scripts/browser-bridge/",
+    "requirements-dev.txt", "scripts/browser-bridge/", "scripts/jxgl/",
 )
 VERSION_FILES = (
     ("plugin.json", "json"), (".codebuddy-plugin/plugin.json", "json"),

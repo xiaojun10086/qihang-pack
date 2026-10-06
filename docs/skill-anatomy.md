@@ -59,12 +59,14 @@ docs/skill-anatomy.md   LICENSE      THIRD_PARTY_NOTICES.md
 ```text
 README.md  INSTALL.md  docs/getting-started.md  docs/agents.md
 scripts/   tests/     requirements-dev.txt
-scripts/browser-bridge/   .github/  .gitattributes  .gitignore
+scripts/browser-bridge/   scripts/jxgl/   .github/  .gitattributes  .gitignore
 ```
 
 清单以 `../scripts/sync_release.py` 的 `WHITELIST` 为唯一真相源。main 提交触发 `../.github/workflows/sync-release.yml` 后，CI 必须先运行维护测试及交付校验，通过后才发布指定已提交版本。
 
 `../scripts/browser-bridge/` 是仓库维护用的零依赖浏览器接入工具（Node >= 22，靠自带的 `fetch` 与 `WebSocket` 走 CDP，读取用户已登录的页面），同样不进 release：交付技能包自身不需要它，技能正文里的登录要求只给用户侧可复制的浏览器命令，不依赖该工具。
+
+`../scripts/jxgl/` 是仓库维护用的综合教务系统页面内取数脚本（依赖同上，只放页面内逻辑，CDP 接入复用 `browser-bridge`，不写死学期 ID / 入口 ID / 端口），同样不进 release：交付侧以 `../references/dlut-field-map.md` 第四～七节的字段口径为准，技能正文不引用该目录。
 
 ### 维护环境与检查方式
 

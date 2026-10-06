@@ -586,8 +586,8 @@ async function main(cmd, opts) {
   }
 
   if (cmd === "eval") {
-    const expr = opts._?.[0];
-    if (!expr) throw new Error('用法：eval "<js表达式>"');
+    const expr = opts.file ? fs.readFileSync(opts.file, "utf8") : opts._?.[0];
+    if (!expr) throw new Error('用法：eval "<js表达式>" 或 eval --file <脚本路径>');
     const { inst } = await resolve({ preferBrowser: opts.browser, port: opts.port, fresh: !!opts.fresh, tab: opts.tab });
     const v = await evalIn(inst, expr);
     console.log(JSON.stringify(v ?? null, null, 2));
@@ -665,12 +665,14 @@ async function main(cmd, opts) {
   node qihang-bridge.mjs tabs                列出所有标签页（序号供 --tab 使用）
   node qihang-bridge.mjs tab-new <url>       新建标签页
   node qihang-bridge.mjs eval "<js>"         在页面执行 JS
+  node qihang-bridge.mjs eval --file <脚本>  在页面执行 JS 文件（较长脚本用这个）
   node qihang-bridge.mjs shot [--out f.png | f.png]  截图（省略则存 ~/.qihang/shots/）
 
 选项：
   --port <n>               直接接入指定 CDP 端口（用于用户自己已登录的调试实例）
   --browser edge|chrome    优先浏览器（默认 edge）
   --tab <序号|URL子串>     多标签页时指定目标页（序号见 tabs）
+  --file <路径>            eval 子命令：从文件读取 JS（与位置参数二选一）
   --fresh                  忽略已运行实例，按 profile 重新接入
 环境：
   QIHANG_HEADLESS=1        以无头模式启动（仅用于验证）`);
