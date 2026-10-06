@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>启航 · 大工学习与校务助手</title>
+<meta name="description" content="「启航」是大连理工大学学生的学习、信息搜集与校务助手：25 个 skill 的扁平技能包，按需求自动路由。">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #16181d;
+    --muted: #6b7280;
+    --line: #e6e8ec;
+    --card: #fafbfc;
+    --accent: #1a56db;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --fg: #e8eaed;
+      --muted: #9aa0a6;
+      --line: #262a31;
+      --card: #16181d;
+      --accent: #7aa2ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 72px 24px 96px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header { margin-bottom: 56px; }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 12px; letter-spacing: -.01em; }
+  .tagline { color: var(--muted); margin: 0 0 20px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    font-size: 12.5px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px;
+  }
+
+  h2 {
+    font-size: 13px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+    margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  }
+  p { margin: 0 0 14px; }
+  .lead { font-size: 17px; }
+
+  .grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .stage { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .stage h3 { font-size: 14px; margin: 0 0 8px; }
+  .stage ul { margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--muted); }
+  .stage li { margin: 2px 0; }
+  .stage code { font-size: 12.5px; color: var(--fg); opacity: .85; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 18px; }
+  .btn {
+    display: inline-block; padding: 10px 18px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--card); color: var(--fg);
+    font-size: 14.5px; font-weight: 500;
+  }
+  .btn:hover { text-decoration: none; border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { opacity: .9; color: #fff; }
+
+  .cmd {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13.5px; overflow-x: auto;
+  }
+  .cmd code { flex: 1; white-space: nowrap; }
+  .cmd button {
+    border: 1px solid var(--line); background: transparent; color: var(--muted);
+    border-radius: 6px; padding: 3px 9px; font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .cmd button:hover { color: var(--accent); border-color: var(--accent); }
+
+  footer {
+    margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--muted);
+  }
+  footer p { margin: 0 0 6px; }
+  @media (max-width: 480px) { .wrap { padding: 48px 18px 64px; } h1 { font-size: 25px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>启航</h1>
+    <p class="tagline">大连理工大学（大工 / DUT）学生的学习、信息搜集与校务助手</p>
+    <div class="badges">
+      <span class="badge">v4.1.0</span>
+      <span class="badge">25 个 skill</span>
+      <span class="badge">宿主无关</span>
+      <span class="badge">MIT</span>
+    </div>
+  </header>
+
+  <h2>是什么</h2>
+  <p class="lead">
+    「启航」是一个<strong>扁平技能包</strong>：25 个 skill 覆盖「学习 → 巩固 → 产出 → 数据代码 → 检索 → 校务」六个阶段，
+    面向大工学生强绑定校内公开站与需登录平台。
+  </p>
+  <p>
+    用法是<strong>直接用自然语言说需求</strong>——不需要斜杠命令，也不需要先选分类。
+    入口会判断需求属于哪个阶段，再调用对应 skill。
+  </p>
+
+  <h2>有什么功能</h2>
+  <div class="grid">
+    <div class="stage">
+      <h3>学习</h3>
+      <ul>
+        <li><code>explain-stepwise</code> 分步讲解</li>
+        <li><code>error-diagnose</code> 错因归因</li>
+        <li><code>faster-cycle</code> 系统学一门课</li>
+        <li><code>lecture-to-notes</code> 讲义整理成笔记</li>
+        <li><code>reading-note</code> 文献精读笔记</li>
+        <li><code>lang-drill</code> 语言能力练习</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <h3>巩固</h3>
+      <ul>
+        <li><code>exam-sprint</code> 考前冲刺排程</li>
+        <li><code>recall-schedule</code> 记忆与间隔重复</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <h3>产出</h3>
+      <ul>
+        <li><code>assignment-plan</code> 作业与小组任务拆解</li>
+        <li><code>lab-report</code> 实验报告骨架</li>
+        <li><code>paper-outline</code> 论文结构与答辩</li>
+        <li><code>cite-normalize</code> 引用格式与文献管理</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <h3>数据代码</h3>
+      <ul>
+        <li><code>data-lab</code> 实验数据与统计</li>
+        <li><code>code-mentor</code> 编程与科研代码</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <h3>检索</h3>
+      <ul>
+        <li><code>campus-search</code> 校园公开信息</li>
+        <li><code>advisor-finder</code> 导师与教师资料</li>
+        <li><code>notice-track</code> 通知与截止节点</li>
+        <li><code>lit-fetch</code> 文献检索与获取</li>
+        <li><code>citation-verify</code> 引文核验</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <h3>校务</h3>
+      <ul>
+        <li><code>campus-desk</code> 校园事务办理路径</li>
+        <li><code>course-select</code> 选课与培养方案</li>
+        <li><code>campus-proof-guide</code> 证明开具</li>
+        <li><code>dorm-life</code> 宿舍、报修、离校</li>
+        <li><code>portal-operator</code> 校内平台代操作</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:16px">
+    三条共享行为准则贯穿全部 skill：<strong>先给可用的答案</strong> ·
+    <strong>区分「解释」与「代做」</strong> · <strong>涉及事实必须给来源</strong>。
+    另有高于全部准则的安全兜底（心理危机、诈骗、急症直达对应通道）。
+  </p>
+
+  <h2>下载</h2>
+  <div class="actions">
+    <a class="btn primary" href="https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/release.zip">下载 release.zip</a>
+    <a class="btn" href="https://github.com/xiaojun10086/qihang-pack/archive/refs/heads/release.tar.gz">下载 release.tar.gz</a>
+    <a class="btn" href="https://github.com/xiaojun10086/qihang-pack">GitHub 仓库</a>
+  </div>
+  <div class="cmd">
+    <code>git clone -b release https://github.com/xiaojun10086/qihang-pack.git</code>
+    <button type="button" data-copy="git clone -b release https://github.com/xiaojun10086/qihang-pack.git">复制</button>
+  </div>
+  <p style="margin-top:14px;color:var(--muted);font-size:14px">
+    <code>release</code> 分支是可直接解压使用的交付内容（不含仓库说明与维护脚本）。
+    安装时按目标宿主的技能目录规范放入整包，不改包内结构。
+  </p>
+
+  <footer>
+    <p><a href="https://github.com/xiaojun10086/qihang-pack">github.com/xiaojun10086/qihang-pack</a> · MIT</p>
+    <p>DUT 特化技能包：skill 文本离线可读，实际执行依赖宿主平台的模型与工具能力。信息库中标注未核验的条目请勿直接使用。</p>
+  </footer>
+
+</div>
+<script>
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      var done = function () {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = old; }, 1500);
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>
+</body>
+</html>
